@@ -1,10 +1,10 @@
-
 const { sign } = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
 const pool = require("../../config/database");
 const logger = require("../../util/logger.js");
+var createHash = require("hash-generator");
 
 // mail sender details
 var transporter = nodemailer.createTransport({
@@ -59,8 +59,8 @@ module.exports = {
         /////////////////////// check if initial data insert is successful then proceed to insert general users data
 
         if (result.affectedRows == 1) {
-          let sqlQuery1 = `insert into users (email,createdAt,createdBy,pincode,role,active,password,parent,student,admin,superAdmin,feesManage,expenseManage,examManage,teacher ) values
-          ('${data.email}','${date}','${data.createdBy}',${userPin},'${data.role}','${data.active}','${hashedPass}','${parent}','${student}','${admin}','${superAdmin}','${feesManage}','${examManage}','${expenseManage}','${teacher}')`;
+          let sqlQuery1 = `insert into users (email,createdAt,createdBy,pincode,role,password,parent,student,admin,superAdmin,feesManage,expenseManage,examManage,teacher ) values
+          ('${data.email}','${date}','${data.createdBy}',${userPin},'${data.role}','${hashedPass}','${parent}','${student}','${admin}','${superAdmin}','${feesManage}','${examManage}','${expenseManage}','${teacher}')`;
 
           pool.query(sqlQuery1, (error, result) => {
             if (error) {
@@ -99,6 +99,12 @@ module.exports = {
                   process.env.JWT_KEY3
                 );
 
+                let logInfo;
+                if (data.role == "student") {
+                  logInfo = { user: data.email, pass: data.password };
+                } else {
+                  logInfo = "";
+                }
                 if (error) {
                   console.log("mail not sent");
                   console.log(signedToken);
@@ -107,6 +113,7 @@ module.exports = {
                     success: 1,
                     message: "sign up  successful",
                     userPin: userPin,
+                    data: logInfo,
                     access_token: jsontoken,
                     Verification_mail: "mail not sent - network Connectivity",
                   });
@@ -115,6 +122,7 @@ module.exports = {
                   return res.status(200).json({
                     success: 1,
                     message: "sign up successful",
+                    data: logInfo,
                     access_token: jsontoken,
                     Verification_mail: "mail sent",
                     userPin: userPin,
@@ -176,6 +184,11 @@ module.exports = {
             sqlQuery = `insert into student (student_id,firstName,lastName,otherName,contact1,contact2,class,section,religion,dateofbirth,gender) values
                  ('${student_id}','${data.firstName}','${data.lastName}','${data.otherName}','${data.contact1}','${data.contact2}','${data.class}','${data.section}','${data.religion}','${data.dateofbirth}','${data.gender}')`;
 
+            let GeneratedEmail = data.firstName.slice(0, 3) + createHash(4);
+            let GeneratedPassword = createHash(6);
+
+            data.email = GeneratedEmail.toLowerCase();
+            data.password = GeneratedPassword;
             userCreater(sqlQuery);
           });
         }
@@ -512,7 +525,7 @@ module.exports = {
               .status(500)
               .json({ success: 0, error: "internal server error" });
           }
-    
+
           if (result.affectedRows != 1) {
             logger.info(
               `${req.method} ${req.originalUrl}, update user password: no user record found`
@@ -523,14 +536,15 @@ module.exports = {
             });
           }
           if (result.affectedRows == 1) {
-            logger.info(`${req.method} ${req.originalUrl}, update user password success`);
+            logger.info(
+              `${req.method} ${req.originalUrl}, update user password success`
+            );
             return res.status(200).json({
               success: 1,
               message: "update user password successfully",
             });
           }
         });
-
       } else {
         return res.status(200).json({
           success: 1,

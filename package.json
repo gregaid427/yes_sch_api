@@ -22,6 +22,7 @@
     "jsonwebtoken": "^9.0.2",
     "multer": "^1.4.5-lts.1",
     "mysql": "^2.18.1",
+    "node-random-chars": "^2.0.0",
     "nodemailer": "^6.7.8",
     "nodemon": "^3.0.3",
     "pino": "^8.19.0",
