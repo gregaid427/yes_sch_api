@@ -4,7 +4,12 @@ const cors = require("cors")
 const app = express();
 const userRouter = require("./api/users/user.router");
 const studentRouter = require("./api/student/student.router");
-// const scanRouter = require("./api/scannedceque/scancheque.router");
+const classRouter = require("./api/class/class.router");
+const subjectRouter = require("./api/subject/subject.router");
+const statRouter = require("./api/statistics/statistics.router");
+const inventoryRouter = require("./api/inventory/inventory.router");
+
+
 //const patientsRouter = require("./api/patients/patients.router");
 //const vitalsRouter = require("./api/vitals/vitals.router");
 //const logRouter = require("./api/log/log.router");
@@ -21,6 +26,14 @@ global.__basedir = __dirname;
 // app.use("/api/transactions", transactionsRouter);
 app.use("/api/users", userRouter);
 app.use("/api/student", studentRouter);
+app.use("/api/class", classRouter);
+app.use("/api/subject", subjectRouter);
+app.use("/api/stat", statRouter);
+app.use("/api/inventory", inventoryRouter);
+
+
+
+
 
 // app.use("/api/linkedaccounts", linkedaccountsRouter);
 // app.use("/api/projects", projectRouter);

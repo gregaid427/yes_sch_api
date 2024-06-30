@@ -2,15 +2,19 @@
 
 const pool = require("../../config/database.js");
 const logger = require("../../util/logger.js");
-let date = Date.now();
+var createHash = require("hash-generator");
+
+let date = new Date();
+function hashgenerator(num){
+  return createHash(num)
+}
 
 module.exports = {
   createsubject: async (req, res) => {
     const data = req.body;
-
-
-    let sqlQuery = `insert into subject (subject_name,subject_description,created_at,created_by) values
-           ('${data.subject_name}','${data.subject_description}','${date}','${data.created_by}')`;
+   let code = hashgenerator(5)
+    let sqlQuery = `insert into subject (subjectname,createdat,createdby,type,subjectcode) values
+           ('${data.subjectName}','${date}','${data.createdBy}','${data.type}','${code}')`;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
         logger.info(
@@ -23,6 +27,9 @@ module.exports = {
 
       if (result.affectedRows == 1) {
         logger.info(`${req.method} ${req.originalUrl}, create new  subject`);
+        return res
+        .status(200)
+        .json({ success: 1, data: result });
       }
     });
   },
@@ -78,8 +85,8 @@ module.exports = {
 
   updateSubject: (req, res) => {
     const data = req.body;
-
-    let sqlQuery = `update subject set subject_name ='${data.subject_name}',subject_description='${data.subject_description}',updated_at='${date}',updated_by='${data.updated_by}' where subject_id = ${data.subject_id}`;
+console.log(data)
+    let sqlQuery = `update subject set subjectname ='${data.subjectname}',createdat='${date}',createdby='${data.createdby}' , type='${data.type}' where id = ${data.id}`;
 
     pool.query(sqlQuery, (error, result) => {
       if (error) {
@@ -104,7 +111,7 @@ module.exports = {
         logger.info(`${req.method} ${req.originalUrl}, update subject data`);
         return res
           .status(200)
-          .json({ success: 1, error: "update subject data success" });
+          .json({ success: 1, message: "update subject data success" });
       }
     });
   },
