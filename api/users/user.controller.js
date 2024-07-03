@@ -415,9 +415,10 @@ module.exports = {
           let guardian1 = data?.gfName1 +" "+ data?.glName1 
           let guardian2 = data?.gfName2 +" "+ data?.glName2 
 
+          
+        
 
-
-          let dataArray = [{"studentName":studName,"studentEmail":data.email,"studentPass":studentPass},{"guardian1Name":guardian1,"guardian1Email":data.gemail1,"guardian1Pass":gaurdian1Pass},{"guardian2Name":guardian2,"guardian2Email":data.gemail2,"guardian2Pass":gaurdian2Pass,},]
+          let dataArray = [{"studentName":studName,"studentEmail":data.email,"studentPass":studentPass},{"guardian1Name":guardian1 != " " ? guardian1 : null,"guardian1Email":data.gemail1,"guardian1Pass":gaurdian1Pass},{"guardian2Name":guardian2 != " " ? guardian2 : null,"guardian2Email":data.gemail2,"guardian2Pass":gaurdian2Pass,},]
      
           console.log(dataArray)
           return res.status(200).json({

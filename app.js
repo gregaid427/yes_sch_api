@@ -28,7 +28,7 @@ app.use("/api/users", userRouter);
 app.use("/api/student", studentRouter);
 app.use("/api/class", classRouter);
 app.use("/api/subject", subjectRouter);
-app.use("/api/stat", statRouter);
+app.use("/api/statistics", statRouter);
 app.use("/api/inventory", inventoryRouter);
 
 

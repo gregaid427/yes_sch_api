@@ -10,6 +10,8 @@ const {
   // updateInventorystatus,
   updateInventorycartegory,
   deleteAllInventory,
+  addstockInventory,
+  getstockInventory,
   getCart,
 
 
@@ -19,13 +21,17 @@ const {
 router.get("/",  getAllInventory);
 router.get("/cart",  getCart);
 router.post("/cart",  createInventoryCartegory);
+router.post("/addstock",  addstockInventory);
+router.get("/getstock",  getstockInventory);
+
 
 router.post("/editcartegory",  updateInventorycartegory);
 router.post("/",  createInventory);
 
 
+
 router.get("/:Inventory_id",  getInventoryById);
-router.patch("/:Inventory_id",  updateInventory);
+router.patch("/item",  updateInventory);
 // router.patch("/status/:Inventory_id",  updateInventorystatus);
 router.delete("/",  deleteAllInventory);
 

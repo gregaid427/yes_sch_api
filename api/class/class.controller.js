@@ -359,7 +359,7 @@ module.exports = {
     pool.query(sqlQuery, (error, result) => {
       if (error) {
         logger.info(
-          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update Class data`
+          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update section data`
         );
         return res
           .status(500)
@@ -368,18 +368,18 @@ module.exports = {
 
       if (result.affectedRows != 1) {
         logger.info(
-          `${req.method} ${req.originalUrl}, update Class data: no record found`
+          `${req.method} ${req.originalUrl}, update section data: no record found`
         );
         return res
           .status(200)
-          .json({ success: 0, error: "update Class data: no record found" });
+          .json({ success: 0, error: "update section data: no record found" });
       }
 
       if (result.affectedRows == 1) {
-        logger.info(`${req.method} ${req.originalUrl}, update Class data`);
+        logger.info(`${req.method} ${req.originalUrl}, update section data`);
         return res
           .status(200)
-          .json({ success: 1, error: "update Class data success" });
+          .json({ success: 1, data: "update section data success" });
       }
     });
   },
