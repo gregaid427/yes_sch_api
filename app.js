@@ -8,6 +8,8 @@ const classRouter = require("./api/class/class.router");
 const subjectRouter = require("./api/subject/subject.router");
 const statRouter = require("./api/statistics/statistics.router");
 const inventoryRouter = require("./api/inventory/inventory.router");
+const expenseRouter = require("./api/expense/expense.router");
+
 
 
 //const patientsRouter = require("./api/patients/patients.router");
@@ -30,6 +32,8 @@ app.use("/api/class", classRouter);
 app.use("/api/subject", subjectRouter);
 app.use("/api/statistics", statRouter);
 app.use("/api/inventory", inventoryRouter);
+app.use("/api/expense", expenseRouter);
+
 
 
 

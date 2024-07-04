@@ -24,8 +24,9 @@ module.exports = {
     });
 
   },
+  
   getAllStat2: (req, res) => {
-    let sqlQuery2 = `select count(users.userId) as noStaff from users where isActive ='true'`;
+    let sqlQuery2 = `select count(users.userId) as noStaff from users where isActive ='true' and role='staff'`;
  
 
 
@@ -85,7 +86,7 @@ module.exports = {
     });
 
   },
-  
+
   getAllStat5: (req, res) => {
 
     let sqlQuery5 = `select count(id) as nosubject from subject where isactive ='true'`;
