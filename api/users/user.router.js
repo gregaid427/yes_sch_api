@@ -12,11 +12,24 @@ const {
   mailPasswordreset,
   resetOTP,
   getOTPpin,
+  createUserStudent,
+  createUserStaff,
+  createUserGuardian,
+  setStudentPicture,
+  getUserByUserIdRole
 } = require("./user.controller");
 
-
+router.post("/picture",  setStudentPicture);
 router.get("/",  getUsers);
-router.post("/",  createUser);
+router.post("/guardian",  createUserGuardian);
+router.post("/staff",  createUserStaff);
+router.post("/",  createUserStudent);
+
+
+
+router.get("/userbyrole",  getUserByUserIdRole);
+
+
 router.get("/:userId",  getUserByUserId);
 router.get("/pin/:userId",  getOTPpin);
 

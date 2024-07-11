@@ -10,6 +10,10 @@ const {
   updateExpensestatus,
   deleteallexpense,
   getcustomexpense,
+  truncateTable,
+  deleteSingleExpense,
+  deleteSingleExpenseHead,
+  updateExpenseHead
 
 } = require("./expense.controller");
 
@@ -19,11 +23,18 @@ router.post("/custom",  getcustomexpense);
 
 router.get("/",  getallexpense);
 router.post("/head",  createExpenseHead);
+router.post("/update",  updateExpense);
+router.post("/updatehead",  updateExpenseHead);
+
 router.post("/",  createExpense);
 router.get("/:expense_id",  getExpenseById);
-router.patch("/:expense_id",  updateExpense);
 // router.post("/resetPassword",  resetPassword);
 router.patch("/status/:expense_id",  updateExpensestatus);
+router.delete("/truncate",  truncateTable);
+router.delete("/head/:id",  deleteSingleExpenseHead);
+router.delete("/:id",  deleteSingleExpense);
+
 router.delete("/",  deleteallexpense);
+
 
 module.exports = router;

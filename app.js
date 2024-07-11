@@ -21,7 +21,10 @@ const expenseRouter = require("./api/expense/expense.router");
 app.use(express.json());
 app.use(cors())
 global.__basedir = __dirname;
-// app.use(function(req,res,next){
+//app.use(bodyParser.urlencoded())
+
+app.use (express.urlencoded({extended: true}));
+//  app.use(function(req,res,next){
 // res.header("Access-Control-Allow","*");
 // res.header("Access-Control-Allow-Headers","X-Requested-With");
 // })

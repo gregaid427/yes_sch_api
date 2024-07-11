@@ -5,8 +5,8 @@ const {
   getsubjectById,
   getAllSubject,
   updateSubject,
-  updateSubjectStatus,
   deleteAllSubject,
+  deleteSingleSubject
 
 } = require("./subject.controller");
 
@@ -15,7 +15,7 @@ router.post("/",  createsubject);
 router.get("/", getAllSubject );
 router.get("/Subject_id",  getsubjectById );
 router.patch("/",  updateSubject);
-router.patch("/status/:Subject_id",  updateSubjectStatus);
+router.delete("/:subjectId",  deleteSingleSubject);
 router.delete("/",  deleteAllSubject);
 
 module.exports = router;

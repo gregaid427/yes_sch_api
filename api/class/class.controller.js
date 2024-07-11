@@ -60,9 +60,19 @@ module.exports = {
             logger.info(
               `${req.method} ${req.originalUrl},success create new Class`
             );
-            res
-              .status(200)
-              .json({ success: 1, Message: "create new Class successful" });
+
+
+            // res
+            //   .status(200)
+            //   .json({ success: 1, Message: "create new Class successful" });
+
+            //return table data
+            let sqlQuery = `select * from class where isActive = 'true'`;
+            pool.query(sqlQuery, (error, result) => {
+                    
+              res.status(200).json({ success: 1, data: result });
+            });
+
           }
         });
       }
@@ -144,12 +154,10 @@ module.exports = {
             logger.info(
               `${req.method} ${req.originalUrl}, create new Class section`
             );
-            res
-              .status(200)
-              .json({
-                success: 1,
-                Message: "create new Class section successful",
-              });
+            let sqlQuery = `select * from sectionGroup where isActive = 'true'`;
+            pool.query(sqlQuery, (error, result) => {         
+              res.status(200).json({ success: 1, data: result });
+            });
           }
         });
       }
@@ -448,8 +456,8 @@ module.exports = {
     });
   },
   deleteSingleClass: (req, res) => {
-    const id = req.body;
-    let sqlQuery = `delete from Class where classId = '${id.ClassId}'`;
+    const id = req.params.classId;
+    let sqlQuery = `delete from Class where classId = '${id}'`;
 
     pool.query(sqlQuery, (error, result) => {
       if (error) {
@@ -472,9 +480,69 @@ module.exports = {
       }
       if (result.affectedRows == 1) {
         logger.info(`${req.method} ${req.originalUrl}, delete Class  by id`);
+      //return table data
+      let sqlQuery = `select * from class where isActive = 'true'`;
+      pool.query(sqlQuery, (error, result) => {
+              
+        res.status(200).json({ success: 1, data: result });
+      });
+      }
+    });
+  },
+
+  
+
+  deletesinglegroup: (req, res) => {
+    const id = req.params.id;
+    let sqlQuery = `delete from sectiongroup where id = '${id}'`;
+
+    pool.query(sqlQuery, (error, result) => {
+      if (error) {
+        logger.info(
+          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete Class by id`
+        );
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error" });
+      }
+
+      if (result.affectedRows != 1) {
+        logger.info(
+          `${req.method} ${req.originalUrl}, delete Class by  id: no Class record found`
+        );
+        return res.status(200).json({
+          success: 0,
+          error: "delete Class by id: no Class record found",
+        });
+      }
+      if (result.affectedRows == 1) {
+        logger.info(`${req.method} ${req.originalUrl}, delete Class  by id`);
+      //return table data
+      let sqlQuery = `select * from sectiongroup `;
+      pool.query(sqlQuery, (error, result) => {
+              
+        res.status(200).json({ success: 1, data: result });
+      });
+      }
+    });
+  },
+
+  truncateTable: (req, res) => {
+    let sqlQuery = `truncate table class`;
+    pool.query(sqlQuery, (error, result) => {
+      if (error) {
+        logger.info(
+          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete all records`
+        );
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error" });
+      }
+      if (result.affectedRows == 1) {
+        logger.info(`${req.method} ${req.originalUrl}, delete all records`);
         return res.status(200).json({
           success: 1,
-          message: "Class deleted successfully",
+          message: "delete all record success",
         });
       }
     });

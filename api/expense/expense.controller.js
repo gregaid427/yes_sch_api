@@ -1,14 +1,19 @@
 const pool = require("../../config/database.js");
 const logger = require("../../util/logger.js");
+const uploadFile = require("./upload.js");
+let date = new Date();
 
 module.exports = {
   createExpense: async (req, res) => {
-    const data = req.body;
+    await uploadFile(req, res);
+    console.log(req);
+    const data = JSON.parse(req.body.data);
 
     let date = new Date();
+    let link = process.env.SERVERLINK + "/uploadexpense/" + data.filename;
 
-    let sqlQuery = `insert into expense (name,date,expensehead,createdby,invoice,description,amount) values
-           ('${data.name}','${data.date}','${data.expensehead}','${data.createdby}','${data.invoice}','${data.description}','${data.amount}')`;
+    let sqlQuery = `insert into expense (name,date,expensehead,createdby,invoice,description,amount,filename,link) values
+           ('${data.name}','${data.date}','${data.expensehead}','${data.createdby}','${data.invoice}','${data.description}','${data.amount}','${data.filename}','${link}')`;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
         logger.info(
@@ -20,18 +25,20 @@ module.exports = {
       }
 
       if (result.affectedRows == 1) {
-        logger.info(`${req.method} ${req.originalUrl}, create new  expense`);
-        res.status(200).json({ success: 1, data: result });
+        logger.info(`${req.method} ${req.originalUrl}, `);
+        let sqlQuery = `select * from expense`;
+        pool.query(sqlQuery, (error, result) => {
+          res.status(200).json({ success: 1, data: result });
+        });
       }
     });
   },
   createExpenseHead: async (req, res) => {
     const data = req.body;
 
-    let date = Date.now();
-
+    let date = new Date();
     let sqlQuery = `insert into expensehead (expensehead,createdat,createdby,notes) values
-           ('${data.expensehead}','${data}','${data.createdby}','${data.note}')`;
+           ('${data.expensehead}','${date}','${data.createdby}','${data.notes}')`;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
         logger.info(
@@ -43,10 +50,11 @@ module.exports = {
       }
 
       if (result.affectedRows == 1) {
-        logger.info(
-          `${req.method} ${req.originalUrl}, create new  expense Head`
-        );
-        res.status(200).json({ success: 1, data: result });
+        logger.info(`${req.method} ${req.originalUrl}, `);
+        let sqlQuery = `select * from expensehead`;
+        pool.query(sqlQuery, (error, result) => {
+          res.status(200).json({ success: 1, data: result });
+        });
       }
     });
   },
@@ -78,8 +86,7 @@ module.exports = {
   getcustomexpense: (req, res) => {
     const data = req.body;
     let date = data.date;
-    console.log(date);
-     function getparams(date) {
+    function getparams(date) {
       if (date == "Today") {
         return `select * from expense where createdat = CURDATE()`;
       }
@@ -94,7 +101,7 @@ module.exports = {
         return `select * from expense where createdat >= date_sub(now(),interval 6 month);`;
       }
       if (date == "This Year") {
-        return `select * from expense where YEAR(createdat) = YEAR(CURDATE()).`;
+        return `select * from expense where YEAR(createdat) = YEAR(CURDATE())`;
       }
       if (date == "Last year") {
         return `select * from expense where YEAR(createdat) = YEAR(NOW())- 1`;
@@ -164,10 +171,10 @@ module.exports = {
     });
   },
 
-  updateExpense: (req, res) => {
-    const data = req.body;
-
-    let sqlQuery = `update expense set expense_name ='${data.expense_name}',date='${data.date}',expense_group='${data.expense_group}',updated_at='${data.created_at}',updated_at='${data.updated_by}' where expense_id = ${data.expense_id}`;
+  updateExpense: async (req, res) => {
+    await uploadFile(req, res);
+    const data = JSON.parse(req.body.data);
+    let sqlQuery = `update expense set name ='${data.expense}',date='${data.date}',expensehead='${data.expensehead}',invoice='${data.invoice}',amount='${data.amount}',documentlink='${data.link}',createdby='${data.createdby}',filename='${data.filename}'   where id = ${data.id}`;
 
     pool.query(sqlQuery, (error, result) => {
       if (error) {
@@ -189,10 +196,43 @@ module.exports = {
       }
 
       if (result.affectedRows == 1) {
-        logger.info(`${req.method} ${req.originalUrl}, update expense data`);
+        logger.info(`${req.method} ${req.originalUrl}, delete expense  by id`);
+        let sqlQuery = `select * from expense`;
+        pool.query(sqlQuery, (error, result) => {
+          res.status(200).json({ success: 1, data: result });
+        });
+      }
+    });
+  },
+  updateExpenseHead: async (req, res) => {
+    const data = req.body.data;
+    let sqlQuery = `update expensehead set expensehead ='${data.expensehead}',date='${date}',createdby='${data.createdby}',invoice='${data.notes}'  where id = ${data.id}`;
+
+    pool.query(sqlQuery, (error, result) => {
+      if (error) {
+        logger.info(
+          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update expense data`
+        );
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error" });
+      }
+
+      if (result.affectedRows != 1) {
+        logger.info(
+          `${req.method} ${req.originalUrl}, update expense data: no record found`
+        );
         return res
           .status(200)
-          .json({ success: 1, error: "update expense data success" });
+          .json({ success: 0, error: "update expense data: no record found" });
+      }
+
+      if (result.affectedRows == 1) {
+        logger.info(`${req.method} ${req.originalUrl}, delete expense  by id`);
+        let sqlQuery = `select * from expensehead`;
+        pool.query(sqlQuery, (error, result) => {
+          res.status(200).json({ success: 1, data: result });
+        });
       }
     });
   },
@@ -220,14 +260,117 @@ module.exports = {
       }
 
       if (result.affectedRows == 1) {
-        logger.info(`${req.method} ${req.originalUrl}, update expense data`);
+        logger.info(`${req.method} ${req.originalUrl}, delete expense  by id`);
+        let sqlQuery = `select * from expense`;
+        pool.query(sqlQuery, (error, result) => {
+          res.status(200).json({ success: 1, data: result });
+        });
+      }
+    });
+  },
+  truncateTable: (req, res) => {
+    let sqlQuery = `truncate table expense`;
+    pool.query(sqlQuery, (error, result) => {
+      if (error) {
+        logger.info(
+          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete all records`
+        );
         return res
-          .status(200)
-          .json({ success: 1, error: "update expense data success" });
+          .status(500)
+          .json({ success: 0, error: "internal server error" });
+      }
+      if (result.affectedRows == 1) {
+        logger.info(`${req.method} ${req.originalUrl}, delete all records`);
+        let sqlQuery1 = `truncate table expensehead`;
+        pool.query(sqlQuery1, (error, result) => {
+          if (error) {
+            logger.info(
+              `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete all records`
+            );
+            return res
+              .status(500)
+              .json({ success: 0, error: "internal server error" });
+          }
+          if (result.affectedRows == 1) {
+            logger.info(`${req.method} ${req.originalUrl}, delete all records`);
+            return res.status(200).json({
+              success: 1,
+              message: "delete all record success",
+            });
+          }
+        });
       }
     });
   },
 
+  deleteSingleExpenseHead: (req, res) => {
+    const id = req.params.id;
+    let sqlQuery = `delete from expensehead where id = ${id}`;
+    // let sqlQuery = `delete from expense`;
+
+    pool.query(sqlQuery, (error, result) => {
+      if (error) {
+        logger.info(
+          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete expense head by id`
+        );
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error" });
+      }
+
+      if (result.affectedRows != 1) {
+        logger.info(
+          `${req.method} ${req.originalUrl}, delete expense head by  id: no  record found`
+        );
+        return res.status(200).json({
+          success: 0,
+          error: "delete expense by id: no expense record found",
+        });
+      }
+      if (result.affectedRows == 1) {
+        logger.info(
+          `${req.method} ${req.originalUrl}, delete expense head by id`
+        );
+        let sqlQuery = `select * from expensehead`;
+        pool.query(sqlQuery, (error, result) => {
+          res.status(200).json({ success: 1, data: result });
+        });
+      }
+    });
+  },
+  deleteSingleExpense: (req, res) => {
+    const id = req.params.id;
+    let sqlQuery = `delete from expense where id = ${id}`;
+    // let sqlQuery = `delete from expense`;
+
+    pool.query(sqlQuery, (error, result) => {
+      if (error) {
+        logger.info(
+          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete expense by id`
+        );
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error" });
+      }
+
+      if (result.affectedRows != 1) {
+        logger.info(
+          `${req.method} ${req.originalUrl}, delete expense by  id: no expense record found`
+        );
+        return res.status(200).json({
+          success: 0,
+          error: "delete expense by id: no expense record found",
+        });
+      }
+      if (result.affectedRows == 1) {
+        logger.info(`${req.method} ${req.originalUrl}, delete expense  by id`);
+        let sqlQuery = `select * from expense`;
+        pool.query(sqlQuery, (error, result) => {
+          res.status(200).json({ success: 1, data: result });
+        });
+      }
+    });
+  },
   deleteallexpense: (req, res) => {
     const id = req.body;
     // let sqlQuery = `delete from expense where userId = ${id.expense_id}`;

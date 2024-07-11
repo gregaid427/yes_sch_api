@@ -3,19 +3,23 @@ const { checkToken } = require("../../auth/token_validation");
 const {
   createInventory,
   createInventoryCartegory,
-
+  truncateTable,
   getInventoryById,
   getAllInventory,
   updateInventory,
   // updateInventorystatus,
   updateInventorycartegory,
-  deleteAllInventory,
+  deleteSingleInventory,
   addstockInventory,
   getstockInventory,
   getCart,
+  deleteSingleInventorystock,
+  deleteSingleCartstock
 
 
 } = require("./inventory.controller");
+
+
 
 
 router.get("/",  getAllInventory);
@@ -29,10 +33,15 @@ router.post("/editcartegory",  updateInventorycartegory);
 router.post("/",  createInventory);
 
 
+router.delete("/truncate",  truncateTable);
 
 router.get("/:Inventory_id",  getInventoryById);
 router.patch("/item",  updateInventory);
 // router.patch("/status/:Inventory_id",  updateInventorystatus);
-router.delete("/",  deleteAllInventory);
+router.delete("/cartegory/:id",  deleteSingleCartstock);
+
+router.delete("/:id",  deleteSingleInventory);
+router.delete("/stock/:id",  deleteSingleInventorystock);
+
 
 module.exports = router;

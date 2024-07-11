@@ -142,7 +142,26 @@ module.exports = {
       }
     });
   },
-
+  truncateTable: (req, res) => {
+    let sqlQuery = `truncate table section`;
+    pool.query(sqlQuery, (error, result) => {
+      if (error) {
+        logger.info(
+          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete all records`
+        );
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error" });
+      }
+      if (result.affectedRows == 1) {
+        logger.info(`${req.method} ${req.originalUrl}, delete all records`);
+        return res.status(200).json({
+          success: 1,
+          message: "delete all record success",
+        });
+      }
+    });
+  },
 
   deleteAllSection: (req, res) => {
     const id = req.body;

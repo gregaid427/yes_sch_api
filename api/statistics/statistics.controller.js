@@ -89,7 +89,7 @@ module.exports = {
 
   getAllStat5: (req, res) => {
 
-    let sqlQuery5 = `select count(id) as nosubject from subject where isactive ='true'`;
+    let sqlQuery5 = `select extract(MONTH from date) as month,sum(amount) as total_value from expense where YEAR(date) = YEAR(CURDATE()) group by month; `;
 
 
 

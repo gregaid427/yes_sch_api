@@ -1,18 +1,16 @@
-
-
 const pool = require("../../config/database.js");
 const logger = require("../../util/logger.js");
 var createHash = require("hash-generator");
 
 let date = new Date();
-function hashgenerator(num){
-  return createHash(num)
+function hashgenerator(num) {
+  return createHash(num);
 }
 
 module.exports = {
   createsubject: async (req, res) => {
     const data = req.body;
-   let code = hashgenerator(5)
+    let code = hashgenerator(5);
     let sqlQuery = `insert into subject (subjectname,createdat,createdby,type,subjectcode) values
            ('${data.subjectName}','${date}','${data.createdBy}','${data.type}','${code}')`;
     pool.query(sqlQuery, (error, result) => {
@@ -27,13 +25,16 @@ module.exports = {
 
       if (result.affectedRows == 1) {
         logger.info(`${req.method} ${req.originalUrl}, create new  subject`);
-        return res
-        .status(200)
-        .json({ success: 1, data: result });
+      
+        let sqlQuery = `select * from subject`;
+        pool.query(sqlQuery, (error, result) => {
+          res.status(200).json({ success: 1, data: result });
+        });
+
+
       }
     });
   },
-
 
   getsubjectById: (req, res) => {
     const id = parseInt(req.params.subject_id);
@@ -82,10 +83,9 @@ module.exports = {
     });
   },
 
-
   updateSubject: (req, res) => {
     const data = req.body;
-console.log(data)
+    console.log(data);
     let sqlQuery = `update subject set subjectname ='${data.subjectname}',createdat='${date}',createdby='${data.createdby}' , type='${data.type}' where id = ${data.id}`;
 
     pool.query(sqlQuery, (error, result) => {
@@ -109,23 +109,22 @@ console.log(data)
 
       if (result.affectedRows == 1) {
         logger.info(`${req.method} ${req.originalUrl}, update subject data`);
-        return res
-          .status(200)
-          .json({ success: 1, message: "update subject data success" });
+         let sqlQuery = `select * from subject`;
+        pool.query(sqlQuery, (error, result) => {
+          res.status(200).json({ success: 1, data: result });
+        });
       }
     });
   },
-
-
-
-  updateSubjectStatus: (req, res) => {
-
-    let sqlQuery = `update subject set subject_status ='false'`;
+  
+  deleteSingleSubject: (req, res) => {
+    const id = req.params.subjectId;
+     let sqlQuery = `delete from subject where id = ${id}`;
 
     pool.query(sqlQuery, (error, result) => {
       if (error) {
         logger.info(
-          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update subject data`
+          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete subject by id`
         );
         return res
           .status(500)
@@ -134,22 +133,22 @@ console.log(data)
 
       if (result.affectedRows != 1) {
         logger.info(
-          `${req.method} ${req.originalUrl}, update subject data: no record found`
+          `${req.method} ${req.originalUrl}, delete subject by  id: no subject record found`
         );
-        return res
-          .status(200)
-          .json({ success: 0, error: "update subject data: no record found" });
+        return res.status(200).json({
+          success: 0,
+          error: "delete subject by id: no subject record found",
+        });
       }
-
       if (result.affectedRows == 1) {
-        logger.info(`${req.method} ${req.originalUrl}, update subject data`);
-        return res
-          .status(200)
-          .json({ success: 1, error: "update subject data success" });
+        logger.info(`${req.method} ${req.originalUrl}, delete subject  by id`);
+        let sqlQuery = `select * from subject `;
+        pool.query(sqlQuery, (error, result) => {
+          res.status(200).json({ success: 1, data: result });
+        });
       }
     });
   },
-
 
   deleteAllSubject: (req, res) => {
     const id = req.body;
@@ -170,18 +169,16 @@ console.log(data)
         logger.info(
           `${req.method} ${req.originalUrl}, delete subject by  id: no subject record found`
         );
-        return res
-          .status(200)
-          .json({
-            success: 0,
-            error: "delete subject by id: no subject record found",
-          });
+        return res.status(200).json({
+          success: 0,
+          error: "delete subject by id: no subject record found",
+        });
       }
       if (result.affectedRows == 1) {
         logger.info(`${req.method} ${req.originalUrl}, delete subject  by id`);
-        return res.status(200).json({
-          success: 1,
-          message: "subject deleted successfully",
+        let sqlQuery = `select * from subject `;
+        pool.query(sqlQuery, (error, result) => {
+          res.status(200).json({ success: 1, data: result });
         });
       }
     });

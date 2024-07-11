@@ -6,7 +6,8 @@ const {
   updatestudent,
   getstudentbyClass,
   getstudentbyClassCustom,
-  deleteUser,
+  deleteStudentsingle,
+  truncateTable,
 } = require("./student.controller");
 
 
@@ -16,6 +17,9 @@ router.post("/custom",  getstudentbyClass);
 router.get("/single/:student_id",  getstudentbiodata);
 
 router.patch("/",  updatestudent);
-router.delete("/",  deleteUser);
+
+router.delete("/:student_id",  deleteStudentsingle);
+router.delete("/truncate",  truncateTable);
+
 
 module.exports = router;

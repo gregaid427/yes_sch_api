@@ -14,7 +14,9 @@ const {
   getAllSectiongroup,
   deleteSectionbyClass,
   getsectionByClassId,
-  updateSection
+  updateSection,
+  truncateTable,
+  deletesinglegroup
 
 } = require("./class.controller");
 
@@ -34,8 +36,12 @@ router.patch("/",  updateClass);
 router.patch("/section",  updateSection);
 router.patch("/status/:ClassId",  updateClassStatus);
 router.delete("/",  deleteAllClass);
-router.delete("/single",  deleteSingleClass);
+router.delete("/single/:classId",  deleteSingleClass);
 router.post("/single/sectiondelete",  deleteSectionbyClass);
+router.delete("/truncate",  truncateTable);
+router.delete("/sectiongroup/:id",  deletesinglegroup);
+
+
 
 
 

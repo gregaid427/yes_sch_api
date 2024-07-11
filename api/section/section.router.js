@@ -7,6 +7,8 @@ const {
   updateSection,
   updateSectionstatus,
   deleteAllSection,
+  truncateTable,
+  
 
 } = require("./user.controller");
 
@@ -18,5 +20,8 @@ router.patch("/:section_id",  updateSection);
 router.post("/resetPassword",  resetPassword);
 router.patch("/status/:section_id",  updateSectionstatus);
 router.delete("/",  deleteAllSection);
+router.delete("/truncate",  truncateTable);
+
+
 
 module.exports = router;
