@@ -111,6 +111,29 @@ module.exports = {
   },
  
 
+  getAllStat6: (req, res) => {
+
+    let sqlQuery5 = `select count(userId) as noParent from guardian `;
+
+
+
+   pool.query(sqlQuery5, (error, result) => {
+      if (error) {
+        logger.info(
+          `${req.method} ${req.originalUrl}, 'server error', result1 `
+        );
+        return res
+          .status(500)
+         .json({ success: 0, error: "internal server error" });
+      }
+      return res
+      .status(200)
+     .json({ success: 1, data: result });
+      
+    });
+
+  },
+
 
  
 };

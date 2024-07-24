@@ -191,9 +191,11 @@ module.exports = {
     // console.log(res)
 
     const data = JSON.parse(req.body.data)
+    console.log(data)
+
    
     let link = process.env.SERVERLINK + "/uploadsstudent/" + data.filename;
-    let sqlQuery = `UPDATE student SET firstName = '${data.firstName}', lastName = '${data.lastName}', otherName = '${data.otherName}', class = '${data.classes}', section = '${data.section}', religion = '${data.religion}', gender = '${data.gender}', dateofbirth = '${data.dateofbirth}', g1fname = '${data.gfName1}', g1lastname = '${data.glName1}', g1sex = '${data.gsex1}', g1address = '${data.firstName}', g1email = '${data.gAddress1}', g1contact1 = '${data.contact1}', g1relation = '${data.gRelation1}', g1contact2 = '${data.contact2}', g2fname = '${data.gfName2}', g2lastname = '${data.glName2}', g2sex = '${data.gsex2}', g2address = '${data.gAddress2}', g2email = '${data.gemail2}', g2contact1 = '${data.contact3}', g2relation = '${data.gRelation2}', g2contact2 = '${data.contact4}',imagelink = '${link}',filename = '${data.filename}' WHERE student_id = '${data.studentId}' `;
+    let sqlQuery = `UPDATE student SET firstName = '${data.firstName}', lastName = '${data.lastName}', otherName = '${data.otherName}', class = '${data.classes}', section = '${data.section}', religion = '${data.religion}', gender = '${data.gender}', dateofbirth = '${data.dateofbirth}', g1fname = '${data.gfName1}', g1lastname = '${data.glName1}', g1sex = '${data.gsex1}', g1address = '${data.gAddress1}', g1email = '${data.gemail1}', g1contact1 = '${data.contact1}', g1relation = '${data.gRelation1}', g1contact2 = '${data.contact2}', g2fname = '${data.gfName2}', g2lastname = '${data.glName2}', g2sex = '${data.gsex2}', g2address = '${data.gAddress2}', g2email = '${data.gemail2}', g2contact1 = '${data.contact3}', g2relation = '${data.gRelation2}', g2contact2 = '${data.contact4}',imagelink = '${link}',filename = '${data.filename}' WHERE student_id = '${data.studentId}' `;
 
     pool.query(sqlQuery, (error, result) => {
       if (error) {
@@ -224,7 +226,11 @@ module.exports = {
   },
   
   deleteStudentsingle: (req, res) => {
-    const studentId = req.params.student_id;
+    const studentId = req.body.id;
+    const clazz = req.body.class;
+    const section = req.body.section;
+    console.log(clazz)
+    console.log(section)
     console.log(studentId)
     let sqlQuery = `update  student  set isActive='false' WHERE student_id = '${studentId}'`;
     pool.query(sqlQuery, (error, result) => {
@@ -248,9 +254,19 @@ module.exports = {
       }
       if (result.affectedRows == 1) {
         logger.info(`${req.method} ${req.originalUrl}, delete user pin by id`);
-        return res.status(200).json({
-          success: 1,
-          message: "Student deleted successfully",
+      
+
+ let   sectionz = section == "All Sections" ? 'none' : section
+
+        let sqlQuery = `select student_id,firstName,otherName, lastName,gender, class,section from student where class = '${clazz}' and section = '${sectionz}' and isActive='true'`;
+        pool.query(sqlQuery, (error, result) => {
+        
+    
+          logger.info(
+            `${req.method} ${sqlQuery},'success', fetch all student by class`
+          );
+    console.log(result)
+          res.status(200).json({ success: 1, data: result });
         });
       }
     });
@@ -277,3 +293,8 @@ module.exports = {
     });
   },
 };
+
+
+
+
+// thygracenaturalClinic$7

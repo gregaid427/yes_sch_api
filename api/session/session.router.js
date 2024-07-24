@@ -1,21 +1,24 @@
 const router = require("express").Router();
 const { checkToken } = require("../../auth/token_validation");
 const {
-  createSession,
-  getsesSionById,
-  getAllSession,
-  updateSession,
-  updateSessionStatus,
-  deleteAllSession,
+  createsession,
+  getsessionById,
+  getAllsession,
+  updatesession,
+  updatesessionStatus,
+  deleteAllsession,
+  deleteSinglesession
 
-} = require("./user.controller");
+} = require("./session.controller");
 
 
-router.get("/",  createSession);
-router.post("/",  getsesSionById);
-router.get("/:session_id",  getAllSession);
-router.patch("/:session_id",  updateSession);
-router.patch("/status/:session_id",  updateSessionStatus);
-router.delete("/",  deleteAllSession);
+router.post("/",  createsession);
+router.get("/",  getAllsession);
+router.get("/:id", getsessionById );
+router.patch("/",  updatesession);
+router.patch("/status/:id",  updatesessionStatus); 
+router.delete("/single/:id",  deleteSinglesession);
+
+router.delete("/",  deleteAllsession);
 
 module.exports = router;

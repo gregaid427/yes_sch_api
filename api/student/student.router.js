@@ -15,10 +15,10 @@ router.get("/",  getstudent);
 router.post("/custom1",  getstudentbyClassCustom);
 router.post("/custom",  getstudentbyClass);
 router.get("/single/:student_id",  getstudentbiodata);
+router.post("/delete",  deleteStudentsingle);
 
 router.patch("/",  updatestudent);
 
-router.delete("/:student_id",  deleteStudentsingle);
 router.delete("/truncate",  truncateTable);
 
 
