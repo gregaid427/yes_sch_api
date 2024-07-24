@@ -2,7 +2,7 @@ const { sign } = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const pool = require("../../config/database.js");
-const logger = require("../../util/logger.js");
+// const logger = require("../../util/logger.js");
 const uploadFile = require("./upload.js");
 
 
@@ -26,23 +26,23 @@ module.exports = {
     let sqlQuery = `select * from student where student_id = '${id}'`;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch user by id`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch user by id`
+        // );
         return res
           .status(500)
           .json({ success: 0, error: "internal server error" });
       }
 
       if (!result) {
-        logger.info(
-          `${req.method} ${req.originalUrl}, fetch user by id: no record found`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, fetch user by id: no record found`
+        // );
         return res
           .status(200)
           .json({ success: 1, error: "fetch user by id: no record found" });
       }
-      logger.info(`${req.method} ${req.originalUrl}, fetch user by id`);
+      // logger.info(`${req.method} ${req.originalUrl}, fetch user by id`);
       res.status(200).json({ success: 1, data: result });
     });
   },
@@ -51,18 +51,18 @@ module.exports = {
     let sqlQuery = `select * from student where isActive='true'`;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl}, 'server error', fetch all student`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, 'server error', fetch all student`
+        // );
 
         return res
           .status(500)
           .json({ success: 0, error: "internal server error" });
       }
 
-      logger.info(
-        `${req.method} ${req.originalUrl},'success', fetch all student`
-      );
+      // logger.info(
+      //   `${req.method} ${req.originalUrl},'success', fetch all student`
+      // );
 
       res.status(200).json({ success: 1, data: result });
     });
@@ -73,23 +73,23 @@ module.exports = {
     let sqlQuery = `select * from student where student_id = '${id}'`;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch user by id`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch user by id`
+        // );
         return res
           .status(500)
           .json({ success: 0, error: "internal server error" });
       }
 
       if (!result) {
-        logger.info(
-          `${req.method} ${req.originalUrl}, fetch user by id: no record found`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, fetch user by id: no record found`
+        // );
         return res
           .status(200)
           .json({ success: 1, error: "fetch user by id: no record found" });
       }
-      logger.info(`${req.method} ${req.originalUrl}, fetch user by id`);
+      // logger.info(`${req.method} ${req.originalUrl}, fetch user by id`);
       res.status(200).json({ success: 1, data: result });
     });
   },
@@ -100,18 +100,18 @@ module.exports = {
     let sqlQuery = `select student_id,firstName,otherName, lastName,gender, class,section  from student where class = '${clazz}' and isActive='true'`;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all student by class`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all student by class`
+        // );
 
         return res
           .status(500)
           .json({ success: 0, error: "internal server error" });
       }
 
-      logger.info(
-        `${req.method} ${req.originalUrl},'success', fetch all student by class`
-      );
+      // logger.info(
+      //   `${req.method} ${req.originalUrl},'success', fetch all student by class`
+      // );
 
       res.status(200).json({ success: 1, data: result });
     });
@@ -123,18 +123,18 @@ module.exports = {
     let sqlQuery = `select student_id,firstName,otherName, lastName,gender, class,section from student where class = '${clazz}' and section = '${section}' and isActive='true'`;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all student by class`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all student by class`
+        // );
 
         return res
           .status(500)
           .json({ success: 0, error: "internal server error" });
       }
 
-      logger.info(
-        `${req.method} ${req.originalUrl},'success', fetch all student by class`
-      );
+      // logger.info(
+      //   `${req.method} ${req.originalUrl},'success', fetch all student by class`
+      // );
 
       res.status(200).json({ success: 1, data: result });
     });
@@ -169,18 +169,18 @@ module.exports = {
     let sqlQuery = `select * from student where student_id = '${id}'`;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl} ${req.error}, 'server error', fetch single student biodata`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl} ${req.error}, 'server error', fetch single student biodata`
+        // );
 
         return res
           .status(500)
           .json({ success: 0, error: "internal server error" });
       }
 
-      logger.info(
-        `${req.method} ${req.originalUrl},'success', fetch single student biodata`
-      );
+      // logger.info(
+      //   `${req.method} ${req.originalUrl},'success', fetch single student biodata`
+      // );
       res.status(200).json({ success: 1, data: result });
       console.log(result)
     });
@@ -199,25 +199,25 @@ module.exports = {
 
     pool.query(sqlQuery, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update user data`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update user data`
+        // );
         return res
           .status(500)
           .json({ success: 0, Message: "internal server error" });
       }
 
       if (result.affectedRows != 1) {
-        logger.info(
-          `${req.method} ${req.originalUrl}, update user data: no record found`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, update user data: no record found`
+        // );
         return res
           .status(200)
           .json({ success: 0, message: "update user data: no record found" });
       }
 
       if (result.affectedRows == 1) {
-        logger.info(`${req.method} ${req.originalUrl}, update user data`);
+        // logger.info(`${req.method} ${req.originalUrl}, update user data`);
         return res
           .status(200)
           .json({ success: 1, Message: "update student data success" });
@@ -229,31 +229,29 @@ module.exports = {
     const studentId = req.body.id;
     const clazz = req.body.class;
     const section = req.body.section;
-    console.log(clazz)
-    console.log(section)
-    console.log(studentId)
+ 
     let sqlQuery = `update  student  set isActive='false' WHERE student_id = '${studentId}'`;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete user by id`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete user by id`
+        // );
         return res
           .status(500)
           .json({ success: 0, error: "internal server error" });
       }
 
       if (result.affectedRows != 1) {
-        logger.info(
-          `${req.method} ${req.originalUrl}, delete user by user id: no user record found`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, delete user by user id: no user record found`
+        // );
         return res.status(200).json({
           success: 0,
           error: "delete user by id: no user record found",
         });
       }
       if (result.affectedRows == 1) {
-        logger.info(`${req.method} ${req.originalUrl}, delete user pin by id`);
+        // logger.info(`${req.method} ${req.originalUrl}, delete user pin by id`);
       
 
  let   sectionz = section == "All Sections" ? 'none' : section
@@ -262,9 +260,9 @@ module.exports = {
         pool.query(sqlQuery, (error, result) => {
         
     
-          logger.info(
-            `${req.method} ${sqlQuery},'success', fetch all student by class`
-          );
+          // logger.info(
+          //   `${req.method} ${sqlQuery},'success', fetch all student by class`
+          // );
     console.log(result)
           res.status(200).json({ success: 1, data: result });
         });
@@ -276,15 +274,15 @@ module.exports = {
     let sqlQuery = `truncate table student`;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete all records`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete all records`
+        // );
         return res
           .status(500)
           .json({ success: 0, error: "internal server error" });
       }
       if (result.affectedRows == 1) {
-        logger.info(`${req.method} ${req.originalUrl}, delete all records`);
+        // logger.info(`${req.method} ${req.originalUrl}, delete all records`);
         return res.status(200).json({
           success: 1,
           message: "delete all record success",

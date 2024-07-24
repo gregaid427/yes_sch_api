@@ -1,5 +1,5 @@
 const pool = require("../../config/database.js");
-const logger = require("../../util/logger.js");
+// const logger = require("../../util/logger.js");
 var createHash = require("hash-generator");
 
 let date = new Date();
@@ -20,9 +20,9 @@ module.exports = {
  ('${data.itemName}','${code}','${data.cartegory}',${data.quantity},'${data.CreatedBy}','${data.supplier}','${date}','${data.supplierContact1}','${data.supplierContact2}','${data.SupplierInfo}','true','${data.description}')`;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, create new Inventory`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, create new Inventory`
+        // );
         return res
           .status(500)
           .json({ success: 0, error: "internal server error" });
@@ -44,31 +44,31 @@ module.exports = {
     let sql2 = `select quantity from inventory where itemName = '${data.item}'`;
     pool.query(sql2, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, create new Inventory`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, create new Inventory`
+        // );
         return res
           .status(500)
           .json({ success: 0, error: "internal server error" });
       }
 
       if (!result) {
-        logger.info(`${req.method} ${req.originalUrl}, create new Inventory`);
+        // logger.info(`${req.method} ${req.originalUrl}, create new Inventory`);
         return res
           .status(200)
           .json({ success: 0, message: "Product Non Exist" });
       }
       if (result) {
-        logger.info(`${req.method} ${req.originalUrl}, item Exists`);
+        // logger.info(`${req.method} ${req.originalUrl}, item Exists`);
 
         let myresult = parseInt(result[0].quantity) + parseInt(data.quantity);
         let sqlQuery2 = `update inventory set quantity='${myresult}' where itemName = '${data.item}'`;
 
         pool.query(sqlQuery2, (error, result) => {
           if (error) {
-            logger.info(
-              `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, Error updating main inventory`
-            );
+            // logger.info(
+            //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, Error updating main inventory`
+            // );
             return res
               .status(500)
               .json({
@@ -84,9 +84,9 @@ module.exports = {
           ('${data.item}','${data.cartegory}','${data.quantity}','${data.availableqty}','${data.CreatedBy}','${data.supplier}','${data.date}','${data.note}')`;
             pool.query(sqlQuery, (error, result) => {
               if (error) {
-                logger.info(
-                  `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, create new Inventory stock`
-                );
+                // logger.info(
+                //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, create new Inventory stock`
+                // );
                 return res
                   .status(500)
                   .json({ success: 0, error: "internal server error" });
@@ -111,24 +111,24 @@ module.exports = {
     let sqlQuery = `select * from Inventory where Inventory_id = ${id}`;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch Inventory by id`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch Inventory by id`
+        // );
         return res
           .status(500)
           .json({ success: 0, error: "internal server error" });
       }
 
       if (!result) {
-        logger.info(
-          `${req.method} ${req.originalUrl}, fetch Inventory by id: no record found`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, fetch Inventory by id: no record found`
+        // );
         return res.status(200).json({
           success: 1,
           error: "fetch Inventory by id: no record found",
         });
       }
-      logger.info(`${req.method} ${req.originalUrl}, fetch Inventory by id`);
+      // logger.info(`${req.method} ${req.originalUrl}, fetch Inventory by id`);
       res.status(200).json({ success: 1, data: result });
     });
   },
@@ -137,18 +137,18 @@ module.exports = {
     let sqlQuery = `select * from inventory  where isActive = 'true'`;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl}, 'server error', fetch all Inventory`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, 'server error', fetch all Inventory`
+        // );
 
         return res
           .status(500)
           .json({ success: 0, error: "internal server error" });
       }
 
-      logger.info(
-        `${req.method} ${req.originalUrl},'success', fetch all Inventory`
-      );
+      // logger.info(
+      //   `${req.method} ${req.originalUrl},'success', fetch all Inventory`
+      // );
 
       res.status(200).json({ success: 1, data: result });
     });
@@ -158,18 +158,18 @@ module.exports = {
     let sqlQuery = `select * from inventorystock  where isactive = 'true'`;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl}, 'server error', fetch all Inventory`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, 'server error', fetch all Inventory`
+        // );
 
         return res
           .status(500)
           .json({ success: 0, error: "internal server error" });
       }
 
-      logger.info(
-        `${req.method} ${req.originalUrl},'success', fetch all Inventory`
-      );
+      // logger.info(
+      //   `${req.method} ${req.originalUrl},'success', fetch all Inventory`
+      // );
 
       res.status(200).json({ success: 1, data: result });
     });
@@ -183,18 +183,18 @@ module.exports = {
                                                  ('${data.cartegoryname}','${data.createdby}','${date}','true','${data.notes}')`;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method}  ${error.sqlMessage}, ${req.originalUrl}, 'server error', create  Inventory cartegory`
-        );
+        // logger.info(
+        //   `${req.method}  ${error.sqlMessage}, ${req.originalUrl}, 'server error', create  Inventory cartegory`
+        // );
 
         return res
           .status(500)
           .json({ success: 0, error: "internal server error" });
       }
 
-      logger.info(
-        `${req.method} ${req.originalUrl},'success', create  Inventory cartegory`
-      );
+      // logger.info(
+      //   `${req.method} ${req.originalUrl},'success', create  Inventory cartegory`
+      // );
 
       res.status(200).json({ success: 1, data: result });
     });
@@ -203,18 +203,18 @@ module.exports = {
     let sqlQuery = `select * from inventorycartegory  where isActive = 'true'`;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl}, 'server error', fetch all Inventory`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, 'server error', fetch all Inventory`
+        // );
 
         return res
           .status(500)
           .json({ success: 0, error: "internal server error" });
       }
 
-      logger.info(
-        `${req.method} ${req.originalUrl},'success', fetch all Inventory`
-      );
+      // logger.info(
+      //   `${req.method} ${req.originalUrl},'success', fetch all Inventory`
+      // );
 
       res.status(200).json({ success: 1, data: result });
     });
@@ -227,18 +227,18 @@ module.exports = {
 
     pool.query(sqlQuery, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update Inventory data`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update Inventory data`
+        // );
         return res
           .status(500)
           .json({ success: 0, error: "internal server error" });
       }
 
       if (result.affectedRows != 1) {
-        logger.info(
-          `${req.method} ${req.originalUrl}, update Inventory data: no record found`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, update Inventory data: no record found`
+        // );
         return res.status(200).json({
           success: 0,
           error: "update Inventory data: no record found",
@@ -246,7 +246,7 @@ module.exports = {
       }
 
       if (result.affectedRows == 1) {
-        logger.info(`${req.method} ${req.originalUrl}, update Inventory data`);
+        // logger.info(`${req.method} ${req.originalUrl}, update Inventory data`);
         return res
           .status(200)
           .json({ success: 1, Message: "update Inventory data success" });
@@ -261,18 +261,18 @@ module.exports = {
 
     pool.query(sqlQuery, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update Inventory cartegory data`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update Inventory cartegory data`
+        // );
         return res
           .status(500)
           .json({ success: 0, error: "internal server error" });
       }
 
       if (result.affectedRows != 1) {
-        logger.info(
-          `${req.method} ${req.originalUrl}, update Inventory data: no record found`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, update Inventory data: no record found`
+        // );
         return res.status(200).json({
           success: 0,
           error: "update Inventory cartegory data: no record found",
@@ -280,9 +280,9 @@ module.exports = {
       }
 
       if (result.affectedRows == 1) {
-        logger.info(
-          `${req.method} ${req.originalUrl}, update Inventory cartegory data`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, update Inventory cartegory data`
+        // );
         return res.status(200).json({
           success: 1,
           message: "update Inventory cartegory data success",
@@ -296,18 +296,18 @@ module.exports = {
 
     pool.query(sqlQuery, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update Inventory data`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update Inventory data`
+        // );
         return res
           .status(500)
           .json({ success: 0, error: "internal server error" });
       }
 
       if (result.affectedRows != 1) {
-        logger.info(
-          `${req.method} ${req.originalUrl}, update Inventory data: no record found`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, update Inventory data: no record found`
+        // );
         return res.status(200).json({
           success: 0,
           error: "update Inventory data: no record found",
@@ -315,7 +315,7 @@ module.exports = {
       }
 
       if (result.affectedRows == 1) {
-        logger.info(`${req.method} ${req.originalUrl}, update Inventory data`);
+        // logger.info(`${req.method} ${req.originalUrl}, update Inventory data`);
         return res
           .status(200)
           .json({ success: 1, error: "update Inventory data success" });
@@ -326,15 +326,15 @@ module.exports = {
     let sqlQuery = `truncate table inventory`;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete all records`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete all records`
+        // );
         return res
           .status(500)
           .json({ success: 0, error: "internal server error" });
       }
       if (result.affectedRows == 1) {
-        logger.info(`${req.method} ${req.originalUrl}, delete all records`);
+        // logger.info(`${req.method} ${req.originalUrl}, delete all records`);
         return res.status(200).json({
           success: 1,
           message: "delete all record success",
@@ -349,18 +349,18 @@ module.exports = {
 
     pool.query(sqlQuery, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete Inventory by id`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete Inventory by id`
+        // );
         return res
           .status(500)
           .json({ success: 0, error: "internal server error" });
       }
 
       if (result.affectedRows != 1) {
-        logger.info(
-          `${req.method} ${req.originalUrl}, delete Inventory by  id: no Inventory record found`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, delete Inventory by  id: no Inventory record found`
+        // );
         return res.status(200).json({
           success: 0,
           error: "delete Inventory by id: no Inventory record found",
@@ -384,18 +384,18 @@ module.exports = {
 
     pool.query(sqlQuery, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete Inventory Cartegory by id`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete Inventory Cartegory by id`
+        // );
         return res
           .status(500)
           .json({ success: 0, error: "internal server error" });
       }
 
       if (result.affectedRows != 1) {
-        logger.info(
-          `${req.method} ${req.originalUrl}, delete Inventory Cartegory by  id: no Inventory Cartegory record found`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, delete Inventory Cartegory by  id: no Inventory Cartegory record found`
+        // );
         return res.status(200).json({
           success: 0,
           error: "delete Inventory Cartegory by id: no Inventory cartegory record found",
@@ -417,18 +417,18 @@ module.exports = {
 
     pool.query(sqlQuery, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete Inventory stock by id`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete Inventory stock by id`
+        // );
         return res
           .status(500)
           .json({ success: 0, error: "internal server error" });
       }
 
       if (result.affectedRows != 1) {
-        logger.info(
-          `${req.method} ${req.originalUrl}, delete Inventory by  id: no Inventory stock record found`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, delete Inventory by  id: no Inventory stock record found`
+        // );
         return res.status(200).json({
           success: 0,
           error: "delete Inventory sock by id: no Inventory stock record found",

@@ -1,7 +1,7 @@
 
 
 const pool = require("../../config/database.js");
-const logger = require("../../util/logger.js");
+// const logger = require("../../util/logger.js");
 
 module.exports = {
 
@@ -10,9 +10,9 @@ module.exports = {
  
    pool.query(sqlQuery1, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl}, 'server error', result1 `
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, 'server error', result1 `
+        // );
         return res
           .status(500)
           .json({ success: 0, error: "internal server error" });
@@ -32,9 +32,9 @@ module.exports = {
 
    pool.query(sqlQuery2, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl}, 'server error', result1 `
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, 'server error', result1 `
+        // );
         return res
           .status(500)
           .json({ success: 0, error: "internal server error" });
@@ -53,9 +53,9 @@ module.exports = {
 
    pool.query(sqlQuery3, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl}, 'server error', result1 `
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, 'server error', result1 `
+        // );
         return res
           .status(500)
          .json({ success: 0, error: "internal server error" });
@@ -73,9 +73,9 @@ module.exports = {
   let sqlQuery4 = `select count(id) as nosubject from subject where isactive ='true'`;
    pool.query(sqlQuery4, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl}, 'server error', result1 `
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, 'server error', result1 `
+        // );
         return res
           .status(500)
          .json({ success: 0, error: "internal server error" });
@@ -95,9 +95,9 @@ module.exports = {
 
    pool.query(sqlQuery5, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl}, 'server error', result1 `
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, 'server error', result1 `
+        // );
         return res
           .status(500)
          .json({ success: 0, error: "internal server error" });
@@ -119,9 +119,9 @@ module.exports = {
 
    pool.query(sqlQuery5, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl}, 'server error', result1 `
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, 'server error', result1 `
+        // );
         return res
           .status(500)
          .json({ success: 0, error: "internal server error" });

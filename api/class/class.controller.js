@@ -1,5 +1,5 @@
 const pool = require("../../config/database.js");
-const logger = require("../../util/logger.js");
+// const logger = require("../../util/logger.js");
 
 function getClassByName(email, callBack) {
   pool.query(
@@ -48,18 +48,18 @@ module.exports = {
            ('${classId}','${data.title}','${date}','${data.createdBy}','true','${data.instructor}')`;
         pool.query(sqlQuery, (error, result) => {
           if (error) {
-            logger.info(
-              `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, Error create new Class`
-            );
+            // logger.info(
+            //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, Error create new Class`
+            // );
             return res
               .status(500)
               .json({ success: 0, error: "internal server error" });
           }
 
           if (result.affectedRows == 1) {
-            logger.info(
-              `${req.method} ${req.originalUrl},success create new Class`
-            );
+            // logger.info(
+            //   `${req.method} ${req.originalUrl},success create new Class`
+            // );
 
 
             // res
@@ -142,18 +142,18 @@ module.exports = {
            ('${data.sectionName}','${date}','${data.createdBy}','true')`;
         pool.query(sqlQuery, (error, result) => {
           if (error) {
-            logger.info(
-              `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, create new Class section`
-            );
+            // logger.info(
+            //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, create new Class section`
+            // );
             return res
               .status(500)
               .json({ success: 0, error: "internal server error" });
           }
 
           if (result.affectedRows == 1) {
-            logger.info(
-              `${req.method} ${req.originalUrl}, create new Class section`
-            );
+            // logger.info(
+            //   `${req.method} ${req.originalUrl}, create new Class section`
+            // );
             let sqlQuery = `select * from sectionGroup where isActive = 'true'`;
             pool.query(sqlQuery, (error, result) => {         
               res.status(200).json({ success: 1, data: result });
@@ -178,18 +178,18 @@ module.exports = {
       let sqlQuery = `select * from class left join section on class.classId = section.classId where class.classId = '${Id}' `;
       pool.query(sqlQuery, (error, result) => {
         if (error) {
-          logger.info(
-            `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch Class by id`
-          );
+          // logger.info(
+          //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch Class by id`
+          // );
           return res
             .status(500)
             .json({ success: 0, error: "internal server error" });
         }
 
         if (!result) {
-          logger.info(
-            `${req.method} ${req.originalUrl}, fetch Class by id: no record found`
-          );
+          // logger.info(
+          //   `${req.method} ${req.originalUrl}, fetch Class by id: no record found`
+          // );
           return res
             .status(200)
             .json({ success: 1, error: "fetch Class by id: no record found" });
@@ -198,9 +198,9 @@ module.exports = {
 
           console.log(result);
 
-          logger.info(
-            `${req.method} ${req.originalUrl}, success fetch Class by id`
-          );
+          // logger.info(
+          //   `${req.method} ${req.originalUrl}, success fetch Class by id`
+          // );
         }
       });
 
@@ -214,9 +214,9 @@ module.exports = {
       console.log(error);
 
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all Class`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all Class`
+        // );
         console.log(error);
 
         return res
@@ -224,9 +224,9 @@ module.exports = {
           .json({ success: 0, error: "internal server error" });
       }
 
-      logger.info(
-        `${req.method} ${req.originalUrl},'success', fetch all Class`
-      );
+      // logger.info(
+      //   `${req.method} ${req.originalUrl},'success', fetch all Class`
+      // );
 
       res.status(200).json({ success: 1, data: result });
     });
@@ -263,9 +263,9 @@ module.exports = {
       console.log(error);
 
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all sections`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all sections`
+        // );
         console.log(error);
 
         return res
@@ -273,9 +273,9 @@ module.exports = {
           .json({ success: 0, error: "internal server error" });
       }
 
-      logger.info(
-        `${req.method} ${req.originalUrl},'success', fetch all sections`
-      );
+      // logger.info(
+      //   `${req.method} ${req.originalUrl},'success', fetch all sections`
+      // );
       console.log(result);
       res.status(200).json({ success: 1, data: result });
     });
@@ -307,18 +307,18 @@ module.exports = {
     let sqlQuery = `select class.classId, class.title ,section.sectionName from class inner join section on class.classId = section.classId  order by class.title asc`;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all Class with section`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all Class with section`
+        // );
 
         return res
           .status(500)
           .json({ success: 0, error: "internal server error" });
       }
 
-      logger.info(
-        `${req.method} ${req.originalUrl},'success', fetch all Class with section`
-      );
+      // logger.info(
+      //   `${req.method} ${req.originalUrl},'success', fetch all Class with section`
+      // );
 
       res.status(200).json({ success: 1, data: result });
     });
@@ -332,25 +332,25 @@ module.exports = {
 
     pool.query(sqlQuery, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update Class data`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update Class data`
+        // );
         return res
           .status(500)
           .json({ success: 0, error: "internal server error" });
       }
 
       if (result.affectedRows != 1) {
-        logger.info(
-          `${req.method} ${req.originalUrl}, update Class data: no record found`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, update Class data: no record found`
+        // );
         return res
           .status(200)
           .json({ success: 0, error: "update Class data: no record found" });
       }
 
       if (result.affectedRows == 1) {
-        logger.info(`${req.method} ${req.originalUrl}, update Class data`);
+        // logger.info(`${req.method} ${req.originalUrl}, update Class data`);
         return res
           .status(200)
           .json({ success: 1, error: "update Class data success" });
@@ -366,25 +366,25 @@ module.exports = {
 
     pool.query(sqlQuery, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update section data`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update section data`
+        // );
         return res
           .status(500)
           .json({ success: 0, error: "internal server error" });
       }
 
       if (result.affectedRows != 1) {
-        logger.info(
-          `${req.method} ${req.originalUrl}, update section data: no record found`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, update section data: no record found`
+        // );
         return res
           .status(200)
           .json({ success: 0, error: "update section data: no record found" });
       }
 
       if (result.affectedRows == 1) {
-        logger.info(`${req.method} ${req.originalUrl}, update section data`);
+        // logger.info(`${req.method} ${req.originalUrl}, update section data`);
         return res
           .status(200)
           .json({ success: 1, data: "update section data success" });
@@ -396,25 +396,25 @@ module.exports = {
 
     pool.query(sqlQuery, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update Class data`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update Class data`
+        // );
         return res
           .status(500)
           .json({ success: 0, error: "internal server error" });
       }
 
       if (result.affectedRows != 1) {
-        logger.info(
-          `${req.method} ${req.originalUrl}, update Class data: no record found`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, update Class data: no record found`
+        // );
         return res
           .status(200)
           .json({ success: 0, error: "update Class data: no record found" });
       }
 
       if (result.affectedRows == 1) {
-        logger.info(`${req.method} ${req.originalUrl}, update Class data`);
+        // logger.info(`${req.method} ${req.originalUrl}, update Class data`);
         return res
           .status(200)
           .json({ success: 1, error: "update Class data success" });
@@ -429,25 +429,25 @@ module.exports = {
 
     pool.query(sqlQuery, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete Class by id`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete Class by id`
+        // );
         return res
           .status(500)
           .json({ success: 0, error: "internal server error" });
       }
 
       if (result.affectedRows != 1) {
-        logger.info(
-          `${req.method} ${req.originalUrl}, delete Class by  id: no Class record found`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, delete Class by  id: no Class record found`
+        // );
         return res.status(200).json({
           success: 0,
           error: "delete Class by id: no Class record found",
         });
       }
       if (result.affectedRows == 1) {
-        logger.info(`${req.method} ${req.originalUrl}, delete Class  by id`);
+        // logger.info(`${req.method} ${req.originalUrl}, delete Class  by id`);
         return res.status(200).json({
           success: 1,
           message: "Class deleted successfully",
@@ -461,25 +461,25 @@ module.exports = {
 
     pool.query(sqlQuery, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete Class by id`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete Class by id`
+        // );
         return res
           .status(500)
           .json({ success: 0, error: "internal server error" });
       }
 
       if (result.affectedRows != 1) {
-        logger.info(
-          `${req.method} ${req.originalUrl}, delete Class by  id: no Class record found`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, delete Class by  id: no Class record found`
+        // );
         return res.status(200).json({
           success: 0,
           error: "delete Class by id: no Class record found",
         });
       }
       if (result.affectedRows == 1) {
-        logger.info(`${req.method} ${req.originalUrl}, delete Class  by id`);
+        // logger.info(`${req.method} ${req.originalUrl}, delete Class  by id`);
       //return table data
       let sqlQuery = `select * from class where isActive = 'true'`;
       pool.query(sqlQuery, (error, result) => {
@@ -498,25 +498,25 @@ module.exports = {
 
     pool.query(sqlQuery, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete Class by id`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete Class by id`
+        // );
         return res
           .status(500)
           .json({ success: 0, error: "internal server error" });
       }
 
       if (result.affectedRows != 1) {
-        logger.info(
-          `${req.method} ${req.originalUrl}, delete Class by  id: no Class record found`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, delete Class by  id: no Class record found`
+        // );
         return res.status(200).json({
           success: 0,
           error: "delete Class by id: no Class record found",
         });
       }
       if (result.affectedRows == 1) {
-        logger.info(`${req.method} ${req.originalUrl}, delete Class  by id`);
+        // logger.info(`${req.method} ${req.originalUrl}, delete Class  by id`);
       //return table data
       let sqlQuery = `select * from sectiongroup `;
       pool.query(sqlQuery, (error, result) => {
@@ -531,15 +531,15 @@ module.exports = {
     let sqlQuery = `truncate table class`;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete all records`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete all records`
+        // );
         return res
           .status(500)
           .json({ success: 0, error: "internal server error" });
       }
       if (result.affectedRows == 1) {
-        logger.info(`${req.method} ${req.originalUrl}, delete all records`);
+        // logger.info(`${req.method} ${req.originalUrl}, delete all records`);
         return res.status(200).json({
           success: 1,
           message: "delete all record success",
@@ -556,27 +556,27 @@ module.exports = {
     pool.query(sqlQuery, (error, result) => {
       console.log(result.affectedRows);
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl} ${req.sqlQuery},'DB error:'${error.sqlMessage}, delete Class section by id`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl} ${req.sqlQuery},'DB error:'${error.sqlMessage}, delete Class section by id`
+        // );
         return res
           .status(500)
           .json({ success: 0, error: "internal server error" });
       }
 
       if (result.affectedRows != 1) {
-        logger.info(
-          `${req.method} ${req.originalUrl}, delete Class section by  id: no  record found`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, delete Class section by  id: no  record found`
+        // );
         return res.status(200).json({
           success: 0,
           error: "delete Class section by id: no  record found",
         });
       }
       if (result.affectedRows == 1) {
-        logger.info(
-          `${req.method} ${req.originalUrl}, delete Class section  by id`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, delete Class section  by id`
+        // );
         return res.status(200).json({
           success: 1,
           message: "Class section deleted successfully",

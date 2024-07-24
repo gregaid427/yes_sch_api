@@ -1,14 +1,14 @@
-const logger = require('pino') ;
+// const logger = require('pino') ;
 
-const log = logger({
-  base: { pid: false },
-  transport: {
-    target: 'pino-pretty',
-    options: {
-      colorized: true
-    }
-  },
-  timestamp: () => `,"time": "${new Date().toLocaleString()}"`
-});
+// const log = logger({
+//   base: { pid: false },
+//   transport: {
+//     target: 'pino-pretty',
+//     options: {
+//       colorized: true
+//     }
+//   },
+//   timestamp: () => `,"time": "${new Date().toLocaleString()}"`
+// });
 
-module.exports = log;
+// module.exports = log;

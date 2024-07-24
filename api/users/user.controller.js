@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
 const pool = require("../../config/database");
-const logger = require("../../util/logger.js");
+// const logger = require("../../util/logger.js");
 var createHash = require("hash-generator");
 const uploadFile = require("./upload.js");
 
@@ -106,9 +106,9 @@ module.exports = {
 
               pool.query(sqlQuery1, (error, result) => {
                 if (error) {
-                  logger.info(
-                    `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, create new user -error`
-                  );
+                  // logger.info(
+                  //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, create new user -error`
+                  // );
                   return res.status(500).json({
                     success: 0,
                     error: "internal server error -create New user",
@@ -116,9 +116,9 @@ module.exports = {
                 }
 
                 if (result.affectedRows == 1) {
-                  logger.info(
-                    `${req.method} ${req.originalUrl}, create new user successful`
-                  );
+                  // logger.info(
+                  //   `${req.method} ${req.originalUrl}, create new user successful`
+                  // );
                   res
                     .status(500)
                     .json({ success: 1, Message: "User Created Successfully" });
@@ -271,9 +271,9 @@ module.exports = {
 
             pool.query(sqlQuery1, (error, result) => {
               if (error) {
-                logger.info(
-                  `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage},Error - create new user`
-                );
+                // logger.info(
+                //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage},Error - create new user`
+                // );
                 console.log("guardian 1 error");
                 // return res
                 //   .status(500)
@@ -283,9 +283,9 @@ module.exports = {
               if (result.affectedRows == 1) {
                 // credentialArray.push({"guardian1Email":data.gemail1,"guardian1Pass":gaurdian1Pass})
 
-                logger.info(
-                  `${req.method} ${req.originalUrl}, create new parent1 successful`
-                );
+                // logger.info(
+                //   `${req.method} ${req.originalUrl}, create new parent1 successful`
+                // );
 
                 const signedToken = jwt.sign(
                   { data: result.email },
@@ -349,9 +349,9 @@ module.exports = {
 
             pool.query(sqlQuery1, (error, result) => {
               if (error) {
-                logger.info(
-                  `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, create new user`
-                );
+                // logger.info(
+                //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, create new user`
+                // );
                 console.log("parent1 success");
                 // return res
                 //   .status(500)
@@ -361,9 +361,9 @@ module.exports = {
               if (result.affectedRows == 1) {
                 // credentialArray.push({"guardian2Email":data.gemail2,"guardian2Pass":gaurdian2Pass})
 
-                logger.info(
-                  `${req.method} ${req.originalUrl}, create new user successful`
-                );
+                // logger.info(
+                //   `${req.method} ${req.originalUrl}, create new user successful`
+                // );
 
                 const signedToken = jwt.sign(
                   { data: result.email },
@@ -427,9 +427,9 @@ module.exports = {
 
             pool.query(sqlQuery1, (error, result) => {
               if (error) {
-                logger.info(
-                  `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, create new student error`
-                );
+                // logger.info(
+                //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, create new student error`
+                // );
                 console.log("student eeror error");
                 // return res
                 //   .status(500)
@@ -439,9 +439,9 @@ module.exports = {
               if (result.affectedRows == 1) {
                 // credentialArray.push({"studentEmail":data.email,"studentPass":studentPass})
 
-                logger.info(
-                  `${req.method} ${req.originalUrl}, create new user student  successful`
-                );
+                // logger.info(
+                //   `${req.method} ${req.originalUrl}, create new user student  successful`
+                // );
 
                 const signedToken = jwt.sign(
                   { data: result.email },
@@ -651,9 +651,9 @@ module.exports = {
 
             pool.query(sqlQuery1, (error, result) => {
               if (error) {
-                logger.info(
-                  `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, create new user -error`
-                );
+                // logger.info(
+                //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, create new user -error`
+                // );
                 return res.status(500).json({
                   success: 0,
                   error: "internal server error -create New user",
@@ -661,9 +661,9 @@ module.exports = {
               }
 
               if (result.affectedRows == 1) {
-                logger.info(
-                  `${req.method} ${req.originalUrl}, create new user successful`
-                );
+                // logger.info(
+                //   `${req.method} ${req.originalUrl}, create new user successful`
+                // );
 
                 res.status(200).json({
                   success: 1,
@@ -737,9 +737,9 @@ module.exports = {
     const body = req.body;
     getUserByEmail(body.email, async (err, results) => {
       if (err) {
-        logger.info(
-          `${req.originalUrl},'DB error:'${err.sqlMessage}, server error`
-        );
+        // logger.info(
+        //   `${req.originalUrl},'DB error:'${err.sqlMessage}, server error`
+        // );
         return res.status(500).json({
           success: 0,
           message: "Database Connection Error",
@@ -748,9 +748,9 @@ module.exports = {
       }
 
       if (results == undefined) {
-        logger.info(
-          `${req.method} ${req.originalUrl}, user doesn't exist, authentication `
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, user doesn't exist, authentication `
+        // );
         return res.status(200).json({
           success: 0,
           data: [],
@@ -767,9 +767,9 @@ module.exports = {
       const resultz = await compareReseult();
 
       if (resultz == true) {
-        logger.info(
-          `${req.method} ${req.originalUrl}, correct credentials, authentication`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, correct credentials, authentication`
+        // );
         const jsontoken = sign({ result: results.email }, process.env.JWT_KEY);
 
         let returnData = [
@@ -790,9 +790,9 @@ module.exports = {
         });
         // });
       } else {
-        logger.info(
-          `${req.method} ${req.originalUrl}, Incorrect Email and Password combination`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, Incorrect Email and Password combination`
+        // );
         return res.status(200).json({
           success: 0,
           message: "Invalid Email or Password",
@@ -807,23 +807,23 @@ module.exports = {
     let sqlQuery = `select * from users where userId = ${id}`;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch user by id`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch user by id`
+        // );
         return res
           .status(500)
           .json({ success: 0, error: "internal server error" });
       }
 
       if (!result) {
-        logger.info(
-          `${req.method} ${req.originalUrl}, fetch user by id: no record found`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, fetch user by id: no record found`
+        // );
         return res
           .status(200)
           .json({ success: 1, error: "fetch user by id: no record found" });
       }
-      logger.info(`${req.method} ${req.originalUrl}, fetch user by id`);
+      // logger.info(`${req.method} ${req.originalUrl}, fetch user by id`);
       res.status(200).json({ success: 1, data: result });
     });
   },
@@ -839,23 +839,23 @@ module.exports = {
 
     pool.query(query, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch user by id`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch user by id`
+        // );
         return res
           .status(500)
           .json({ success: 0, error: "internal server error" });
       }
 
       if (!result) {
-        logger.info(
-          `${req.method} ${req.originalUrl}, fetch user by id: no record found`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, fetch user by id: no record found`
+        // );
         return res
           .status(200)
           .json({ success: 1, error: "fetch user by id: no record found" });
       }
-      logger.info(`${req.method} ${req.originalUrl}, fetch user by id`);
+      // logger.info(`${req.method} ${req.originalUrl}, fetch user by id`);
       res.status(200).json({ success: 1, data: result });
     });
   },
@@ -864,18 +864,18 @@ module.exports = {
     let sqlQuery = `select * from users`;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl}, 'server error', fetch all users`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, 'server error', fetch all users`
+        // );
 
         return res
           .status(500)
           .json({ success: 0, error: "internal server error" });
       }
 
-      logger.info(
-        `${req.method} ${req.originalUrl},'success', fetch all users`
-      );
+      // logger.info(
+      //   `${req.method} ${req.originalUrl},'success', fetch all users`
+      // );
 
       res.status(200).json({ success: 1, data: result });
     });
@@ -886,23 +886,23 @@ module.exports = {
     let sqlQuery = `select pincode from users where userId = ${id}`;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, get pin user by id`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, get pin user by id`
+        // );
         return res
           .status(500)
           .json({ success: 0, error: "internal server error" });
       }
 
       if (!result) {
-        logger.info(
-          `${req.method} ${req.originalUrl}, fetch pin by user id: no record found`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, fetch pin by user id: no record found`
+        // );
         return res
           .status(200)
           .json({ success: 1, error: "fetch pin by id: no record found" });
       }
-      logger.info(`${req.method} ${req.originalUrl}, fetch pin by id`);
+      // logger.info(`${req.method} ${req.originalUrl}, fetch pin by id`);
       res.status(200).json({ success: 1, data: result });
     });
   },
@@ -913,9 +913,9 @@ module.exports = {
     let sqlQuery = `update users set pincode = ${userPin} where userId = ${id}`;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, reset pin user by id`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, reset pin user by id`
+        // );
         return res
           .status(500)
           .json({ success: 0, error: "internal server error" });
@@ -930,7 +930,7 @@ module.exports = {
           .json({ success: 1, error: "fetch pin by id: no user record found" });
       }
 
-      logger.info(`${req.method} ${req.originalUrl}, update user pin by id`);
+      // logger.info(`${req.method} ${req.originalUrl}, update user pin by id`);
       return res.status(200).json({
         success: 1,
         message: "OTP updated successfully",
@@ -946,25 +946,25 @@ module.exports = {
 
     pool.query(sqlQuery, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update user data`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update user data`
+        // );
         return res
           .status(500)
           .json({ success: 0, error: "internal server error" });
       }
 
       if (result.affectedRows != 1) {
-        logger.info(
-          `${req.method} ${req.originalUrl}, update user data: no record found`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, update user data: no record found`
+        // );
         return res
           .status(200)
           .json({ success: 0, error: "update user data: no record found" });
       }
 
       if (result.affectedRows == 1) {
-        logger.info(`${req.method} ${req.originalUrl}, update user data`);
+        // logger.info(`${req.method} ${req.originalUrl}, update user data`);
         return res
           .status(200)
           .json({ success: 1, error: "update user data success" });
@@ -1005,17 +1005,17 @@ module.exports = {
         let sqlQuery = `update users set verified='true' where email = '${body.email}'`;
         pool.query(sqlQuery, (error, result) => {
           if (error) {
-            logger.info(
-              `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, verify email by token`
-            );
+            // logger.info(
+            //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, verify email by token`
+            // );
             return res
               .status(500)
               .json({ success: 0, error: "internal server error" });
           }
 
-          logger.info(
-            `${req.method} ${req.originalUrl}, verify email by jwt signed token successful`
-          );
+          // logger.info(
+          //   `${req.method} ${req.originalUrl}, verify email by jwt signed token successful`
+          // );
           res.status(200).json({ success: 1, data: result });
         });
       } else {
@@ -1059,27 +1059,27 @@ module.exports = {
         let sqlQuery = `update users set password = ${body.password} where email = ${body.email}`;
         pool.query(sqlQuery, (error, result) => {
           if (error) {
-            logger.info(
-              `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update user password`
-            );
+            // logger.info(
+            //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update user password`
+            // );
             return res
               .status(500)
               .json({ success: 0, error: "internal server error" });
           }
 
           if (result.affectedRows != 1) {
-            logger.info(
-              `${req.method} ${req.originalUrl}, update user password: no user record found`
-            );
+            // logger.info(
+            //   `${req.method} ${req.originalUrl}, update user password: no user record found`
+            // );
             return res.status(200).json({
               success: 0,
               error: "update user password: no user record found",
             });
           }
           if (result.affectedRows == 1) {
-            logger.info(
-              `${req.method} ${req.originalUrl}, update user password success`
-            );
+            // logger.info(
+            //   `${req.method} ${req.originalUrl}, update user password success`
+            // );
             return res.status(200).json({
               success: 1,
               message: "update user password successfully",
@@ -1150,25 +1150,25 @@ module.exports = {
     let sqlQuery = `delete from users where userId = ${id.userId}`;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete user by id`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete user by id`
+        // );
         return res
           .status(500)
           .json({ success: 0, error: "internal server error" });
       }
 
       if (result.affectedRows != 1) {
-        logger.info(
-          `${req.method} ${req.originalUrl}, delete user by user id: no user record found`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, delete user by user id: no user record found`
+        // );
         return res.status(200).json({
           success: 0,
           error: "delete user by id: no user record found",
         });
       }
       if (result.affectedRows == 1) {
-        logger.info(`${req.method} ${req.originalUrl}, delete user pin by id`);
+        // logger.info(`${req.method} ${req.originalUrl}, delete user pin by id`);
         return res.status(200).json({
           success: 1,
           message: "user deleted successfully",
