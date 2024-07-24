@@ -1,7 +1,7 @@
 
 
 const pool = require("../../config/database.js");
-const logger = require("../../util/logger.js");
+// const logger = require("../../util/logger.js");
 
 module.exports = {
   createsession: async (req, res) => {
@@ -24,9 +24,9 @@ module.exports = {
            ('${data.sessionname}','${date}','${data.createdby}','${data.active}','${data.startmonth}')`;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, create new session`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, create new session`
+        // );
         return res
           .status(500)
           .json({ success: 0, error: "internal server error" });
@@ -50,23 +50,23 @@ module.exports = {
     let sqlQuery = `select * from session where id = ${id}`;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch session by id`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch session by id`
+        // );
         return res
           .status(500)
           .json({ success: 0, error: "internal server error" });
       }
 
       if (!result) {
-        logger.info(
-          `${req.method} ${req.originalUrl}, fetch session by id: no record found`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, fetch session by id: no record found`
+        // );
         return res
           .status(200)
           .json({ success: 1, error: "fetch session by id: no record found" });
       }
-      logger.info(`${req.method} ${req.originalUrl}, fetch session by id`);
+      // logger.info(`${req.method} ${req.originalUrl}, fetch session by id`);
       res.status(200).json({ success: 1, data: result });
     });
   },
@@ -75,18 +75,18 @@ module.exports = {
     let sqlQuery = `select * from session`;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl}, 'server error', fetch all session`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, 'server error', fetch all session`
+        // );
 
         return res
           .status(500)
           .json({ success: 0, error: "internal server error" });
       }
 
-      logger.info(
-        `${req.method} ${req.originalUrl},'success', fetch all session`
-      );
+      // logger.info(
+      //   `${req.method} ${req.originalUrl},'success', fetch all session`
+      // );
 
       res.status(200).json({ success: 1, data: result });
     });
@@ -100,25 +100,25 @@ module.exports = {
 
     pool.query(sqlQuery, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update session data`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update session data`
+        // );
         return res
           .status(500)
           .json({ success: 0, error: "internal server error" });
       }
 
       if (result.affectedRows != 1) {
-        logger.info(
-          `${req.method} ${req.originalUrl}, update session data: no record found`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, update session data: no record found`
+        // );
         return res
           .status(200)
           .json({ success: 0, error: "update session data: no record found" });
       }
 
       if (result.affectedRows == 1) {
-        logger.info(`${req.method} ${req.originalUrl}, update session data`);
+        // logger.info(`${req.method} ${req.originalUrl}, update session data`);
         let sqlQuery = `select * from session`;
         pool.query(sqlQuery, (error, result) => {
        
@@ -137,9 +137,9 @@ module.exports = {
 
     pool.query(sqlQuery, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update session data`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update session data`
+        // );
         return res
           .status(500)
           .json({ success: 0, error: "internal server error" });
@@ -147,7 +147,7 @@ module.exports = {
 
 
       if (result.affectedRows ) {
-        logger.info(`${req.method} ${req.originalUrl}, update session data`);
+        // logger.info(`${req.method} ${req.originalUrl}, update session data`);
         let sqlQuery = `update session set active ='true' where id = '${id}'`;
         pool.query(sqlQuery, (error, result) => {
        
@@ -167,18 +167,18 @@ module.exports = {
 
     pool.query(sqlQuery, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete session by id`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete session by id`
+        // );
         return res
           .status(500)
           .json({ success: 0, error: "internal server error" });
       }
 
       if (result.affectedRows != 1) {
-        logger.info(
-          `${req.method} ${req.originalUrl}, delete session by  id: no session record found`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, delete session by  id: no session record found`
+        // );
         return res
           .status(200)
           .json({
@@ -187,7 +187,7 @@ module.exports = {
           });
       }
       if (result.affectedRows == 1) {
-        logger.info(`${req.method} ${req.originalUrl}, delete session  by id`);
+        // logger.info(`${req.method} ${req.originalUrl}, delete session  by id`);
         return res.status(200).json({
           success: 1,
           message: "session deleted successfully",
@@ -202,18 +202,18 @@ module.exports = {
 
     pool.query(sqlQuery, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete session by id`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete session by id`
+        // );
         return res
           .status(500)
           .json({ success: 0, error: "internal server error" });
       }
 
       if (result.affectedRows != 1) {
-        logger.info(
-          `${req.method} ${req.originalUrl}, delete session by  id: no session record found`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, delete session by  id: no session record found`
+        // );
         return res
           .status(200)
           .json({
@@ -222,7 +222,7 @@ module.exports = {
           });
       }
       if (result.affectedRows == 1) {
-        logger.info(`${req.method} ${req.originalUrl}, delete session  by id`);
+        // logger.info(`${req.method} ${req.originalUrl}, delete session  by id`);
         let sqlQuery = `select * from session`;
         pool.query(sqlQuery, (error, result) => {
        

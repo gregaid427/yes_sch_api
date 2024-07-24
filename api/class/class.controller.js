@@ -238,9 +238,9 @@ module.exports = {
       console.log(error);
 
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all sections`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all sections`
+        // );
         console.log(error);
 
         return res
@@ -248,9 +248,9 @@ module.exports = {
           .json({ success: 0, error: "internal server error" });
       }
 
-      logger.info(
-        `${req.method} ${req.originalUrl},'success', fetch all sections`
-      );
+      // logger.info(
+      //   `${req.method} ${req.originalUrl},'success', fetch all sections`
+      // );
 
       res.status(200).json({ success: 1, data: result });
     });
@@ -286,9 +286,9 @@ module.exports = {
       console.log(error);
 
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all sections`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all sections`
+        // );
         console.log(error);
 
         return res
@@ -296,9 +296,9 @@ module.exports = {
           .json({ success: 0, error: "internal server error" });
       }
 
-      logger.info(
-        `${req.method} ${req.originalUrl},'success', fetch all sections`
-      );
+      // logger.info(
+      //   `${req.method} ${req.originalUrl},'success', fetch all sections`
+      // );
 
       res.status(200).json({ success: 1, data: result });
     });
