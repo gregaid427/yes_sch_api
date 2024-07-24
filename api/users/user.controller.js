@@ -499,9 +499,9 @@ module.exports = {
           }
 
           let studName =
-            data?.firstName + " " + data?.otherName + " " + data?.lastName;
-          let guardian1 = data?.gfName1 + " " + data?.glName1;
-          let guardian2 = data?.gfName2 + " " + data?.glName2;
+            data.firstName + " " + data.otherName + " " + data.lastName;
+          let guardian1 = data.gfName1 + " " + data.glName1;
+          let guardian2 = data.gfName2 + " " + data.glName2;
 
           let dataArray = [
             {
