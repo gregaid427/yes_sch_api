@@ -2,12 +2,13 @@
 
 const pool = require("../../config/database.js");
 // const logger = require("../../util/logger.js");
-
+let date = new Date();
+date = date.toUTCString();
 module.exports = {
   createsession: async (req, res) => {
     const data = req.body;
 
-    let date = new Date();
+   
 
   // if(data.active == true){
     let sqlQuery1 = `update session set active ='false'`;
@@ -131,8 +132,7 @@ module.exports = {
 
 
   updatesessionStatus: (req, res) => {
-         id =  req.params.id 
-
+    let data = req.body
     let sqlQuery = `update session set active ='false'`;
 
     pool.query(sqlQuery, (error, result) => {
@@ -148,7 +148,7 @@ module.exports = {
 
       if (result.affectedRows ) {
         // logger.info(`${req.method} ${req.originalUrl}, update session data`);
-        let sqlQuery = `update session set active ='true' where id = '${id}'`;
+        let sqlQuery = `update session set active ='true' , startmonth='${data.startmonth}' where sessionname = '${data.session}'`;
         pool.query(sqlQuery, (error, result) => {
        
           let sqlQuery = `select * from session`;

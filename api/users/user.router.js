@@ -16,13 +16,31 @@ const {
   createUserStaff,
   createUserGuardian,
   setStudentPicture,
-  getUserByUserIdRole
+  getUserByUserIdRole,
+  getAllStaff,
+  InactiveStaff,
+  deleteStaff,
+  activeStaff,
+  schoolinfo,
+  schoolinfoupdate
 } = require("./user.controller");
 
 router.post("/picture",  setStudentPicture);
+router.get("/staff",  getAllStaff);
+
+router.post("/deletestaff/:id",  deleteStaff);
+router.post("/inactivestaff/:id",  InactiveStaff);
+router.post("/activestaff/:id",  activeStaff);
+router.get("/school/",  schoolinfo);
+router.post("/school/update",  schoolinfoupdate);
+
+
+
+
+
 router.get("/",  getUsers);
 router.post("/guardian",  createUserGuardian);
-router.post("/staff",  createUserStaff);
+router.post("/newstaff",  createUserStaff);
 router.post("/",  createUserStudent);
 
 

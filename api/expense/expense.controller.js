@@ -1,31 +1,35 @@
 const pool = require("../../config/database.js");
 const logger = require("../../util/logger.js");
 const uploadFile = require("./upload.js");
-let date = new Date();
 
+let date = new Date();
+date = date.toUTCString();
 module.exports = {
   createExpense: async (req, res) => {
     await uploadFile(req, res);
     console.log(req);
     const data = JSON.parse(req.body.data);
-
     let date = new Date();
+    date = `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}`
+   // date = date.toUTCString();
+
+    
     let link = process.env.SERVERLINK + "/uploadexpense/" + data.filename;
 
-    let sqlQuery = `insert into expense (name,date,expensehead,createdby,invoice,description,amount,filename,link) values
-           ('${data.name}','${data.date}','${data.expensehead}','${data.createdby}','${data.invoice}','${data.description}','${data.amount}','${data.filename}','${link}')`;
+    let sqlQuery = `insert into expense (name,date,expensehead,createdby,invoice,description,amount,filename,link,createdat) values
+           ('${data.name}','${data.date}','${data.expensehead}','${data.createdby}','${data.invoice}','${data.description}','${data.amount}','${data.filename}','${link}','${date}')`;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, create new expense`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, create new expense`
+        // );
         return res
           .status(500)
           .json({ success: 0, error: "internal server error" });
       }
 
       if (result.affectedRows == 1) {
-        logger.info(`${req.method} ${req.originalUrl}, `);
+        // logger.info(`${req.method} ${req.originalUrl}, `);
         let sqlQuery = `select * from expense`;
         pool.query(sqlQuery, (error, result) => {
           res.status(200).json({ success: 1, data: result });
@@ -36,7 +40,7 @@ module.exports = {
   createExpenseHead: async (req, res) => {
     const data = req.body;
 
-    let date = new Date();
+    
     let sqlQuery = `insert into expensehead (expensehead,createdat,createdby,notes) values
            ('${data.expensehead}','${date}','${data.createdby}','${data.notes}')`;
     pool.query(sqlQuery, (error, result) => {
@@ -86,19 +90,20 @@ module.exports = {
   getcustomexpense: (req, res) => {
     const data = req.body;
     let date = data.date;
+    console.log(date)
     function getparams(date) {
       if (date == "Today") {
         return `select * from expense where createdat = CURDATE()`;
       }
       if (date == "This Month") {
         return `select * from expense where MONTH(createdat)=MONTH(now())
-        and YEAR(createdat)=YEAR(now());`;
+        and YEAR(createdat)=YEAR(now())`;
       }
       if (date == "Last Month") {
-        return `select * from expense where  month(createdat) = month(NOW() - INTERVAL 1 MONTH);`;
+        return `select * from expense where  month(createdat) = month(NOW() - INTERVAL 1 MONTH)`;
       }
       if (date == "Last Six Month") {
-        return `select * from expense where createdat >= date_sub(now(),interval 6 month);`;
+        return `select * from expense where createdat >= date_sub(now(),interval 6 month)`;
       }
       if (date == "This Year") {
         return `select * from expense where YEAR(createdat) = YEAR(CURDATE())`;
@@ -272,9 +277,9 @@ module.exports = {
     let sqlQuery = `truncate table expense`;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
-        logger.info(
-          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete all records`
-        );
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete all records`
+        // );
         return res
           .status(500)
           .json({ success: 0, error: "internal server error" });

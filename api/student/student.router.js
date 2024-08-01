@@ -8,6 +8,9 @@ const {
   getstudentbyClassCustom,
   deleteStudentsingle,
   truncateTable,
+  setstudentwaiting,
+  allpromote,
+  selectedpromote
 } = require("./student.controller");
 
 
@@ -16,6 +19,11 @@ router.post("/custom1",  getstudentbyClassCustom);
 router.post("/custom",  getstudentbyClass);
 router.get("/single/:student_id",  getstudentbiodata);
 router.post("/delete",  deleteStudentsingle);
+router.post("/waiting",  setstudentwaiting);
+router.post("/allpromote",  allpromote);
+router.post("/selectedpromote",  selectedpromote);
+
+
 
 router.patch("/",  updatestudent);
 

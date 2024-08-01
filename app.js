@@ -1,6 +1,6 @@
 require("dotenv").config();
 const express = require("express");
-const cors = require("cors")
+const cors = require("cors");
 const app = express();
 const userRouter = require("./api/users/user.router");
 const studentRouter = require("./api/student/student.router");
@@ -12,10 +12,6 @@ const expenseRouter = require("./api/expense/expense.router");
 const sessionRouter = require("./api/session/session.router");
 const settingRouter = require("./api/setting/setting.router");
 
-
-
-
-
 //const patientsRouter = require("./api/patients/patients.router");
 //const vitalsRouter = require("./api/vitals/vitals.router");
 //const logRouter = require("./api/log/log.router");
@@ -23,11 +19,18 @@ const settingRouter = require("./api/setting/setting.router");
 // const transactionsRouter = require("./api/transactions/transactions.router");
 
 app.use(express.json());
-app.use(cors())
+var corsOptions = {
+  // 'Access-Control-Allow-Origin': 'https://yes-school-frontend.vercel.app/',
+  // 'Access-Control-Allow-Methods'     : 'POST, GET, OPTIONS, PUT, DELETE',
+  // 'Access-Control-Allow-Credentials' : 'true',
+  // 'Access-Control-Max-Age'           : '86400',
+  // 'Access-Control-Allow-Headers'     : 'Content-Type, Authorization, X-Requested-With'
+};
+app.use(cors(corsOptions));
 global.__basedir = __dirname;
 //app.use(bodyParser.urlencoded())
 
-app.use (express.urlencoded({extended: true}));
+app.use(express.urlencoded({ extended: true }));
 //  app.use(function(req,res,next){
 // res.header("Access-Control-Allow","*");
 // res.header("Access-Control-Allow-Headers","X-Requested-With");
@@ -42,13 +45,6 @@ app.use("/api/inventory", inventoryRouter);
 app.use("/api/expense", expenseRouter);
 app.use("/api/session", sessionRouter);
 app.use("/api/setting", settingRouter);
-
-
-
-
-
-
-
 
 // app.use("/api/linkedaccounts", linkedaccountsRouter);
 // app.use("/api/projects", projectRouter);

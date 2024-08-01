@@ -3,6 +3,9 @@
 const pool = require("../../config/database.js");
 // const logger = require("../../util/logger.js");
 
+let date = new Date();
+date = date.toUTCString();
+
 module.exports = {
   createSection: async (req, res) => {
     const data = req.body;

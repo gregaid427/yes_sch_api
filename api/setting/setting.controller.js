@@ -6,7 +6,8 @@ const pool = require("../../config/database.js");
 // const logger = require("../../util/logger.js");
 var createHash = require("hash-generator");
 const uploadFile = require("./upload.js");
-
+let date = new Date();
+date = date.toUTCString();
 // mail sender details
 var transporter = nodemailer.createTransport({
   // service: "gmail",
@@ -49,7 +50,7 @@ module.exports = {
 
     const userPin = Math.floor(Math.random() * 9000 + 1000);
 
-    let date = new Date();
+   
     date = date.toUTCString();
 
     function idGenerator() {
@@ -187,6 +188,31 @@ module.exports = {
     });
   },
 
+  createSchoolInfo: async (req, res) => {
+
+      const data = req.body;
+  
+      let date = Date.now();
+  
+      let sqlQuery = `update school set name=${data.name} ,address=${data.address}, contact1=${data.contact1}, contact2=${data.contact2},code=${data.code}, email=${data.email} `;
+      pool.query(sqlQuery, (error, result) => {
+        if (error) {
+          // logger.info(
+          //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, create new section`
+          // );
+          return res
+            .status(500)
+            .json({ success: 0, error: "internal server error" });
+        }
+  
+        if (result.affectedRows == 1) {
+          // logger.info(`${req.method} ${req.originalUrl}, create new section`);
+        }
+      });
+    
+
+  },
+
   setStudentPicture: async (req, res) => {
     await uploadFile(req, res);
      console.log(req.body)
@@ -237,7 +263,7 @@ module.exports = {
     const userPin = Math.floor(Math.random() * 9000 + 1000);
     const userPin1 = Math.floor(Math.random() * 9000 + 1000);
 
-    let date = new Date();
+   
     date = date.toUTCString();
 
     function userCreaterStudent(
@@ -617,7 +643,7 @@ module.exports = {
 
     const userPin = Math.floor(Math.random() * 9000 + 1000);
 
-    let date = new Date();
+   
     date = date.toUTCString();
 
     const saltRounds = 10;

@@ -16,14 +16,18 @@ const {
   createUserStaff,
   createUserGuardian,
   setStudentPicture,
+  createSchoolInfo,
   getUserByUserIdRole
 } = require("./setting.controller");
 
+
+router.post("/school",  createSchoolInfo);
 router.post("/picture",  setStudentPicture);
 router.get("/",  getUsers);
 router.post("/guardian",  createUserGuardian);
 router.post("/staff",  createUserStaff);
 router.post("/",  createUserStudent);
+
 
 
 router.get("/userbyrole",  getUserByUserIdRole);

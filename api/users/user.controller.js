@@ -7,6 +7,8 @@ const pool = require("../../config/database");
 var createHash = require("hash-generator");
 const uploadFile = require("./upload.js");
 
+let date = new Date();
+date = date.toUTCString();
 // mail sender details
 var transporter = nodemailer.createTransport({
   // service: "gmail",
@@ -76,33 +78,19 @@ module.exports = {
 
       // if not create user
       else {
-        //when user is staff
-        let sqlQuery3 = `select staff_id from staff order by id desc limit 1  `;
-        pool.query(sqlQuery3, (error, result) => {
-          console.log(error);
+     
 
-          function myresult() {
-            let val = result[0].staff_id;
-            console.log(val);
-
-            val = val.slice(-4);
-            val = parseInt(val) + 1;
-            return "SF" + partId + val;
-          }
-
-          // check if db is empty start with a default student_id
-          const staff_id = result[0] ? myresult() : "SF" + partId + "1110";
-
-          let sqlQuery = `insert into staff (userId,sEmail,sGender,sLastName,sFirstName,sOtherName,contact1,contact2,address,staff_id ,definedRole,info) values
-          ('${customStaffId}','${data.email}','${data.gender}','${data.lastName}','${data.firstName}','${data.otherName}','${data.contact1}','${data.contact2}','${data.address}','${staff_id}','${data.definedRole}','${data.info}')`;
+          let sqlQuery = `insert into staff (userId,sEmail,sGender,sLastName,sFirstName,contact1,contact2,address,definedRole,info) values
+          ('${customStaffId}','${data.email}','${data.sex}','${data.lname}','${data.fname}','${data.contact1}','${data.contact2}','${data.address}','${data.role}','${data.info}')`;
 
           pool.query(sqlQuery, (error, result) => {
             console.log(error);
 
+
             /////////////////////// check if initial data insert is successful then proceed to insert general users data
             if (result.affectedRows == 1) {
-              let sqlQuery1 = `insert into users (userId,email,createdAt,createdBy,pincode,role,password ) values
-              ('${customStaffId}','${data.email}','${date}','${data.createdBy}',${userPin},'staff','${password}')`;
+              let sqlQuery1 = `insert into users (userId,email,createdAt,createdBy,pincode,role,password,rolecode ) values
+              ('${customStaffId}','${data.email}','${date}','${data.createdBy}',${userPin},'staff','${password}','${data.rolecode}')`;
 
               pool.query(sqlQuery1, (error, result) => {
                 if (error) {
@@ -116,11 +104,11 @@ module.exports = {
                 }
 
                 if (result.affectedRows == 1) {
-                  // logger.info(
-                  //   `${req.method} ${req.originalUrl}, create new user successful`
-                  // );
+                  console.log(
+                  'create new user successful'
+                 );
                   res
-                    .status(500)
+                    .status(200)
                     .json({ success: 1, Message: "User Created Successfully" });
 
                   const signedToken = jwt.sign(
@@ -145,12 +133,7 @@ module.exports = {
                       process.env.JWT_KEY3
                     );
 
-                    let logInfo;
-                    if (data.role == "student") {
-                      logInfo = { user: data.email, pass: data.password };
-                    } else {
-                      logInfo = "";
-                    }
+                 
                     // if (error) {
                     //   console.log("mail not sent");
                     //   console.log(signedToken);
@@ -182,28 +165,26 @@ module.exports = {
                 .status(500)
                 .json({ success: 0, error: "internal server error" });
           });
-        });
       }
     });
   },
 
   setStudentPicture: async (req, res) => {
     await uploadFile(req, res);
-     console.log(req.body)
+    console.log(req.body);
     const data = JSON.parse(req.body.data);
-    console.log(data)
+    console.log(data);
 
-    let link =
-    process.env.SERVERLINK + "/uploadsstudent/" + data.filename;
+    let link = process.env.SERVERLINK + "/uploadsstudent/" + data.filename;
     let sqlQuery = `update student set filename='${data.filename}',imagelink = '${link}'
      where userId = '${data.id}' `;
 
-   
     pool.query(sqlQuery, (error, result) => {
-    //  console.log()
-      if (error) return res
-      .status(500)
-      .json({ success: 0, Message: "Error Uploadeding Image" });
+      //  console.log()
+      if (error)
+        return res
+          .status(500)
+          .json({ success: 0, Message: "Error Uploadeding Image" });
 
       if (result.affectedRows == 1) {
         return res
@@ -237,8 +218,6 @@ module.exports = {
     const userPin = Math.floor(Math.random() * 9000 + 1000);
     const userPin1 = Math.floor(Math.random() * 9000 + 1000);
 
-    let date = new Date();
-    date = date.toUTCString();
 
     function userCreaterStudent(
       sqlQuery,
@@ -505,7 +484,7 @@ module.exports = {
 
           let dataArray = [
             {
-              id: customStudentId, 
+              id: customStudentId,
               studentName: studName,
               studentEmail: data.email,
               studentPass: studentPass,
@@ -617,9 +596,6 @@ module.exports = {
 
     const userPin = Math.floor(Math.random() * 9000 + 1000);
 
-    let date = new Date();
-    date = date.toUTCString();
-
     const saltRounds = 10;
 
     let password = await bcrypt.hash(data.password, saltRounds);
@@ -640,7 +616,7 @@ module.exports = {
 
         // when user is parent u need to post student id from client side
         sqlQuery = `insert into guardian (userId,gEmail,gSex,gLastName,gFirstName,gContact1,gContact2,gAddress,student_id,gRelation ) values
-          ('${customguardian1Id}','${data.gemail1}','${data.gsex1}','${data.glName1}','${data.gfName1}','${data.contact1}','${data.contact2}','${data.gAddress1}','${data.student_id}','${data.gRelation}') `;
+          ('${customguardian1Id}','${data.email1}','${data.sex}','${data.lastName}','${data.firstName}','${data.contact1}','${data.contact2}','${data.address}','${data.userId}','${data.relation}') `;
 
         pool.query(sqlQuery, (error, result) => {
           console.log(error);
@@ -692,12 +668,7 @@ module.exports = {
                     process.env.JWT_KEY3
                   );
 
-                  let logInfo;
-                  if (data.role == "student") {
-                    logInfo = { user: data.email, pass: data.password };
-                  } else {
-                    logInfo = "";
-                  }
+                 
                   // if (error) {
                   //   console.log("mail not sent");
                   //   console.log(signedToken);
@@ -832,10 +803,12 @@ module.exports = {
     const id = req.body.id;
     const role = req.body.role;
 
-     
-   let query = (role == 'student') ? `select * from student where userId = '${id}'` : role == 'staff' ? `select * from staff where userId = '${id}'`: `select * from guardian where userId = '${id}'`
-  
-
+    let query =
+      role == "student"
+        ? `select * from student where userId = '${id}'`
+        : role == "staff"
+        ? `select * from staff where userId = '${id}'`
+        : `select * from guardian where userId = '${id}'`;
 
     pool.query(query, (error, result) => {
       if (error) {
@@ -880,7 +853,73 @@ module.exports = {
       res.status(200).json({ success: 1, data: result });
     });
   },
+  schoolinfo: (req, res) => {
+    let sqlQuery = `select * from school`;
+    pool.query(sqlQuery, (error, result) => {
+      if (error) {
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, 'server error', fetch all users`
+        // );
 
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error" });
+      }
+
+      // logger.info(
+      //   `${req.method} ${req.originalUrl},'success', fetch all users`
+      // );
+
+      res.status(200).json({ success: 1, data: result });
+    });
+  },
+  schoolinfoupdate: (req, res) => {
+    let data = req.body
+    
+    let sqlQuery = data.id == null ? `insert into school (name,address,contact1,contact2,email) values('${data.name}','${data.address}','${data.contact1}','${data.contact2}','${data.email}')` :  `update school set name='${data.name}',address='${data.address}',contact1='${data.contact1}',contact2='${data.contact2}',email='${data.email}',name='${data.name}' where id = '1'`;
+    pool.query(sqlQuery, (error, result) => {
+      if (error) {
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, 'server error', fetch all users`
+        // );
+
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error" });
+      }
+
+      // logger.info(
+      //   `${req.method} ${req.originalUrl},'success', fetch all users`
+      // );
+      let sqlQuery = `select * from school limit 1 `;
+      pool.query(sqlQuery, (error, result) => {
+        res.status(200).json({ success: 1, data: result });
+      });
+
+    });
+  },
+  
+
+  getAllStaff: (req, res) => {
+    let sqlQuery = `select * from staff left join users on staff.userId = users.userId  where users.role = 'staff' and staff.active='true'`;
+    pool.query(sqlQuery, (error, result) => {
+      if (error) {
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, 'server error', fetch all users`
+        // );
+
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error" });
+      }
+
+      // logger.info(
+      //   `${req.method} ${req.originalUrl},'success', fetch all users`
+      // );
+
+      res.status(200).json({ success: 1, data: result });
+    });
+  },
   getOTPpin: (req, res) => {
     const id = parseInt(req.params.userId);
     let sqlQuery = `select pincode from users where userId = ${id}`;
@@ -1144,10 +1183,121 @@ module.exports = {
       }
     });
   },
+  activeStaff: (req, res) => {
+    const id = req.params.id;
+    console.log(id)
+     let sqlQuery = `update staff set active ='true' where userId = '${id}'`;
+
+    pool.query(sqlQuery, (error, result) => {
+      if (error) {
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete subject by id`
+        // );
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error" });
+      }
+
+      if (result.affectedRows != 1) {
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, delete subject by  id: no subject record found`
+        // );
+        return res.status(200).json({
+          success: 0,
+          error: "delete subject by id: no subject record found",
+        });
+      }
+      if (result.affectedRows == 1) {
+        // logger.info(`${req.method} ${req.originalUrl}, delete subject  by id`);
+        let sqlQuery1 = `update users set iaActive ='true' where userId = '${id}'`;
+        pool.query(sqlQuery1, (error, result) => {
+        });
+       
+        let sqlQuery = `select * from staff left join users on staff.userId = users.userId  where users.role = 'staff' and active='true'`;
+        pool.query(sqlQuery, (error, result) => {
+          res.status(200).json({ success: 1, data: result });
+        });
+      }
+    });
+  },
+  InactiveStaff: (req, res) => {
+    const id = req.params.id;
+    console.log(id)
+     let sqlQuery = `update staff set active ='false' where userId = '${id}'`;
+
+    pool.query(sqlQuery, (error, result) => {
+      if (error) {
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete subject by id`
+        // );
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error" });
+      }
+
+      if (result.affectedRows != 1) {
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, delete subject by  id: no subject record found`
+        // );
+        return res.status(200).json({
+          success: 0,
+          error: "delete subject by id: no subject record found",
+        });
+      }
+      if (result.affectedRows == 1) {
+        // logger.info(`${req.method} ${req.originalUrl}, delete subject  by id`);
+        let sqlQuery1 = `update users set iaActive ='false' where userId = '${id}'`;
+        pool.query(sqlQuery1, (error, result) => {
+        });
+       
+        let sqlQuery = `select * from staff left join users on staff.userId = users.userId  where users.role = 'staff' and active='true'`;
+        pool.query(sqlQuery, (error, result) => {
+          res.status(200).json({ success: 1, data: result });
+        });
+      }
+    });
+  },
+  deleteStaff: (req, res) => {
+    const id = req.params.id;
+    console.log(id)
+     let sqlQuery = `delete from staff where userId = '${id}'`;
+
+    pool.query(sqlQuery, (error, result) => {
+      if (error) {
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete subject by id`
+        // );
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error" });
+      }
+
+      if (result.affectedRows != 1) {
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, delete subject by  id: no subject record found`
+        // );
+        return res.status(200).json({
+          success: 0,
+          error: "delete subject by id: no subject record found",
+        });
+      }
+      if (result.affectedRows == 1) {
+        // logger.info(`${req.method} ${req.originalUrl}, delete subject  by id`);
+        let sqlQuery1 = `delete from users where userId = '${id}'`;
+        pool.query(sqlQuery1, (error, result) => {
+        });
+       
+        let sqlQuery = `select * from staff left join users on staff.userId = users.userId  where users.role = 'staff' and active='true'`;
+        pool.query(sqlQuery, (error, result) => {
+          res.status(200).json({ success: 1, data: result });
+        });
+      }
+    });
+  },
 
   deleteUser: (req, res) => {
     const id = req.body;
-    let sqlQuery = `delete from users where userId = ${id.userId}`;
+    let sqlQuery = `delete from users where userId = '${id.userId}'`;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(

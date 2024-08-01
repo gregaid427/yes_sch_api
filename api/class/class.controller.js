@@ -44,7 +44,7 @@ module.exports = {
 
       // if not create user
       else {
-        let sqlQuery = `insert into Class (classId,title,createdAt,createdBy,isActive,instructor) values
+        let sqlQuery = `insert into class (classId,title,createdAt,createdBy,isActive,instructor) values
            ('${classId}','${data.title}','${date}','${data.createdBy}','true','${data.instructor}')`;
         pool.query(sqlQuery, (error, result) => {
           if (error) {
@@ -392,7 +392,7 @@ module.exports = {
     });
   },
   updateClassStatus: (req, res) => {
-    let sqlQuery = `update Class set isActive ='false'`;
+    let sqlQuery = `update class set isActive ='false'`;
 
     pool.query(sqlQuery, (error, result) => {
       if (error) {
@@ -410,14 +410,14 @@ module.exports = {
         // );
         return res
           .status(200)
-          .json({ success: 0, error: "update Class data: no record found" });
+          .json({ success: 0, error: "update class data: no record found" });
       }
 
       if (result.affectedRows == 1) {
         // logger.info(`${req.method} ${req.originalUrl}, update Class data`);
         return res
           .status(200)
-          .json({ success: 1, error: "update Class data success" });
+          .json({ success: 1, error: "update class data success" });
       }
     });
   },
@@ -425,7 +425,7 @@ module.exports = {
   deleteAllClass: (req, res) => {
     const id = req.body;
     // let sqlQuery = `delete from Class where userId = ${id.Class_id}`;
-    let sqlQuery = `delete from Class`;
+    let sqlQuery = `delete from class`;
 
     pool.query(sqlQuery, (error, result) => {
       if (error) {
@@ -457,7 +457,7 @@ module.exports = {
   },
   deleteSingleClass: (req, res) => {
     const id = req.params.classId;
-    let sqlQuery = `delete from Class where classId = '${id}'`;
+    let sqlQuery = `delete from class where classId = '${id}'`;
 
     pool.query(sqlQuery, (error, result) => {
       if (error) {
@@ -570,7 +570,7 @@ module.exports = {
         // );
         return res.status(200).json({
           success: 0,
-          error: "delete Class section by id: no  record found",
+          error: "delete class section by id: no  record found",
         });
       }
       if (result.affectedRows == 1) {

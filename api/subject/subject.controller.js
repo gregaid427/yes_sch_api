@@ -3,7 +3,7 @@ const pool = require("../../config/database.js");
 var createHash = require("hash-generator");
 
 let date = new Date();
-function hashgenerator(num) {
+date = date.toUTCString();function hashgenerator(num) {
   return createHash(num);
 }
 

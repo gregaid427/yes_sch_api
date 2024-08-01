@@ -9,7 +9,8 @@ const {
 } = require("./transactions.service");
 const { hashSync, genSaltSync, compareSync } = require("bcrypt");
 const { sign } = require("jsonwebtoken");
-
+let date = new Date();
+date = date.toUTCString();
 module.exports = {
   createtransaction: (req, res) => {
     const body = req.body;

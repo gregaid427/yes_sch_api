@@ -4,8 +4,8 @@ const jwt = require("jsonwebtoken");
 const pool = require("../../config/database.js");
 // const logger = require("../../util/logger.js");
 const uploadFile = require("./upload.js");
-
-
+let date = new Date();
+date = date.toUTCString();
 
 function getStudentByEmail(email, callBack) {
   pool.query(
@@ -21,6 +21,90 @@ function getStudentByEmail(email, callBack) {
 }
 
 module.exports = {
+  setstudentwaiting: (req, res) => {
+    let sqlQuery = `update student set status = 'waiting'`;
+    pool.query(sqlQuery, (error, result) => {
+      if (error) {
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch user by id`
+        // );
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error" });
+      }
+
+      if (result.affectedRows > 0) {
+        res.status(200).json({ success: 1, data: result });
+        console.log("students status updated");
+      }
+      // logger.info(`${req.method} ${req.originalUrl}, fetch user by id`);
+    });
+  },
+  allpromote: (req, res) => {
+    let data = req.body;
+
+    let sqlQuery = `update student set status = 'current' ,class='${data.nextclass}' where class ='${data.prevclass}'`;
+    pool.query(sqlQuery, (error, result) => {
+      if (error) {
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch user by id`
+        // );
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error" });
+      }
+
+      if (result.affectedRows) {
+        res.status(200).json({ success: 1, data: result });
+        console.log("students status updated");
+      }
+      // logger.info(`${req.method} ${req.originalUrl}, fetch user by id`);
+    });
+  },
+  selectedpromote: (req, res) => {
+    let data = req.body;
+
+    let myArray = req.body.value;
+
+    let sqlQuery = `update student set status = 'current' ,class='${data.nextclass}' where class ='${data.prevclass}'`;
+    pool.query(sqlQuery, (error, result) => {
+      if (error) {
+        console.log(error);
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch user by id`
+        // );
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error" });
+      }
+
+      if (result.affectedRows) {
+        if (0 == myArray.length)
+          return res
+            .status(200)
+            .json({
+              success: 1,
+              message: "updated students class successfully",
+            });
+        let i = 0;
+        while (i < myArray.length) {
+          console.log(i);
+          let sqlQuery = `update student set status = 'current' ,class='${data.prevclass}' where student_id ='${myArray[i]}'`;
+          pool.query(sqlQuery, (error, result) => {});
+          i++;
+          if (i+1 == myArray.length)
+            return res
+              .status(200)
+              .json({
+                success: 1,
+                message: "updated students class successfully",
+              });
+        }
+      }
+
+      // logger.info(`${req.method} ${req.originalUrl}, fetch user by id`);
+    });
+  },
   getStudentByUserId: (req, res) => {
     const id = req.params.student_id;
     let sqlQuery = `select * from student where student_id = '${id}'`;
@@ -162,7 +246,7 @@ module.exports = {
   //     res.status(200).json({ success: 1, data: result });
   //   });
   // },
-  
+
   getstudentbiodata: (req, res) => {
     const id = req.params.student_id;
     console.log(id);
@@ -182,18 +266,16 @@ module.exports = {
       //   `${req.method} ${req.originalUrl},'success', fetch single student biodata`
       // );
       res.status(200).json({ success: 1, data: result });
-      console.log(result)
+      console.log(result);
     });
   },
-  updatestudent: async(req, res) => {
-
+  updatestudent: async (req, res) => {
     await uploadFile(req, res);
     // console.log(res)
 
-    const data = JSON.parse(req.body.data)
-    console.log(data)
+    const data = JSON.parse(req.body.data);
+    console.log(data);
 
-   
     let link = process.env.SERVERLINK + "/uploadsstudent/" + data.filename;
     let sqlQuery = `UPDATE student SET firstName = '${data.firstName}', lastName = '${data.lastName}', otherName = '${data.otherName}', class = '${data.classes}', section = '${data.section}', religion = '${data.religion}', gender = '${data.gender}', dateofbirth = '${data.dateofbirth}', g1fname = '${data.gfName1}', g1lastname = '${data.glName1}', g1sex = '${data.gsex1}', g1address = '${data.gAddress1}', g1email = '${data.gemail1}', g1contact1 = '${data.contact1}', g1relation = '${data.gRelation1}', g1contact2 = '${data.contact2}', g2fname = '${data.gfName2}', g2lastname = '${data.glName2}', g2sex = '${data.gsex2}', g2address = '${data.gAddress2}', g2email = '${data.gemail2}', g2contact1 = '${data.contact3}', g2relation = '${data.gRelation2}', g2contact2 = '${data.contact4}',imagelink = '${link}',filename = '${data.filename}' WHERE student_id = '${data.studentId}' `;
 
@@ -224,12 +306,12 @@ module.exports = {
       }
     });
   },
-  
+
   deleteStudentsingle: (req, res) => {
     const studentId = req.body.id;
     const clazz = req.body.class;
     const section = req.body.section;
- 
+
     let sqlQuery = `update  student  set isActive='false' WHERE student_id = '${studentId}'`;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
@@ -252,18 +334,15 @@ module.exports = {
       }
       if (result.affectedRows == 1) {
         // logger.info(`${req.method} ${req.originalUrl}, delete user pin by id`);
-      
 
- let   sectionz = section == "All Sections" ? 'none' : section
+        let sectionz = section == "All Sections" ? "none" : section;
 
         let sqlQuery = `select student_id,firstName,otherName, lastName,gender, class,section from student where class = '${clazz}' and section = '${sectionz}' and isActive='true'`;
         pool.query(sqlQuery, (error, result) => {
-        
-    
           // logger.info(
           //   `${req.method} ${sqlQuery},'success', fetch all student by class`
           // );
-    console.log(result)
+          console.log(result);
           res.status(200).json({ success: 1, data: result });
         });
       }
@@ -291,8 +370,5 @@ module.exports = {
     });
   },
 };
-
-
-
 
 // thygracenaturalClinic$7
