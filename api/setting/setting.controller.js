@@ -36,6 +36,19 @@ function getUserByEmail(email, callBack) {
   );
 }
 
+function getschdata(email, callBack) {
+  pool.query(
+    `select * from school limit 1 `,
+    [email],
+    (error, results, fields) => {
+      if (error) {
+        callBack(error);
+      }
+      return callBack(null, results[0]);
+    }
+  );
+}
+
 module.exports = {
   createUserStaff: async (req, res) => {
     //await uploadFile(req, res);
@@ -192,8 +205,9 @@ module.exports = {
 
       const data = req.body;
   
-      let date = Date.now();
-  
+
+      getschdata(data.email, (err, results) => {
+        if (results) {
       let sqlQuery = `update school set name=${data.name} ,address=${data.address}, contact1=${data.contact1}, contact2=${data.contact2},code=${data.code}, email=${data.email} `;
       pool.query(sqlQuery, (error, result) => {
         if (error) {
@@ -209,6 +223,32 @@ module.exports = {
           // logger.info(`${req.method} ${req.originalUrl}, create new section`);
         }
       });
+        }
+  
+        // if not create user
+        else {
+          let sqlQuery = `insert into school (name,address,contact1,contact2,email) values  (${data.name},${data.address},${data.contact1},${data.contact2},${data.email} `;
+          pool.query(sqlQuery, (error, result) => {
+            if (error) {
+              // logger.info(
+              //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, create new section`
+              // );
+              return res
+                .status(500)
+                .json({ success: 0, error: "internal server error" });
+            }
+      
+            if (result.affectedRows == 1) {
+              // logger.info(`${req.method} ${req.originalUrl}, create new section`);
+            }
+          });
+
+        }
+
+      });
+
+  
+     
     
 
   },

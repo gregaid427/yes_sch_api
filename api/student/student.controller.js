@@ -77,6 +77,8 @@ module.exports = {
           .status(500)
           .json({ success: 0, error: "internal server error" });
       }
+console.log('result.affectedRows')
+console.log(result.affectedRows)
 
       if (result.affectedRows) {
         if (0 == myArray.length)
@@ -88,12 +90,11 @@ module.exports = {
             });
         let i = 0;
         while (i < myArray.length) {
-          console.log(i);
           let sqlQuery = `update student set status = 'current' ,class='${data.prevclass}' where student_id ='${myArray[i]}'`;
           pool.query(sqlQuery, (error, result) => {});
           i++;
-          if (i+1 == myArray.length)
-            return res
+          if (i == myArray.length)
+             res
               .status(200)
               .json({
                 success: 1,

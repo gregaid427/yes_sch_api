@@ -26,11 +26,14 @@ function getsectionByName(email, callBack) {
     }
   );
 }
+
+let date = new Date();
+date = date.toUTCString();
 module.exports = {
   createClass: async (req, res) => {
     const data = req.body;
 
-    let date = new Date();
+    
     const classId = Math.floor(Math.random() * 9000 + 1000);
 
     getClassByName(data.title, (err, results) => {
@@ -67,7 +70,7 @@ module.exports = {
             //   .json({ success: 1, Message: "create new Class successful" });
 
             //return table data
-            let sqlQuery = `select * from class where isActive = 'true'`;
+            let sqlQuery = 'SELECT distinct(class.title),class.id ,class.instructor,class.classId,count(student.class) as No FROM `class` left join student on class.title = student.class group by class.title';
             pool.query(sqlQuery, (error, result) => {
                     
               res.status(200).json({ success: 1, data: result });
@@ -95,7 +98,7 @@ module.exports = {
 
   //   const data = req.body;
 
-  //   let date = new Date();
+  //   
 
   //   let sqlQuery = `insert into section (classId,sectionName,createdAt,createdBy,isActive) values
   //          ('${data.classId}','${data.sectionName}','${date}','${data.createdBy}','${data.isActive}')`;
@@ -136,7 +139,7 @@ module.exports = {
       else {
         const data = req.body;
 
-        let date = new Date();
+        
 
         let sqlQuery = `insert into sectiongroup (sectionName,createdAt,createdBy,isActive) values
            ('${data.sectionName}','${date}','${data.createdBy}','true')`;
@@ -154,7 +157,7 @@ module.exports = {
             // logger.info(
             //   `${req.method} ${req.originalUrl}, create new Class section`
             // );
-            let sqlQuery = `select * from sectionGroup where isActive = 'true'`;
+            let sqlQuery = `select * from sectiongroup where isActive = 'true'`;
             pool.query(sqlQuery, (error, result) => {         
               res.status(200).json({ success: 1, data: result });
             });
@@ -207,7 +210,29 @@ module.exports = {
       //////////
     });
   },
+  getAllClassNo: (req, res) => {
+    let sqlQuery = 'SELECT distinct(class.title),class.id ,class.instructor,class.classId,count(student.class) as No FROM `class` left join student on class.title = student.class group by class.title';
+    pool.query(sqlQuery, (error, result) => {
+      console.log(error);
 
+      if (error) {
+        // logger.info(
+        //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all Class`
+        // );
+        console.log(error);
+
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error" });
+      }
+
+      // logger.info(
+      //   `${req.method} ${req.originalUrl},'success', fetch all Class`
+      // );
+
+      res.status(200).json({ success: 1, data: result });
+    });
+  },
   getAllClass: (req, res) => {
     let sqlQuery = `select * from class where isActive = 'true'`;
     pool.query(sqlQuery, (error, result) => {
@@ -281,7 +306,7 @@ module.exports = {
     });
   },
   getAllSectiongroup: (req, res) => {
-    let sqlQuery = `select * from sectionGroup where isActive = 'true'`;
+    let sqlQuery = `select * from sectiongroup where isActive = 'true'`;
     pool.query(sqlQuery, (error, result) => {
       console.log(error);
 
@@ -326,7 +351,7 @@ module.exports = {
 
   updateClass: (req, res) => {
     const data = req.body;
-    let date = new Date();
+    
     console.log(data);
     let sqlQuery = `update class set title ='${data.title}',instructor='${data.instructor}',updatedBy='${data.updatedBy}',updatedAt='${date}' where classId = ${data.classId}`;
 
@@ -360,7 +385,7 @@ module.exports = {
   
   updateSection: (req, res) => {
     const data = req.body;
-    let date = new Date();
+    
     console.log(data);
     let sqlQuery = `update sectiongroup set sectionName ='${data.sectionName}' where id = ${data.id}`;
 
@@ -481,7 +506,7 @@ module.exports = {
       if (result.affectedRows == 1) {
         // logger.info(`${req.method} ${req.originalUrl}, delete Class  by id`);
       //return table data
-      let sqlQuery = `select * from class where isActive = 'true'`;
+      let sqlQuery = 'SELECT distinct(class.title),class.id ,class.instructor,class.classId,count(student.class) as No FROM `class` left join student on class.title = student.class group by class.title';
       pool.query(sqlQuery, (error, result) => {
               
         res.status(200).json({ success: 1, data: result });
