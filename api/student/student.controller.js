@@ -6,23 +6,201 @@ const pool = require("../../config/database.js");
 const uploadFile = require("./upload.js");
 let date = new Date();
 date = date.toUTCString();
+let createHash = require("hash-generator");
 
-function getStudentByEmail(email, callBack) {
-  pool.query(
-    `select * from student where email = ?`,
-    [email],
-    (error, results, fields) => {
-      if (error) {
-        callBack(error);
+async function register(mydata) {
+  async function extractdata(mydata) {
+    let data = {
+      FIRST_NAME: mydata.FIRST_NAME ? mydata.FIRST_NAME : '',
+      OTHER_NAMES: mydata.OTHER_NAMES ? mydata.OTHER_NAMES : '',
+      LAST_NAME: mydata.LAST_NAME ? mydata.LAST_NAME : '',
+      RELIGION: mydata.RELIGION ? mydata.RELIGION : '',
+      GENDER: mydata.GENDER ? mydata.GENDER : '',
+      DATE_OF_BIRTH_DDMMYYYY: mydata.DATE_OF_BIRTH_DDMMYYYY ? mydata.DATE_OF_BIRTH_DDMMYYYY : '',
+      GUARDIAN_1_FIRST_NAME: mydata.GUARDIAN_1_FIRST_NAME ? mydata.GUARDIAN_1_FIRST_NAME : '',
+      GUARDIAN_1_LAST_NAME: mydata.GUARDIAN_1_LAST_NAME ? mydata.GUARDIAN_1_LAST_NAME : '',
+      GUARDIAN_1_GENDER: mydata.GUARDIAN_1_GENDER ? mydata.GUARDIAN_1_GENDER : '',
+      GUARDIAN_1_RELATION: mydata.GUARDIAN_1_RELATION ? mydata.GUARDIAN_1_RELATION : '',
+      GUARDIAN_1_CONTACT1: mydata.GUARDIAN_1_CONTACT1 ? mydata.GUARDIAN_1_CONTACT1 : '',
+      GUARDIAN_1_CONTACT2: mydata.GUARDIAN_1_CONTACT2 ? mydata.GUARDIAN_1_CONTACT2 : '',
+      GUARDIAN_1_ADDRESS: mydata.GUARDIAN_1_ADDRESS ? mydata.GUARDIAN_1_ADDRESS : '',
+      GUARDIAN_1_EMAIL: mydata.GUARDIAN_1_EMAIL ? mydata.GUARDIAN_1_EMAIL : '',
+      GUARDIAN_2_FIRST_NAME: mydata.GUARDIAN_2_FIRST_NAME ? mydata.GUARDIAN_2_FIRST_NAME : '',
+      GUARDIAN_2_LAST_NAME: mydata.GUARDIAN_2_LAST_NAME ? mydata.GUARDIAN_2_LAST_NAME : '',
+      GUARDIAN_2_GENDER: mydata.GUARDIAN_2_GENDER ? mydata.GUARDIAN_2_GENDER : '',
+      GUARDIAN_2_RELATION: mydata.GUARDIAN_2_RELATION ? mydata.GUARDIAN_2_RELATION : '',
+      GUARDIAN_2_CONTACT1: mydata.GUARDIAN_2_CONTACT1 ? mydata.GUARDIAN_2_CONTACT1 : '',
+      GUARDIAN_2_CONTACT2: mydata.GUARDIAN_2_CONTACT2 ? mydata.GUARDIAN_2_CONTACT2 : '',
+      GUARDIAN_2_ADDRESS: mydata.GUARDIAN_2_ADDRESS ? mydata.GUARDIAN_2_ADDRESS : '',
+      GUARDIAN_2_EMAIL: mydata.GUARDIAN_2_EMAIL ? mydata.GUARDIAN_2_EMAIL : '',
+      STUDENT_PASSWORD: mydata.STUDENT_PASSWORD ? mydata.STUDENT_PASSWORD : '',
+      EMAIL: mydata.EMAIL ? mydata.EMAIL : '',
+      CLASS: mydata.CLASS ? mydata.CLASS : '',
+      SECTION: mydata.SECTION ? mydata.SECTION : '',
+      GUARD1_PASSWORD: mydata.GUARD1_PASSWORD ? mydata.GUARD1_PASSWORD : '',
+      GUARD2_PASSWORD: mydata.GUARD2_PASSWORD ? mydata.GUARD2_PASSWORD : '',
+      GUARD1_USERNAME: mydata.GUARD1_USERNAME ? mydata.GUARD1_USERNAME : '',
+      GUARD2_USERNAME: mydata.GUARD2_USERNAME ? mydata.GUARD2_USERNAME : '',
+      CREATED_BY: mydata.CREATED_BY ? mydata.CREATED_BY : '',
+    };
+    return data;
+  }
+
+  let data = await extractdata(mydata);
+  let hashedPass = await bcrypt.hash(data.STUDENT_PASSWORD, 10);
+  console.log(data);
+  const userPin = Math.floor(Math.random() * 9000 + 1000);
+
+  let hashedPassGuard1 = await bcrypt.hash(data.GUARD1_PASSWORD, 10);
+  const userPinGuard1 = Math.floor(Math.random() * 9000 + 1000);
+
+  let hashedPassGuard2 = await bcrypt.hash(data.GUARD2_PASSWORD, 10);
+  const userPinGuard2 = Math.floor(Math.random() * 9000 + 1000);
+
+  async function idGenerator() {
+    // let month = new Date().getMonth() + 1
+    let year = new Date().getFullYear();
+    return year;
+  }
+
+  let partId = await idGenerator();
+
+  async function checkExistingStudent(callBack) {
+    pool.query(
+      `select student_id from student order by id desc limit 1`,
+
+      (error, results, fields) => {
+        console.log(results);
+
+        if (error) {
+          callBack(error);
+        }
+        return callBack(null, results[0]);
       }
-      return callBack(null, results[0]);
+    );
+  }
+
+  checkExistingStudent((err, result) => {
+    function myresult() {
+      let val = result.student_id;
+      val = val.slice(-4);
+      val = parseInt(val) + 1;
+      return "SD" + partId + val;
     }
-  );
+    // check if db is empty start with a default student_id
+    let student_id = result ? myresult() : "SD" + partId + "1110";
+    let sdtID = student_id;
+    let studUserId = createHash(6);
+    //insert into student table
+    sqlQuery1 = `insert into student (userId,student_id,firstName,lastName,otherName,class,section,religion,dateofbirth,gender) values
+        ('${studUserId}','${sdtID}','${data.FIRST_NAME}','${data.LAST_NAME}','${data.OTHER_NAMES}','${data.CLASS}','${data.SECTION}','${data.RELIGION}','${data.DATE_OF_BIRTH_DDMMYYYY}','${data.GENDER}')`;
+
+    pool.query(sqlQuery1, (error, result) => {
+      if (error) return console.log(error);
+      // first create student into student table
+
+      if (result.affectedRows == 1) {
+        // insert first guardian into users table
+
+        // insert student into users table
+        let sqlQuery1 = `insert into users (email,createdAt,createdBy,pincode,role,password,userId) values
+              ('${data.EMAIL}','${date}','${data.CREATED_BY}',${userPin},'student','${hashedPass}', '${studUserId}')`;
+
+        pool.query(sqlQuery1, (error, result) => {
+          if (error) {
+            console.log("student eeror error");
+            return res.status(500).json({ success: 0, Message: error });
+          }
+
+          ///////////////////////////////////////////////////////
+
+          if (data.GUARDIAN_1_FIRST_NAME !='') {
+            console.log("fffffffffffffffffffffff");
+            let customguardian1Id = createHash(6);
+
+            slqQuery4 = `insert into guardian (userId,originalemail,gEmail,gSex,gLastName,gFirstName,gContact1,gContact2,gAddress,student_id,gRelation ) values
+  ('${customguardian1Id}','${data.GUARDIAN_1_EMAIL}','${data.GUARD1_USERNAME}','${data.GUARDIAN_1_GENDER}','${data.GUARDIAN_1_LAST_NAME}','${data.GUARDIAN_1_FIRST_NAME}','${data.GUARDIAN_1_CONTACT1}','${data.GUARDIAN_1_CONTACT2}','${data.GUARDIAN_1_ADDRESS}','${sdtID}','${data.GUARDIAN_1_RELATION}') `;
+
+            pool.query(slqQuery4, (error, result) => {
+              if (error) {
+                console.log("Guardian1 GUARDIAN error");
+                return res.status(500).json({ success: 0, Message: error });
+              }
+
+              let sqlQuery3 = `insert into users (userId,email,createdAt,createdBy,pincode,role,password ) values
+  ('${customguardian1Id}','${data.GUARD1_USERNAME}','${date}','${data.CREATED_BY}',${userPinGuard1},'parent','${hashedPassGuard1}')`;
+
+              pool.query(sqlQuery3, (error, result) => {
+                if (error) {
+                  console.log(error);
+
+                  console.log("Guardian1 USERS  error");
+                  return res.status(500).json({ success: 0, Message: error });
+                }
+              });
+            });
+          }
+          if (data.GUARDIAN_2_FIRST_NAME !='') {
+            let customguardian2Id = createHash(6);
+
+            slqQuery4 = `insert into guardian (userId,originalemail,gEmail,gSex,gLastName,gFirstName,gContact1,gContact2,gAddress,student_id,gRelation ) values
+  ('${customguardian2Id}','${data.GUARDIAN_2_EMAIL}','${data.GUARD2_USERNAME}','${data.GUARDIAN_2_GENDER}','${data.GUARDIAN_2_LAST_NAME}','${data.GUARDIAN_2_FIRST_NAME}','${data.GUARDIAN_2_CONTACT1}','${data.GUARDIAN_2_CONTACT2}','${data.GUARDIAN_2_ADDRESS}','${sdtID}','${data.GUARDIAN_2_RELATION}') `;
+
+            pool.query(slqQuery4, (error, result) => {
+              if (error) {
+                console.log("Guardian2 GUARDIAN error");
+                return res.status(500).json({ success: 0, Message: error });
+              }
+
+              let sqlQuery3 = `insert into users (userId,email,createdAt,createdBy,pincode,role,password ) values
+  ('${customguardian2Id}','${data.GUARD2_USERNAME}','${date}','${data.CREATED_BY}',${userPinGuard2},'parent','${hashedPassGuard2}')`;
+
+              pool.query(sqlQuery3, (error, result) => {
+                if (error) {
+                  console.log("Guardian2 USERS  error");
+                  return res.status(500).json({ success: 0, Message: error });
+                }
+              });
+            });
+          }
+
+          //////////////////////////////////////////////////////////////////////
+        });
+      } else {
+        console.log("error along line");
+        return res.status(500).json({
+          success: 0,
+          error: "internal server error",
+          message: error,
+        });
+      }
+    });
+  });
 }
 
 module.exports = {
+  bulkAdmission: async (req, res) => {
+    let datas = req.body;
+    let length = datas.length;
+
+    for (let i = 0; i < length; i++) {
+      const kk = await register(datas[i]);
+      if (datas.length - 1 == i) {
+        let sqlQuery = `SELECT * from class where isActive='true' order by class.title`;
+
+        pool.query(sqlQuery, (error, result) => {
+          return res.status(200).json({
+            success: 1,
+            data: result,
+            message: "Bulk Students created successfully",
+          });
+        });
+      }
+    }
+  },
+
   setstudentwaiting: (req, res) => {
-    let sqlQuery = `update student set status = 'waiting'`;
+    let sqlQuery = `update student set status = 'Awaiting Promotion'`;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
@@ -77,29 +255,25 @@ module.exports = {
           .status(500)
           .json({ success: 0, error: "internal server error" });
       }
-console.log('result.affectedRows')
-console.log(result.affectedRows)
+      console.log("result.affectedRows");
+      console.log(result.affectedRows);
 
       if (result.affectedRows) {
         if (0 == myArray.length)
-          return res
-            .status(200)
-            .json({
-              success: 1,
-              message: "updated students class successfully",
-            });
+          return res.status(200).json({
+            success: 1,
+            message: "updated students class successfully",
+          });
         let i = 0;
         while (i < myArray.length) {
           let sqlQuery = `update student set status = 'current' ,class='${data.prevclass}' where student_id ='${myArray[i]}'`;
           pool.query(sqlQuery, (error, result) => {});
           i++;
           if (i == myArray.length)
-             res
-              .status(200)
-              .json({
-                success: 1,
-                message: "updated students class successfully",
-              });
+            res.status(200).json({
+              success: 1,
+              message: "updated students class successfully",
+            });
         }
       }
 
@@ -182,7 +356,7 @@ console.log(result.affectedRows)
   getstudentbyClass: (req, res) => {
     const clazz = req.body.class;
     console.log(clazz);
-    let sqlQuery = `select student_id,firstName,otherName, lastName,gender, class,section  from student where class = '${clazz}' and isActive='true'`;
+    let sqlQuery = `select userId,student_id,firstName,otherName, lastName,gender, class,section,dateofbirth,religion,imagelink,filename  from student where class = '${clazz}' and isActive='true' and status='current'`;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
@@ -205,7 +379,53 @@ console.log(result.affectedRows)
     const clazz = req.body.class;
     const section = req.body.section;
 
-    let sqlQuery = `select student_id,firstName,otherName, lastName,gender, class,section from student where class = '${clazz}' and section = '${section}' and isActive='true'`;
+    let sqlQuery = `select userId,student_id,firstName,otherName, lastName,gender, class,section from student where class = '${clazz}' and section = '${section}' and isActive='true' and status='current'`;
+    pool.query(sqlQuery, (error, result) => {
+      if (error) {
+        // logger.info(
+        //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all student by class`
+        // );
+
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error" });
+      }
+
+      // logger.info(
+      //   `${req.method} ${req.originalUrl},'success', fetch all student by class`
+      // );
+
+      res.status(200).json({ success: 1, data: result });
+    });
+  },
+
+  getstudentbyClassPromote: (req, res) => {
+    const clazz = req.body.class;
+    console.log(clazz);
+    let sqlQuery = `select * from student where class = '${clazz}' and isActive='true' `;
+    pool.query(sqlQuery, (error, result) => {
+      if (error) {
+        // logger.info(
+        //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all student by class`
+        // );
+
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error" });
+      }
+
+      // logger.info(
+      //   `${req.method} ${req.originalUrl},'success', fetch all student by class`
+      // );
+
+      res.status(200).json({ success: 1, data: result });
+    });
+  },
+  getstudentbyClassCustomPromote: (req, res) => {
+    const clazz = req.body.class;
+    const section = req.body.section;
+
+    let sqlQuery = `select * from student where class = '${clazz}' and section = '${section}' and isActive='true' `;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
@@ -270,18 +490,40 @@ console.log(result.affectedRows)
       console.log(result);
     });
   },
-  updatestudent: async (req, res) => {
+
+  setStudentLogo: async (req, res) => {
     await uploadFile(req, res);
+    const data = JSON.parse(req.body.data);
+
+    let link = process.env.SERVERLINK + "/uploadsStudent/" + data.filename;
+    let sqlQuery = `update student set filename='${data.filename}',imagelink = '${link}'
+     where student_id = ${data.id} `;
+
+    pool.query(sqlQuery, (error, result) => {
+      //  console.log()
+      if (error)
+        return res
+          .status(500)
+          .json({ success: 0, Message: "Error Uploadeding Image" });
+
+      if (result.affectedRows == 1) {
+        return res
+          .status(200)
+          .json({ success: 1, Message: "Student Image Uploaded Successfully" });
+      }
+    });
+  },
+  updatestudent: async (req, res) => {
     // console.log(res)
 
-    const data = JSON.parse(req.body.data);
-    console.log(data);
+    const data = req.body;
 
-    let link = process.env.SERVERLINK + "/uploadsstudent/" + data.filename;
-    let sqlQuery = `UPDATE student SET firstName = '${data.firstName}', lastName = '${data.lastName}', otherName = '${data.otherName}', class = '${data.classes}', section = '${data.section}', religion = '${data.religion}', gender = '${data.gender}', dateofbirth = '${data.dateofbirth}', g1fname = '${data.gfName1}', g1lastname = '${data.glName1}', g1sex = '${data.gsex1}', g1address = '${data.gAddress1}', g1email = '${data.gemail1}', g1contact1 = '${data.contact1}', g1relation = '${data.gRelation1}', g1contact2 = '${data.contact2}', g2fname = '${data.gfName2}', g2lastname = '${data.glName2}', g2sex = '${data.gsex2}', g2address = '${data.gAddress2}', g2email = '${data.gemail2}', g2contact1 = '${data.contact3}', g2relation = '${data.gRelation2}', g2contact2 = '${data.contact4}',imagelink = '${link}',filename = '${data.filename}' WHERE student_id = '${data.studentId}' `;
+    //  let link = process.env.SERVERLINK + "/uploadsstudent/" + data.filename;
+    let sqlQuery = `UPDATE student SET firstName = '${data.firstName}', lastName = '${data.lastName}', otherName = '${data.otherName}', class = '${data.classes}', section = '${data.section}', religion = '${data.religion}', gender = '${data.gender}', dateofbirth = '${data.dateofbirth}' WHERE student_id = '${data.studentId}' `;
 
     pool.query(sqlQuery, (error, result) => {
       if (error) {
+        console.log(error);
         // logger.info(
         //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update user data`
         // );

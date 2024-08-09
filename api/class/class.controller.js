@@ -33,7 +33,6 @@ module.exports = {
   createClass: async (req, res) => {
     const data = req.body;
 
-    
     const classId = Math.floor(Math.random() * 9000 + 1000);
 
     getClassByName(data.title, (err, results) => {
@@ -47,37 +46,63 @@ module.exports = {
 
       // if not create user
       else {
-        let sqlQuery = `insert into class (classId,title,createdAt,createdBy,isActive,instructor) values
-           ('${classId}','${data.title}','${date}','${data.createdBy}','true','${data.instructor}')`;
-        pool.query(sqlQuery, (error, result) => {
-          if (error) {
-            // logger.info(
-            //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, Error create new Class`
-            // );
-            return res
-              .status(500)
-              .json({ success: 0, error: "internal server error" });
-          }
+        console.log(data.sections);
+        if (data.sections[0] == null) {
+          console.log('pppppppppppp')
 
-          if (result.affectedRows == 1) {
-            // logger.info(
-            //   `${req.method} ${req.originalUrl},success create new Class`
-            // );
-
-
-            // res
-            //   .status(200)
-            //   .json({ success: 1, Message: "create new Class successful" });
-
-            //return table data
-            let sqlQuery = 'SELECT distinct(class.title),class.id ,class.instructor,class.classId,count(student.class) as No FROM `class` left join student on class.title = student.class group by class.title';
+          let sqlQuery = `insert into class (classId,title,createdAt,createdBy,isActive,instructor) values
+          ('${classId}','${data.title}','${date}','${data.createdBy}','true','${data.instructor}')`;
+          pool.query(sqlQuery, (error, result) => {
+            if (error) {
+              console.log(error)
+              // logger.info(
+              //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, Error create new Class`
+              // );
+              return res
+                .status(500)
+                .json({ success: 0, error: "internal server error" });
+            }
+              let sqlQuery =
+                `SELECT * from class where isActive="true" order by class.title `;
+              pool.query(sqlQuery, (error, result) => {
+                console.log(result)
+                res.status(200).json({ success: 1, data: result });
+              });
+            
+          });
+        } 
+        else {
+          let datas = data.sections;
+        
+          for (let i = 0; i < datas.length; i++) {
+            let section = datas[i];
+            console.log(section);
+  
+            let sqlQuery = `insert into class (classId,title,createdAt,createdBy,isActive,instructor,section) values
+             ('${classId}','${data.title}','${date}','${data.createdBy}','true','${data.instructor}','${section}')`;
             pool.query(sqlQuery, (error, result) => {
-                    
-              res.status(200).json({ success: 1, data: result });
+              if (error) {
+                // logger.info(
+                //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, Error create new Class`
+                // );
+                return res
+                  .status(500)
+                  .json({ success: 0, error: "internal server error" });
+              }
+  
+              if (datas.length - 1 == i) {
+                let sqlQuery =
+                `SELECT * from class where isActive='true' order by class.title `;
+                pool.query(sqlQuery, (error, result) => {
+                  console.log(result)
+                  res.status(200).json({ success: 1, data: result });
+                });
+              }
             });
-
           }
-        });
+
+    
+        }
       }
     });
   },
@@ -98,7 +123,7 @@ module.exports = {
 
   //   const data = req.body;
 
-  //   
+  //
 
   //   let sqlQuery = `insert into section (classId,sectionName,createdAt,createdBy,isActive) values
   //          ('${data.classId}','${data.sectionName}','${date}','${data.createdBy}','${data.isActive}')`;
@@ -139,8 +164,6 @@ module.exports = {
       else {
         const data = req.body;
 
-        
-
         let sqlQuery = `insert into sectiongroup (sectionName,createdAt,createdBy,isActive) values
            ('${data.sectionName}','${date}','${data.createdBy}','true')`;
         pool.query(sqlQuery, (error, result) => {
@@ -158,7 +181,7 @@ module.exports = {
             //   `${req.method} ${req.originalUrl}, create new Class section`
             // );
             let sqlQuery = `select * from sectiongroup where isActive = 'true'`;
-            pool.query(sqlQuery, (error, result) => {         
+            pool.query(sqlQuery, (error, result) => {
               res.status(200).json({ success: 1, data: result });
             });
           }
@@ -211,7 +234,9 @@ module.exports = {
     });
   },
   getAllClassNo: (req, res) => {
-    let sqlQuery = 'SELECT distinct(class.title),class.id ,class.instructor,class.classId,count(student.class) as No FROM `class` left join student on class.title = student.class group by class.title';
+    let sqlQuery = 
+    `SELECT * from class where isActive='true' order by class.title` ;
+
     pool.query(sqlQuery, (error, result) => {
       console.log(error);
 
@@ -234,7 +259,7 @@ module.exports = {
     });
   },
   getAllClass: (req, res) => {
-    let sqlQuery = `select * from class where isActive = 'true'`;
+    let sqlQuery = `select * from class where isActive = 'true' group by title`;
     pool.query(sqlQuery, (error, result) => {
       console.log(error);
 
@@ -351,7 +376,7 @@ module.exports = {
 
   updateClass: (req, res) => {
     const data = req.body;
-    
+
     console.log(data);
     let sqlQuery = `update class set title ='${data.title}',instructor='${data.instructor}',updatedBy='${data.updatedBy}',updatedAt='${date}' where classId = ${data.classId}`;
 
@@ -373,19 +398,20 @@ module.exports = {
           .status(200)
           .json({ success: 0, error: "update Class data: no record found" });
       }
-
       if (result.affectedRows == 1) {
-        // logger.info(`${req.method} ${req.originalUrl}, update Class data`);
-        return res
-          .status(200)
-          .json({ success: 1, error: "update Class data success" });
+        // logger.info(`${req.method} ${req.originalUrl}, delete Class  by id`);
+        //return table data
+        let sqlQuery = `SELECT * from class where isActive='true' order by class.title` ;
+        pool.query(sqlQuery, (error, result) => {
+          res.status(200).json({ success: 1, data: result });
+        });
       }
     });
   },
-  
+
   updateSection: (req, res) => {
     const data = req.body;
-    
+
     console.log(data);
     let sqlQuery = `update sectiongroup set sectionName ='${data.sectionName}' where id = ${data.id}`;
 
@@ -505,17 +531,14 @@ module.exports = {
       }
       if (result.affectedRows == 1) {
         // logger.info(`${req.method} ${req.originalUrl}, delete Class  by id`);
-      //return table data
-      let sqlQuery = 'SELECT distinct(class.title),class.id ,class.instructor,class.classId,count(student.class) as No FROM `class` left join student on class.title = student.class group by class.title';
-      pool.query(sqlQuery, (error, result) => {
-              
-        res.status(200).json({ success: 1, data: result });
-      });
+        //return table data
+        let sqlQuery = `SELECT * from class where isActive='true' order by class.title` ;
+        pool.query(sqlQuery, (error, result) => {
+          res.status(200).json({ success: 1, data: result });
+        });
       }
     });
   },
-
-  
 
   deletesinglegroup: (req, res) => {
     const id = req.params.id;
@@ -542,12 +565,11 @@ module.exports = {
       }
       if (result.affectedRows == 1) {
         // logger.info(`${req.method} ${req.originalUrl}, delete Class  by id`);
-      //return table data
-      let sqlQuery = `select * from sectiongroup `;
-      pool.query(sqlQuery, (error, result) => {
-              
-        res.status(200).json({ success: 1, data: result });
-      });
+        //return table data
+        let sqlQuery = `select * from sectiongroup `;
+        pool.query(sqlQuery, (error, result) => {
+          res.status(200).json({ success: 1, data: result });
+        });
       }
     });
   },

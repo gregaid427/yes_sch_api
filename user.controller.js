@@ -171,7 +171,7 @@ module.exports = {
 
     let link = process.env.SERVERLINK + "/uploadsstudent/" + data.filename;
     let sqlQuery = `update student set filename='${data.filename}',imagelink = '${link}'
-     where student_id = '${data.id}' `;
+     where userId = '${data.id}' `;
 
     pool.query(sqlQuery, (error, result) => {
       //  console.log()
@@ -213,9 +213,7 @@ module.exports = {
     });
   },
 
-
- 
-createUserStudent: async (req, res) => {
+  createUserStudent: async (req, res) => {
     const data = req.body;
     const saltRounds = 10;
 
@@ -783,7 +781,7 @@ createUserStudent: async (req, res) => {
           });
         }
 
-        if (results.role == "parent") {
+        if (results.role == "guardian") {
           let sqlQuery = `select * from guardian where userId ='${results.userId}'  `;
           pool.query(sqlQuery, (error, result) => {
             let returnData = [
@@ -1002,31 +1000,6 @@ createUserStudent: async (req, res) => {
       //   `${req.method} ${req.originalUrl},'success', fetch all users`
       // );
 
-      res.status(200).json({ success: 1, data: result });
-    });
-  },
-  getuserdata: (req, res) => {
-    let data =  req.body
-  //  if(data.role=='student')
-  // select * from student left join users on student.userId = users.userId where student.userId = 'z0puvv'; 
-    let sqlQuery = `select * from guardian  where student_id = '${data.id}' `;
-    console.log(sqlQuery)
-    
-    pool.query(sqlQuery, (error, result) => {
-      if (error) {
-        // logger.info(
-        //   `${req.method} ${req.originalUrl}, 'server error', fetch all users`
-        // );
-
-        return res
-          .status(500)
-          .json({ success: 0, error: "internal server error" });
-      }
-
-      // logger.info(
-      //   `${req.method} ${req.originalUrl},'success', fetch all users`
-      // );
-       result.password=''
       res.status(200).json({ success: 1, data: result });
     });
   },

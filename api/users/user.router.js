@@ -22,6 +22,7 @@ const {
   deleteStaff,
   activeStaff,
   schoolinfo,
+  getuserdata,
   setSchoolLogo,
   schoolinfoupdate
 } = require("./user.controller");
@@ -44,6 +45,8 @@ router.get("/",  getUsers);
 router.post("/guardian",  createUserGuardian);
 router.post("/newstaff",  createUserStaff);
 router.post("/newstudent",  createUserStudent);
+router.post("/userdata",  getuserdata);
+
 
 
 

@@ -30,7 +30,6 @@ router.get("/allno/",  getAllClassNo);
 router.get("/section",  getAllSection);
 router.get("/groupsection",  getAllSectiongroup);
 
-
 router.post("/single",  getClassByClassId);
 router.post("/sectionclass",  getsectionByClassId);
 
