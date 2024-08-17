@@ -12,7 +12,8 @@ module.exports = {
         // );
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
       return res.status(200).json({ success: 1, data: result });
     });
@@ -28,7 +29,8 @@ module.exports = {
         // );
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
       return res.status(200).json({ success: 1, data: result });
     });
@@ -43,7 +45,8 @@ module.exports = {
         // );
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
       return res.status(200).json({ success: 1, data: result });
     });
@@ -58,7 +61,8 @@ module.exports = {
         // );
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
       return res.status(200).json({ success: 1, data: result });
     });
@@ -74,7 +78,8 @@ module.exports = {
         // );
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
       console.log(result)
       return res.status(200).json({ success: 1, data: result });
@@ -91,7 +96,8 @@ module.exports = {
         // );
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
       return res.status(200).json({ success: 1, data: result });
     });

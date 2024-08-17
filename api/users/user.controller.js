@@ -158,7 +158,8 @@ module.exports = {
           } else
             res
               .status(500)
-              .json({ success: 0, error: "internal server error" });
+                       .json({ success: 0, error: "internal server error",message:error });
+
         });
       }
     });
@@ -418,9 +419,24 @@ createUserStudent: async (req, res) => {
                   .status(500)
                   .json({ success: 0, Message: error });
               }
+              
 
               if (result.affectedRows == 1) {
                
+                let sqlQuery1 = `insert into account (student_id,createdat,createdby) values
+                ('${customStudentId}','${date}','${data.createdBy}')`;
+      
+                  pool.query(sqlQuery1, (error, result) => {
+                    if (error) {
+                     
+                      console.log("student account error");
+                      console.log(error);
+
+                      return res
+                        .status(500)
+                        .json({ success: 0, Message: error });
+                    } 
+                  });
 
                 const signedToken = jwt.sign(
                   { data: result.email },
@@ -708,7 +724,8 @@ createUserStudent: async (req, res) => {
           } else
             res
               .status(500)
-              .json({ success: 0, error: "internal server error" });
+                       .json({ success: 0, error: "internal server error",message:error });
+
         });
       }
     });
@@ -867,7 +884,8 @@ createUserStudent: async (req, res) => {
         // );
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
 
       if (!result) {
@@ -901,7 +919,8 @@ createUserStudent: async (req, res) => {
         // );
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
 
       if (!result) {
@@ -927,7 +946,8 @@ createUserStudent: async (req, res) => {
 
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
 
       // logger.info(
@@ -947,7 +967,8 @@ createUserStudent: async (req, res) => {
 
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
 
       // logger.info(
@@ -972,7 +993,8 @@ createUserStudent: async (req, res) => {
 
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
 
       // logger.info(
@@ -995,7 +1017,8 @@ createUserStudent: async (req, res) => {
 
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
 
       // logger.info(
@@ -1020,7 +1043,8 @@ createUserStudent: async (req, res) => {
 
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
 
       // logger.info(
@@ -1040,7 +1064,8 @@ createUserStudent: async (req, res) => {
         // );
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
 
       if (!result) {
@@ -1067,7 +1092,8 @@ createUserStudent: async (req, res) => {
         // );
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
 
       if (result.affectedRows != 1) {
@@ -1100,7 +1126,8 @@ createUserStudent: async (req, res) => {
         // );
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
 
       if (result.affectedRows != 1) {
@@ -1159,7 +1186,8 @@ createUserStudent: async (req, res) => {
             // );
             return res
               .status(500)
-              .json({ success: 0, error: "internal server error" });
+                       .json({ success: 0, error: "internal server error",message:error });
+
           }
 
           // logger.info(
@@ -1213,7 +1241,8 @@ createUserStudent: async (req, res) => {
             // );
             return res
               .status(500)
-              .json({ success: 0, error: "internal server error" });
+                       .json({ success: 0, error: "internal server error",message:error });
+
           }
 
           if (result.affectedRows != 1) {
@@ -1305,7 +1334,8 @@ createUserStudent: async (req, res) => {
         // );
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
 
       if (result.affectedRows != 1) {
@@ -1343,7 +1373,8 @@ createUserStudent: async (req, res) => {
         // );
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
 
       if (result.affectedRows != 1) {
@@ -1379,7 +1410,8 @@ createUserStudent: async (req, res) => {
         // );
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
 
       if (result.affectedRows != 1) {
@@ -1414,7 +1446,8 @@ createUserStudent: async (req, res) => {
         // );
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
 
       if (result.affectedRows != 1) {

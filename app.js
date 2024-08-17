@@ -11,6 +11,8 @@ const inventoryRouter = require("./api/inventory/inventory.router");
 const expenseRouter = require("./api/expense/expense.router");
 const sessionRouter = require("./api/session/session.router");
 const settingRouter = require("./api/setting/setting.router");
+const feeRouter = require("./api/fee/fee.router");
+
 
 //const patientsRouter = require("./api/patients/patients.router");
 //const vitalsRouter = require("./api/vitals/vitals.router");
@@ -45,6 +47,8 @@ app.use("/api/inventory", inventoryRouter);
 app.use("/api/expense", expenseRouter);
 app.use("/api/session", sessionRouter);
 app.use("/api/setting", settingRouter);
+app.use("/api/fee", feeRouter);
+
 
 // app.use("/api/linkedaccounts", linkedaccountsRouter);
 // app.use("/api/projects", projectRouter);

@@ -158,7 +158,8 @@ module.exports = {
           } else
             res
               .status(500)
-              .json({ success: 0, error: "internal server error" });
+                       .json({ success: 0, error: "internal server error",message:error });
+
         });
       }
     });
@@ -706,7 +707,8 @@ module.exports = {
           } else
             res
               .status(500)
-              .json({ success: 0, error: "internal server error" });
+                       .json({ success: 0, error: "internal server error",message:error });
+
         });
       }
     });
@@ -865,7 +867,8 @@ module.exports = {
         // );
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
 
       if (!result) {
@@ -899,7 +902,8 @@ module.exports = {
         // );
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
 
       if (!result) {
@@ -925,7 +929,8 @@ module.exports = {
 
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
 
       // logger.info(
@@ -945,7 +950,8 @@ module.exports = {
 
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
 
       // logger.info(
@@ -970,7 +976,8 @@ module.exports = {
 
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
 
       // logger.info(
@@ -993,7 +1000,8 @@ module.exports = {
 
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
 
       // logger.info(
@@ -1013,7 +1021,8 @@ module.exports = {
         // );
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
 
       if (!result) {
@@ -1040,7 +1049,8 @@ module.exports = {
         // );
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
 
       if (result.affectedRows != 1) {
@@ -1073,7 +1083,8 @@ module.exports = {
         // );
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
 
       if (result.affectedRows != 1) {
@@ -1132,7 +1143,8 @@ module.exports = {
             // );
             return res
               .status(500)
-              .json({ success: 0, error: "internal server error" });
+                       .json({ success: 0, error: "internal server error",message:error });
+
           }
 
           // logger.info(
@@ -1186,7 +1198,8 @@ module.exports = {
             // );
             return res
               .status(500)
-              .json({ success: 0, error: "internal server error" });
+                       .json({ success: 0, error: "internal server error",message:error });
+
           }
 
           if (result.affectedRows != 1) {
@@ -1278,7 +1291,8 @@ module.exports = {
         // );
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
 
       if (result.affectedRows != 1) {
@@ -1316,7 +1330,8 @@ module.exports = {
         // );
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
 
       if (result.affectedRows != 1) {
@@ -1352,7 +1367,8 @@ module.exports = {
         // );
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
 
       if (result.affectedRows != 1) {
@@ -1387,7 +1403,8 @@ module.exports = {
         // );
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
 
       if (result.affectedRows != 1) {

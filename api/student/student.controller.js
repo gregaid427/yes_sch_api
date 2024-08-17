@@ -100,8 +100,16 @@ async function register(mydata) {
       // first create student into student table
 
       if (result.affectedRows == 1) {
-        // insert first guardian into users table
+        let sqlQuery = `insert into account (student_id,createdat,createdby) values
+        ('${sdtID}','${date}','${data.CREATED_BY}')`;
 
+          pool.query(sqlQuery, (error, result) => {
+            if (error) {
+             
+              console.log("student account error");
+              console.log(error);
+            } 
+          });
         // insert student into users table
         let sqlQuery1 = `insert into users (email,createdAt,createdBy,pincode,role,password,userId) values
               ('${data.EMAIL}','${date}','${data.CREATED_BY}',${userPin},'student','${hashedPass}', '${studUserId}')`;
@@ -208,7 +216,8 @@ module.exports = {
         // );
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
 
       if (result.affectedRows > 0) {
@@ -229,7 +238,8 @@ module.exports = {
         // );
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
 
       if (result.affectedRows) {
@@ -253,7 +263,8 @@ module.exports = {
         // );
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
       console.log("result.affectedRows");
       console.log(result.affectedRows);
@@ -290,7 +301,8 @@ module.exports = {
         // );
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
 
       if (!result) {
@@ -316,7 +328,8 @@ module.exports = {
 
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
 
       // logger.info(
@@ -337,7 +350,8 @@ module.exports = {
         // );
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
 
       if (!result) {
@@ -365,7 +379,8 @@ module.exports = {
 
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
 
       // logger.info(
@@ -388,7 +403,8 @@ module.exports = {
 
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
 
       // logger.info(
@@ -398,6 +414,55 @@ module.exports = {
       res.status(200).json({ success: 1, data: result });
     });
   },
+  getstudentbyClassbal: (req, res) => {
+    const clazz = req.body.class;
+    console.log(clazz);
+    let sqlQuery = `select student.userId,student.student_id,student.firstName,student.otherName, student.lastName,student.gender, student.class,student.section,account.accountbalance from student left join account on student.student_id=account.student_id where student.class = '${clazz}'`;
+    pool.query(sqlQuery, (error, result) => {
+      if (error) {
+        // logger.info(
+        //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all student by class`
+        // );
+
+        return res
+          .status(500)
+                   .json({ success: 0, error: "internal server error",message:error });
+
+      }
+
+      // logger.info(
+      //   `${req.method} ${req.originalUrl},'success', fetch all student by class`
+      // );
+console.log(result)
+      res.status(200).json({ success: 1, data: result });
+    });
+  },
+  getstudentbyClassCustomBal: (req, res) => {
+    const clazz = req.body.class;
+    const section = req.body.section;
+
+    let sqlQuery = `select student.userId,student.student_id,student.firstName,student.otherName, student.lastName,student.gender, student.class,student.section,account.accountbalance from student left join account on student.student_id=account.student_id where student.class = '${clazz}' and student.section = '${section}'`;
+    pool.query(sqlQuery, (error, result) => {
+      if (error) {
+        // logger.info(
+        //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all student by class`
+        // );
+
+        return res
+          .status(500)
+                   .json({ success: 0, error: "internal server error",message:error });
+
+      }
+
+      // logger.info(
+      //   `${req.method} ${req.originalUrl},'success', fetch all student by class`
+      // );
+      console.log(result)
+
+      res.status(200).json({ success: 1, data: result });
+    });
+  },
+
 
   getstudentbyClassPromote: (req, res) => {
     const clazz = req.body.class;
@@ -411,7 +476,8 @@ module.exports = {
 
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
 
       // logger.info(
@@ -434,7 +500,8 @@ module.exports = {
 
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
 
       // logger.info(
@@ -457,7 +524,8 @@ module.exports = {
 
   //       return res
   //         .status(500)
-  //         .json({ success: 0, error: "internal server error" });
+  //                  .json({ success: 0, error: "internal server error",message:error });
+
   //     }
 
   //     logger.info(
@@ -480,7 +548,8 @@ module.exports = {
 
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
 
       // logger.info(
@@ -563,7 +632,8 @@ module.exports = {
         // );
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
 
       if (result.affectedRows != 1) {
@@ -601,7 +671,8 @@ module.exports = {
         // );
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
       if (result.affectedRows == 1) {
         // logger.info(`${req.method} ${req.originalUrl}, delete all records`);

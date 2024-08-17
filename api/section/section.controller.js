@@ -21,7 +21,8 @@ module.exports = {
         // );
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
 
       if (result.affectedRows == 1) {
@@ -41,7 +42,8 @@ module.exports = {
         // );
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
 
       if (!result) {
@@ -67,7 +69,8 @@ module.exports = {
 
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
 
       // logger.info(
@@ -91,7 +94,8 @@ module.exports = {
         // );
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
 
       if (result.affectedRows != 1) {
@@ -125,7 +129,8 @@ module.exports = {
         // );
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
 
       if (result.affectedRows != 1) {
@@ -154,7 +159,8 @@ module.exports = {
         // );
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
       if (result.affectedRows == 1) {
         // logger.info(`${req.method} ${req.originalUrl}, delete all records`);
@@ -178,7 +184,8 @@ module.exports = {
         // );
         return res
           .status(500)
-          .json({ success: 0, error: "internal server error" });
+                   .json({ success: 0, error: "internal server error",message:error });
+
       }
 
       if (result.affectedRows != 1) {
