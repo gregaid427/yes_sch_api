@@ -20,6 +20,7 @@ const {
   deleteSingleCartfee,
   deletescholarship,
   assignfee,
+  preferences
 } = require("./fee.controller");
 
 router.get("/", getAllfee);
@@ -29,6 +30,8 @@ router.post("/scholarship", addScholarship);
 router.get("/scholarship", getScholarship);
 
 router.post("/payfee", payfee);
+router.post("/preferences", preferences);
+
 router.post("/assignfee", assignfee);
 router.post("/generatefee", generatefee);
 router.get("/feerecord", getfeerecord);

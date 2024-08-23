@@ -7,13 +7,16 @@ const {
   updatesession,
   updatesessionStatus,
   deleteAllsession,
-  deleteSinglesession
+  deleteSinglesession,
+  getActivesession
 
 } = require("./session.controller");
+router.get("/active",  getActivesession);
 
 router.post("/status/",  updatesessionStatus); 
 router.post("/",  createsession);
 router.get("/",  getAllsession);
+
 router.get("/:id", getsessionById );
 router.patch("/",  updatesession);
 router.delete("/single/:id",  deleteSinglesession);

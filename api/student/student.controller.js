@@ -417,7 +417,7 @@ module.exports = {
   getstudentbyClassbal: (req, res) => {
     const clazz = req.body.class;
     console.log(clazz);
-    let sqlQuery = `select student.userId,student.student_id,student.firstName,student.otherName, student.lastName,student.gender, student.class,student.section,account.accountbalance from student left join account on student.student_id=account.student_id where student.class = '${clazz}'`;
+    let sqlQuery = `select student.userId,student.student_id,student.firstName,student.otherName, student.lastName,student.gender, student.class,student.section,account.* from student left join account on student.student_id=account.student_id where student.class = '${clazz}'`;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(

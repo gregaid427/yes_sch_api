@@ -96,6 +96,27 @@ module.exports = {
     });
   },
 
+  getActivesession: (req, res) => {
+    let sqlQuery = `select sessionname  from session where active = 'true'`;
+    pool.query(sqlQuery, (error, result) => {
+      if (error) {
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, 'server error', fetch all session`
+        // );
+
+        return res
+          .status(500)
+                   .json({ success: 0, error: "internal server error",message:error });
+
+      }
+
+      // logger.info(
+      //   `${req.method} ${req.originalUrl},'success', fetch all session`
+      // );
+
+      res.status(200).json({ success: 1, data: result });
+    });
+  },
 
   updatesession: (req, res) => {
     const data = req.body;

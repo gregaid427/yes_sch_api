@@ -7,7 +7,9 @@ date = date.toUTCString();
 
 async function RecordAssignFee(data) {
   let sqlQuery = `insert into assignfeerecord (class,total,createdat,status,createdby) values
-     ('${data.class}','${data.total}','${date.slice(0,17)}','pending','${data.createdby}')`;
+     ('${data.class}','${data.total}','${date.slice(0, 17)}','pending','${
+    data.createdby
+  }')`;
 
   pool.query(sqlQuery, (error, results, fields) => {
     if (error) {
@@ -15,6 +17,28 @@ async function RecordAssignFee(data) {
       return console.log("finance log error");
     }
     console.log("logged successfully");
+  });
+}
+
+async function RecordAssignFeeclass(data) {
+  const promise1 = await new Promise((resolve, reject) => {
+    for (let i = 0; i < data.fee.length; i++) {
+      let name = data.fee[i][0];
+      let amt = data.fee[i][1];
+      let sqlQuery = `insert into assignfeecartegory (class,feename,amount,createdat,createdby) values
+     ('${data.class}','${name}','${amt}','${date.slice(0, 17)}','${
+        data.createdby
+      }')`;
+
+      pool.query(sqlQuery, (error, results, fields) => {
+        if (error) {
+          console.log(error);
+          return console.log("finance log error");
+        }
+        resolve(results);
+        console.log("record logged successfully");
+      });
+    }
   });
 }
 
@@ -65,7 +89,9 @@ async function updatefeepayable({ stdid, amount }, callBack) {
     }
   );
 }
-
+function hashgenerator(num) {
+  return createHash(num);
+}
 module.exports = {
   createfee: async (req, res) => {
     const data = req.body;
@@ -102,8 +128,8 @@ module.exports = {
     const data = req.body;
     console.log(data);
 
-    let sqlQuery = `insert into scholarshiplist (name,amount,CreatedBy,createdAt,description) values
-   ('${data.name}','${data.amount}','${data.CreatedBy}','${date}','${data.description}')`;
+    let sqlQuery = `insert into scholarshiplist (title,amount,CreatedBy,createdAt,percent,applicable,type) values
+   ('${data.title}','${data.amount}','${data.CreatedBy}','${date}','${data.percent}','${data.applicable}','${data.type}')`;
 
     pool.query(sqlQuery, (error, result) => {
       if (error) {
@@ -152,9 +178,9 @@ module.exports = {
       res.status(200).json({ success: 1, data: result });
     });
   },
-  updatefeerecord : (req, res) => {
-    let data = req.body
-    let sqlQuery = `update assignfeerecord set status = "Applied" where class='${data.class}'` ;
+  updatefeerecord: (req, res) => {
+    let data = req.body;
+    let sqlQuery = `update assignfeerecord set status = "Applied" where class='${data.class}'`;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(
@@ -230,10 +256,10 @@ module.exports = {
 
   createfeeCartegory: (req, res) => {
     const data = req.body;
-
+    let hash = hashgenerator(7);
     console.log(data);
-    let sqlQuery = `insert into feesgroup (name,createdby,createdat,status,description) values
-    ('${data.name}','${data.createdby}','${date}','true','${data.description}')`;
+    let sqlQuery = `insert into feesgroup (name,feeid,createdby,createdat,status,description) values
+    ('${data.name}','${hash}','${data.createdby}','${date}','true','${data.description}')`;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(
@@ -250,10 +276,10 @@ module.exports = {
       );
       if (result.affectedRows == 1) {
         console.log(`${req.method} ${req.originalUrl},Success create new fee`);
-        let sqlQuery1 = `ALTER TABLE account ADD ${data.name} VARCHAR(50) NULL DEFAULT 'true' AFTER createdat`;
+        let sqlQuery1 = `update account set accountcode =  `;
         pool.query(sqlQuery1, (error, result) => {
           if (error) {
-            console.log(`${req.method} ${error},`);
+            return console.log(`${sqlQuery1} ${error},`);
           }
           console.log(
             `${req.method} ${req.originalUrl},Success create new column field`
@@ -398,11 +424,9 @@ module.exports = {
   },
 
   assignfee: async (req, res) => {
-    
-
     const data = req.body;
-    let record = await RecordAssignFee(data)
-
+    let record = await RecordAssignFee(data);
+    let recordclass = await RecordAssignFeeclass(data);
 
     let feedata = data.fee;
 
@@ -411,7 +435,7 @@ module.exports = {
       let amt = feedata[i][1];
 
       const promise4 = await new Promise((resolve, reject) => {
-        let sqlQuery1 = `select student_id from student where  class ='${data.class}' `;
+        let sqlQuery1 = `select  account.preference,account.student_id from student left join account on student.student_id = account.student_id where student.class ='${data.class}' `;
 
         pool.query(sqlQuery1, async (error, result) => {
           if (error) {
@@ -423,7 +447,9 @@ module.exports = {
           console.log(ss);
 
           for (let i = 0; i < result.length; i++) {
-            let singlestudent = result[i];
+            let singlestudent = result[i].student_id;
+            let preference = result[i].preference;
+
             let bb = ss;
             let feedata = data.fee;
 
@@ -431,7 +457,7 @@ module.exports = {
 
             async function update(name, singlestudent) {
               console.log(singlestudent);
-              let sqlQuery2 = `select feepayable as feepay from account where student_id='${singlestudent.student_id}' `;
+              let sqlQuery2 = `select feepayable as feepay from account where student_id='${singlestudent}' `;
               const promise = await new Promise((resolve, reject) => {
                 pool.query(sqlQuery2, async (error, resulty) => {
                   if (error) {
@@ -444,28 +470,25 @@ module.exports = {
                 });
               });
 
-              let sqlQuery1 = `select ${name} as val from account where student_id='${singlestudent.student_id}'  `;
               const promise1 = await new Promise((resolve, reject) => {
-                pool.query(sqlQuery1, async (error, result) => {
-                  if (error) {
-                    console.log(
-                      `${error} ${req.originalUrl}, 'server error', fetch all fee`
-                    );
-                  }
-
-                  resolve(result);
-                });
+                console.log(singlestudent);
+                let splitPreference = preference.split(",");
+                if (splitPreference.includes(name)) {
+                  resolve(false);
+                } else {
+                  resolve(true);
+                }
               });
-              console.log(promise1);
+
+              let prom = await promise1;
               console.log(promise);
 
               let val = await promise[0].feepay;
               let amount = eval(amt + val);
 
-              let sqlQuery6 = `update account set feepayable = '${amount}'  where student_id = '${singlestudent.student_id}' `;
-              console.log(promise1);
-              if (promise1 == undefined) return promise1;
-              if (promise1[0].val == "true") {
+              let sqlQuery6 = `update account set feepayable = '${amount}'  where student_id = '${singlestudent}' `;
+              console.log(prom);
+              if (prom == true) {
                 console.log("update running" + val);
 
                 console.log("amount is" + amount);
@@ -476,112 +499,164 @@ module.exports = {
                     );
                   }
 
-                  resolve(result);
+                  resolve();
                 });
               }
             }
 
             update(name, singlestudent);
-
-            if (i == result.length - 1) {
-              registerLog(
-                "Assign Fee",
-                data.createdby,
-                "none",
-                "Applied",
-                date,
-                `Assign fee for ${data.class}`
-              );
-
-              let sqlQuery = `select * from assignfeerecord order by id desc`;
-              pool.query(sqlQuery, (error, result) => {
-             
-                res.status(200).json({ success: 1, data: result });
-              });  
-              console.log("Fees Assign logged Successfully");
-
-            }
           }
         });
       });
+
+      if (i == feedata.length - 1) {
+        registerLog(
+          "Assign Fee",
+          data.createdby,
+          "none",
+          "Applied",
+          date,
+          `Assign fee for ${data.class}`
+        );
+
+        let sqlQuery = `select * from assignfeerecord order by id desc`;
+        pool.query(sqlQuery, (error, result) => {
+          res.status(200).json({ success: 1, data: result });
+        });
+        console.log("Fees Assign logged Successfully");
+      }
     }
   },
 
-  payfee: async(req, res) => {
+  payfee: async (req, res) => {
     const data = req.body;
+    console.log(data);
     const promise1 = await new Promise((resolve, reject) => {
-
-    let sqlQuery = `update account set accountbalance ='${data.balanceafterpayment}' where student_id ='${data.id}' `;
-    pool.query(sqlQuery, (error, result) => {
-      if (error) {
-        console.log(
-          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, error update account balance `
-        );
-        return res
-          .status(500)
-          .json({ success: 0, error: "internal server error", message: error });
-      }
-
-      if (result.affectedRows != 1) {
-        console.log(
-          `${req.method} ${req.originalUrl}, Error updating balance`
-        );
-        return res.status(200).json({
-          success: 0,
-          error: error,
-          message: "update account balance unsuccessfull ",
-
-        });
-      }
-
-      if (result.affectedRows == 1) {
-        console.log(
-          `${req.method} ${req.originalUrl}, update fee balance `
-        );
-        return res.status(200).json({
-          success: 1,
-          message: "update account balance successfull ",
-        });
-      }
-    });
-  });
-  const promise2 = await new Promise((resolve, reject) => {
-
-    let sqlQuery = `insert into feepaymentrecords (student_id,amountpaid,mode,balbeforepayment,balanceafterpayment,date,collectedby,receiptid) values
-    ('${data.student_id}','${data.amountpaid}','${data.mode}','${data.balbeforepayment}','${data.balanceafterpayment}','${date}','${data.collectedby}','${data.receiptid}')`;  
+      let sqlQuery = `update account set accountbalance ='${data.balanceafterpayment}' where student_id ='${data.id}' `;
       pool.query(sqlQuery, (error, result) => {
-      if (error) {
-        console.log(
-          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, error update account balance `
-        );
-        return res
-          .status(500)
-          .json({ success: 0, error: "internal server error", message: error });
-      }
+        if (error) {
+          console.log(
+            `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, error update account balance `
+          );
+          return res.status(500).json({
+            success: 0,
+            error: "internal server error",
+            message: error,
+          });
+        }
 
-      if (result.affectedRows != 1) {
-        console.log(
-          `${req.method} ${req.originalUrl}, Error updating balance`
-        );
-        return res.status(200).json({
-          success: 0,
-          error: error,
-          message: "update account balance unsuccessfull ",
+        if (result.affectedRows != 1) {
+          console.log(
+            `${req.method} ${req.originalUrl}, Error updating balance`
+          );
+          return res.status(200).json({
+            success: 0,
+            error: error,
+            message: "update account balance unsuccessfull ",
+          });
+        }
 
-        });
-      }
+        if (result.affectedRows == 1) {
+          console.log(`${req.method} ${req.originalUrl}, update fee balance `);
+          console.log(data.infotype);
 
-      if (result.affectedRows == 1) {
-        console.log(
-          `${req.method} ${req.originalUrl}, update fee balance `
-        );
-        return res.status(200).json({
-          success: 1,
-          message: "update account balance successfull ",
-        });
-      }
+          if (data.infotype == "All Sections") {
+            let sqlQuery = `select student.userId,student.student_id,student.firstName,student.otherName, student.lastName,student.gender, student.class,student.section,account.* from student left join account on student.student_id=account.student_id where student.class = '${data.class}'`;
+            pool.query(sqlQuery, (error, result) => {
+              if (error) {
+                return res.status(500).json({
+                  success: 0,
+                  error: "internal server error",
+                  message: error,
+                });
+              }
+
+              // logger.info(
+              //   `${req.method} ${req.originalUrl},'success', fetch all student by class`
+              // );
+              return res.status(200).json({
+                success: 1,
+                message: "update account balance successfull ",
+                data: result,
+              });
+            });
+          } else {
+            let sqlQuery = `select student.userId,student.student_id,student.firstName,student.otherName, student.lastName,student.gender, student.class,student.section,account.accountbalance from student left join account on student.student_id=account.student_id where student.class = '${data.class}' and student.section = '${data.section}'`;
+            pool.query(sqlQuery, (error, result) => {
+              if (error) {
+                return res.status(500).json({
+                  success: 0,
+                  error: "internal server error",
+                  message: error,
+                });
+              }
+
+              // logger.info(
+              //   `${req.method} ${req.originalUrl},'success', fetch all student by class`
+              // );
+              return res.status(200).json({
+                success: 1,
+                message: "update account balance successfull ",
+                data: result,
+              });
+            });
+          }
+        }
+      });
     });
-  });
+    const promise2 = await new Promise((resolve, reject) => {
+      console.log("ooooooooooooo");
+      let sqlQuery = `insert into feepaymentrecords (student_id,amountpaid,mode,balbeforepayment,balanceafterpayment,date,collectedby,receiptid) values
+    ('${data.student_id}','${data.amountpaid}','${data.mode}','${data.balbeforepayment}','${data.balanceafterpayment}','${date}','${data.collectedby}','${data.receiptid}')`;
+      pool.query(sqlQuery, (error, result) => {
+        if (error) {
+          console.log(
+            `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, error update account balance `
+          );
+          return res.status(500).json({
+            success: 0,
+            error: "internal server error",
+            message: error,
+          });
+        }
+
+        if (result.affectedRows != 1) {
+          console.log(
+            `${req.method} ${req.originalUrl}, Error updating balance`
+          );
+          return res.status(200).json({
+            success: 0,
+            error: error,
+            message: "update account balance unsuccessfull ",
+          });
+        }
+
+        if (result.affectedRows == 1) {
+          console.log(`${req.method} ${req.originalUrl}, update fee balance `);
+          return res.status(200).json({
+            success: 1,
+            message: "update account balance successfull ",
+          });
+        }
+      });
+    });
+  },
+
+  preferences: async (req, res) => {
+    let data = req.body;
+    console.log(data.pref)
+
+    let sqlQuery = `update account set preference ='${data.pref}' where student_id = '${data.id}'  `;
+    pool.query(sqlQuery, (error, results, fields) => {
+      if (error) {
+        console.log(error);
+        return console.log("Update preference  error");
+      }
+
+      return res
+        .status(200)
+        .json({ success: 1, Message: "update fee cartegory success" });
+    });
   },
 
   updatefeeStatus: (req, res) => {
@@ -731,8 +806,11 @@ module.exports = {
         });
       }
       if (result.affectedRows == 1) {
-        let sqlQuery = `ALTER TABLE account DROP ${data.name};  `;
+        let sqlQuery = `ALTER TABLE account DROP ${data.name} `;
         pool.query(sqlQuery, (error, result) => {
+          if (error) {
+            console.log(error);
+          }
           let sqlQuery = `select * from feesgroup `;
           pool.query(sqlQuery, (error, result) => {
             res.status(200).json({ success: 1, data: result });
