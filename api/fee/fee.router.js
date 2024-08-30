@@ -20,14 +20,24 @@ const {
   deleteSingleCartfee,
   deletescholarship,
   assignfee,
-  preferences
+  enrollScholarship,
+  preferences,
+  getPaymentRecords,
+  getScholarshipEnroll,
+  getAssignfeerecord,
 } = require("./fee.controller");
 
 router.get("/", getAllfee);
 router.get("/cart", getCart);
 router.post("/cart", createfeeCartegory);
 router.post("/scholarship", addScholarship);
+router.post("/listscholarship", getScholarshipEnroll);
+
+router.post("/enrollscholarship", enrollScholarship);
+
 router.get("/scholarship", getScholarship);
+router.get("/paymentrecords", getPaymentRecords);
+
 
 router.post("/payfee", payfee);
 router.post("/preferences", preferences);
@@ -36,6 +46,7 @@ router.post("/assignfee", assignfee);
 router.post("/generatefee", generatefee);
 router.get("/feerecord", getfeerecord);
 router.post("/updatefeerecord", updatefeerecord);
+router.get("/assignfeerecord", getAssignfeerecord);
 
 router.post("/", createfee);
 

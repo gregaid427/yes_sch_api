@@ -11,37 +11,67 @@ let createHash = require("hash-generator");
 async function register(mydata) {
   async function extractdata(mydata) {
     let data = {
-      FIRST_NAME: mydata.FIRST_NAME ? mydata.FIRST_NAME : '',
-      OTHER_NAMES: mydata.OTHER_NAMES ? mydata.OTHER_NAMES : '',
-      LAST_NAME: mydata.LAST_NAME ? mydata.LAST_NAME : '',
-      RELIGION: mydata.RELIGION ? mydata.RELIGION : '',
-      GENDER: mydata.GENDER ? mydata.GENDER : '',
-      DATE_OF_BIRTH_DDMMYYYY: mydata.DATE_OF_BIRTH_DDMMYYYY ? mydata.DATE_OF_BIRTH_DDMMYYYY : '',
-      GUARDIAN_1_FIRST_NAME: mydata.GUARDIAN_1_FIRST_NAME ? mydata.GUARDIAN_1_FIRST_NAME : '',
-      GUARDIAN_1_LAST_NAME: mydata.GUARDIAN_1_LAST_NAME ? mydata.GUARDIAN_1_LAST_NAME : '',
-      GUARDIAN_1_GENDER: mydata.GUARDIAN_1_GENDER ? mydata.GUARDIAN_1_GENDER : '',
-      GUARDIAN_1_RELATION: mydata.GUARDIAN_1_RELATION ? mydata.GUARDIAN_1_RELATION : '',
-      GUARDIAN_1_CONTACT1: mydata.GUARDIAN_1_CONTACT1 ? mydata.GUARDIAN_1_CONTACT1 : '',
-      GUARDIAN_1_CONTACT2: mydata.GUARDIAN_1_CONTACT2 ? mydata.GUARDIAN_1_CONTACT2 : '',
-      GUARDIAN_1_ADDRESS: mydata.GUARDIAN_1_ADDRESS ? mydata.GUARDIAN_1_ADDRESS : '',
-      GUARDIAN_1_EMAIL: mydata.GUARDIAN_1_EMAIL ? mydata.GUARDIAN_1_EMAIL : '',
-      GUARDIAN_2_FIRST_NAME: mydata.GUARDIAN_2_FIRST_NAME ? mydata.GUARDIAN_2_FIRST_NAME : '',
-      GUARDIAN_2_LAST_NAME: mydata.GUARDIAN_2_LAST_NAME ? mydata.GUARDIAN_2_LAST_NAME : '',
-      GUARDIAN_2_GENDER: mydata.GUARDIAN_2_GENDER ? mydata.GUARDIAN_2_GENDER : '',
-      GUARDIAN_2_RELATION: mydata.GUARDIAN_2_RELATION ? mydata.GUARDIAN_2_RELATION : '',
-      GUARDIAN_2_CONTACT1: mydata.GUARDIAN_2_CONTACT1 ? mydata.GUARDIAN_2_CONTACT1 : '',
-      GUARDIAN_2_CONTACT2: mydata.GUARDIAN_2_CONTACT2 ? mydata.GUARDIAN_2_CONTACT2 : '',
-      GUARDIAN_2_ADDRESS: mydata.GUARDIAN_2_ADDRESS ? mydata.GUARDIAN_2_ADDRESS : '',
-      GUARDIAN_2_EMAIL: mydata.GUARDIAN_2_EMAIL ? mydata.GUARDIAN_2_EMAIL : '',
-      STUDENT_PASSWORD: mydata.STUDENT_PASSWORD ? mydata.STUDENT_PASSWORD : '',
-      EMAIL: mydata.EMAIL ? mydata.EMAIL : '',
-      CLASS: mydata.CLASS ? mydata.CLASS : '',
-      SECTION: mydata.SECTION ? mydata.SECTION : '',
-      GUARD1_PASSWORD: mydata.GUARD1_PASSWORD ? mydata.GUARD1_PASSWORD : '',
-      GUARD2_PASSWORD: mydata.GUARD2_PASSWORD ? mydata.GUARD2_PASSWORD : '',
-      GUARD1_USERNAME: mydata.GUARD1_USERNAME ? mydata.GUARD1_USERNAME : '',
-      GUARD2_USERNAME: mydata.GUARD2_USERNAME ? mydata.GUARD2_USERNAME : '',
-      CREATED_BY: mydata.CREATED_BY ? mydata.CREATED_BY : '',
+      FIRST_NAME: mydata.FIRST_NAME ? mydata.FIRST_NAME : "",
+      OTHER_NAMES: mydata.OTHER_NAMES ? mydata.OTHER_NAMES : "",
+      LAST_NAME: mydata.LAST_NAME ? mydata.LAST_NAME : "",
+      RELIGION: mydata.RELIGION ? mydata.RELIGION : "",
+      GENDER: mydata.GENDER ? mydata.GENDER : "",
+      DATE_OF_BIRTH_DDMMYYYY: mydata.DATE_OF_BIRTH_DDMMYYYY
+        ? mydata.DATE_OF_BIRTH_DDMMYYYY
+        : "",
+      GUARDIAN_1_FIRST_NAME: mydata.GUARDIAN_1_FIRST_NAME
+        ? mydata.GUARDIAN_1_FIRST_NAME
+        : "",
+      GUARDIAN_1_LAST_NAME: mydata.GUARDIAN_1_LAST_NAME
+        ? mydata.GUARDIAN_1_LAST_NAME
+        : "",
+      GUARDIAN_1_GENDER: mydata.GUARDIAN_1_GENDER
+        ? mydata.GUARDIAN_1_GENDER
+        : "",
+      GUARDIAN_1_RELATION: mydata.GUARDIAN_1_RELATION
+        ? mydata.GUARDIAN_1_RELATION
+        : "",
+      GUARDIAN_1_CONTACT1: mydata.GUARDIAN_1_CONTACT1
+        ? mydata.GUARDIAN_1_CONTACT1
+        : "",
+      GUARDIAN_1_CONTACT2: mydata.GUARDIAN_1_CONTACT2
+        ? mydata.GUARDIAN_1_CONTACT2
+        : "",
+      GUARDIAN_1_ADDRESS: mydata.GUARDIAN_1_ADDRESS
+        ? mydata.GUARDIAN_1_ADDRESS
+        : "",
+      GUARDIAN_1_EMAIL: mydata.GUARDIAN_1_EMAIL ? mydata.GUARDIAN_1_EMAIL : "",
+      GUARDIAN_2_FIRST_NAME: mydata.GUARDIAN_2_FIRST_NAME
+        ? mydata.GUARDIAN_2_FIRST_NAME
+        : "",
+      GUARDIAN_2_LAST_NAME: mydata.GUARDIAN_2_LAST_NAME
+        ? mydata.GUARDIAN_2_LAST_NAME
+        : "",
+      GUARDIAN_2_GENDER: mydata.GUARDIAN_2_GENDER
+        ? mydata.GUARDIAN_2_GENDER
+        : "",
+      GUARDIAN_2_RELATION: mydata.GUARDIAN_2_RELATION
+        ? mydata.GUARDIAN_2_RELATION
+        : "",
+      GUARDIAN_2_CONTACT1: mydata.GUARDIAN_2_CONTACT1
+        ? mydata.GUARDIAN_2_CONTACT1
+        : "",
+      GUARDIAN_2_CONTACT2: mydata.GUARDIAN_2_CONTACT2
+        ? mydata.GUARDIAN_2_CONTACT2
+        : "",
+      GUARDIAN_2_ADDRESS: mydata.GUARDIAN_2_ADDRESS
+        ? mydata.GUARDIAN_2_ADDRESS
+        : "",
+      GUARDIAN_2_EMAIL: mydata.GUARDIAN_2_EMAIL ? mydata.GUARDIAN_2_EMAIL : "",
+      STUDENT_PASSWORD: mydata.STUDENT_PASSWORD ? mydata.STUDENT_PASSWORD : "",
+      EMAIL: mydata.EMAIL ? mydata.EMAIL : "",
+      CLASS: mydata.CLASS ? mydata.CLASS : "",
+      SECTION: mydata.SECTION ? mydata.SECTION : "",
+      GUARD1_PASSWORD: mydata.GUARD1_PASSWORD ? mydata.GUARD1_PASSWORD : "",
+      GUARD2_PASSWORD: mydata.GUARD2_PASSWORD ? mydata.GUARD2_PASSWORD : "",
+      GUARD1_USERNAME: mydata.GUARD1_USERNAME ? mydata.GUARD1_USERNAME : "",
+      GUARD2_USERNAME: mydata.GUARD2_USERNAME ? mydata.GUARD2_USERNAME : "",
+      CREATED_BY: mydata.CREATED_BY ? mydata.CREATED_BY : "",
     };
     return data;
   }
@@ -103,13 +133,12 @@ async function register(mydata) {
         let sqlQuery = `insert into account (student_id,createdat,createdby) values
         ('${sdtID}','${date}','${data.CREATED_BY}')`;
 
-          pool.query(sqlQuery, (error, result) => {
-            if (error) {
-             
-              console.log("student account error");
-              console.log(error);
-            } 
-          });
+        pool.query(sqlQuery, (error, result) => {
+          if (error) {
+            console.log("student account error");
+            console.log(error);
+          }
+        });
         // insert student into users table
         let sqlQuery1 = `insert into users (email,createdAt,createdBy,pincode,role,password,userId) values
               ('${data.EMAIL}','${date}','${data.CREATED_BY}',${userPin},'student','${hashedPass}', '${studUserId}')`;
@@ -122,7 +151,7 @@ async function register(mydata) {
 
           ///////////////////////////////////////////////////////
 
-          if (data.GUARDIAN_1_FIRST_NAME !='') {
+          if (data.GUARDIAN_1_FIRST_NAME != "") {
             console.log("fffffffffffffffffffffff");
             let customguardian1Id = createHash(6);
 
@@ -148,7 +177,7 @@ async function register(mydata) {
               });
             });
           }
-          if (data.GUARDIAN_2_FIRST_NAME !='') {
+          if (data.GUARDIAN_2_FIRST_NAME != "") {
             let customguardian2Id = createHash(6);
 
             slqQuery4 = `insert into guardian (userId,originalemail,gEmail,gSex,gLastName,gFirstName,gContact1,gContact2,gAddress,student_id,gRelation ) values
@@ -216,8 +245,7 @@ module.exports = {
         // );
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
-
+          .json({ success: 0, error: "internal server error", message: error });
       }
 
       if (result.affectedRows > 0) {
@@ -238,8 +266,7 @@ module.exports = {
         // );
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
-
+          .json({ success: 0, error: "internal server error", message: error });
       }
 
       if (result.affectedRows) {
@@ -263,8 +290,7 @@ module.exports = {
         // );
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
-
+          .json({ success: 0, error: "internal server error", message: error });
       }
       console.log("result.affectedRows");
       console.log(result.affectedRows);
@@ -301,8 +327,7 @@ module.exports = {
         // );
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
-
+          .json({ success: 0, error: "internal server error", message: error });
       }
 
       if (!result) {
@@ -328,8 +353,7 @@ module.exports = {
 
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
-
+          .json({ success: 0, error: "internal server error", message: error });
       }
 
       // logger.info(
@@ -350,8 +374,7 @@ module.exports = {
         // );
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
-
+          .json({ success: 0, error: "internal server error", message: error });
       }
 
       if (!result) {
@@ -379,8 +402,7 @@ module.exports = {
 
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
-
+          .json({ success: 0, error: "internal server error", message: error });
       }
 
       // logger.info(
@@ -403,8 +425,7 @@ module.exports = {
 
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
-
+          .json({ success: 0, error: "internal server error", message: error });
       }
 
       // logger.info(
@@ -418,51 +439,85 @@ module.exports = {
     const clazz = req.body.class;
     console.log(clazz);
     let sqlQuery = `select student.userId,student.student_id,student.firstName,student.otherName, student.lastName,student.gender, student.class,student.section,account.* from student left join account on student.student_id=account.student_id where student.class = '${clazz}'`;
-    pool.query(sqlQuery, (error, result) => {
+    pool.query(sqlQuery, async (error, result) => {
       if (error) {
-        // logger.info(
-        //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all student by class`
-        // );
+        logger.info(
+          `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all student by class`
+        );
 
-        return res
-          .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
-
+        
       }
+      console.log(result)
+
+      const promise1 = await new Promise((resolve, reject) => {
+        let sqlQuery = `select * from assignfeecartegory where class = '${clazz}'`;
+        pool.query(sqlQuery, (error, results) => {
+          if (error) {
+            logger.info(
+              `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all student by class`
+            );
+           
+            // return res
+            //   .status(500)
+            //            .json({ success: 0, error: "internal server error",message:error });
+          }
+          console.log(results)
+
+          resolve(results);
+        });
+      });
+
+       let info = await promise1;
+      //  console.log(info)
 
       // logger.info(
       //   `${req.method} ${req.originalUrl},'success', fetch all student by class`
       // );
-console.log(result)
-      res.status(200).json({ success: 1, data: result });
+
+      res.status(200).json({ success: 1, data: result, info: info });
     });
   },
-  getstudentbyClassCustomBal: (req, res) => {
+  getstudentbyClassCustomBal: async (req, res) => {
     const clazz = req.body.class;
     const section = req.body.section;
 
     let sqlQuery = `select student.userId,student.student_id,student.firstName,student.otherName, student.lastName,student.gender, student.class,student.section,account.accountbalance from student left join account on student.student_id=account.student_id where student.class = '${clazz}' and student.section = '${section}'`;
-    pool.query(sqlQuery, (error, result) => {
+    pool.query(sqlQuery, async (error, result) => {
       if (error) {
-        // logger.info(
-        //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all student by class`
-        // );
+        logger.info(
+          `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all student by class`
+        );
 
-        return res
-          .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
-
+       
       }
+      console.log(result)
+      const promise1 = await new Promise((resolve, reject) => {
+        let sqlQuery = `select * from assignfeecartegory where class = '${clazz}'`;
+        pool.query(sqlQuery, (error, results) => {
+          if (error) {
+            console.log(
+              `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all student by class`
+            );
+          
+            // return res
+            //   .status(500)
+            //            .json({ success: 0, error: "internal server error",message:error });
+          }
+          resolve(results);
+        });
+      });
+
+      let info = await promise1;
+      console.log(info)
 
       // logger.info(
       //   `${req.method} ${req.originalUrl},'success', fetch all student by class`
       // );
-      console.log(result)
 
-      res.status(200).json({ success: 1, data: result });
+      res.status(200).json({ success: 1, data: result ,info: info});
+     
     });
   },
-
 
   getstudentbyClassPromote: (req, res) => {
     const clazz = req.body.class;
@@ -470,14 +525,13 @@ console.log(result)
     let sqlQuery = `select * from student where class = '${clazz}' and isActive='true' `;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
-        // logger.info(
-        //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all student by class`
-        // );
+        logger.info(
+          `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all student by class`
+        );
 
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
-
+          .json({ success: 0, error: "internal server error", message: error });
       }
 
       // logger.info(
@@ -500,8 +554,7 @@ console.log(result)
 
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
-
+          .json({ success: 0, error: "internal server error", message: error });
       }
 
       // logger.info(
@@ -548,8 +601,7 @@ console.log(result)
 
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
-
+          .json({ success: 0, error: "internal server error", message: error });
       }
 
       // logger.info(
@@ -632,8 +684,7 @@ console.log(result)
         // );
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
-
+          .json({ success: 0, error: "internal server error", message: error });
       }
 
       if (result.affectedRows != 1) {
@@ -671,8 +722,7 @@ console.log(result)
         // );
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
-
+          .json({ success: 0, error: "internal server error", message: error });
       }
       if (result.affectedRows == 1) {
         // logger.info(`${req.method} ${req.originalUrl}, delete all records`);

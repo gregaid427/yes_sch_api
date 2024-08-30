@@ -158,8 +158,11 @@ module.exports = {
           } else
             res
               .status(500)
-                       .json({ success: 0, error: "internal server error",message:error });
-
+              .json({
+                success: 0,
+                error: "internal server error",
+                message: error,
+              });
         });
       }
     });
@@ -214,9 +217,7 @@ module.exports = {
     });
   },
 
-
- 
-createUserStudent: async (req, res) => {
+  createUserStudent: async (req, res) => {
     const data = req.body;
     const saltRounds = 10;
 
@@ -242,7 +243,8 @@ createUserStudent: async (req, res) => {
       sqlQuery,
       customStudentId,
       customguardian1Id,
-      customguardian2Id
+      customguardian2Id,
+      sqlQueryAccount
     ) {
       // first create student into student table
       pool.query(sqlQuery, (error, result) => {
@@ -269,16 +271,11 @@ createUserStudent: async (req, res) => {
 
             pool.query(sqlQuery1, (error, result) => {
               if (error) {
-              
                 console.log("guardian 1 error");
-                return res
-                  .status(500)
-                  .json({ success: 0, Message: error });
+                return res.status(500).json({ success: 0, Message: error });
               }
 
               if (result.affectedRows == 1) {
-              
-
                 const signedToken = jwt.sign(
                   { data: result.email },
                   process.env.JWT_KEY
@@ -341,16 +338,11 @@ createUserStudent: async (req, res) => {
 
             pool.query(sqlQuery1, (error, result) => {
               if (error) {
-             
                 console.log("parent1 success");
-                 return res
-                  .status(500)
-                .json({ success: 0, Message: error });
+                return res.status(500).json({ success: 0, Message: error });
               }
 
               if (result.affectedRows == 1) {
-      
-
                 const signedToken = jwt.sign(
                   { data: result.email },
                   process.env.JWT_KEY
@@ -413,30 +405,19 @@ createUserStudent: async (req, res) => {
 
             pool.query(sqlQuery1, (error, result) => {
               if (error) {
-               
                 console.log("student eeror error");
-                return res
-                  .status(500)
-                  .json({ success: 0, Message: error });
+                return res.status(500).json({ success: 0, Message: error });
               }
-              
 
               if (result.affectedRows == 1) {
-               
-                let sqlQuery1 = `insert into account (student_id,createdat,createdby) values
-                ('${customStudentId}','${date}','${data.createdBy}')`;
-      
-                  pool.query(sqlQuery1, (error, result) => {
-                    if (error) {
-                     
-                      console.log("student account error");
-                      console.log(error);
+                pool.query(sqlQueryAccount, (error, result) => {
+                  if (error) {
+                    console.log("student account error");
+                    console.log(error);
 
-                      return res
-                        .status(500)
-                        .json({ success: 0, Message: error });
-                    } 
-                  });
+                    return res.status(500).json({ success: 0, Message: error });
+                  }
+                });
 
                 const signedToken = jwt.sign(
                   { data: result.email },
@@ -523,7 +504,13 @@ createUserStudent: async (req, res) => {
             message: "Student and/or Guardian created successfully",
           });
         } else
-          res.status(500).json({ success: 0, error: "internal server error" , message: error});
+          res
+            .status(500)
+            .json({
+              success: 0,
+              error: "internal server error",
+              message: error,
+            });
       });
     }
 
@@ -570,7 +557,9 @@ createUserStudent: async (req, res) => {
             sqlQuery = `insert into guardian (gEmail,gSex,gLastName,gFirstName,gContact1,gContact2,gAddress,student_id,gRelation,userId ) values
               ('${data.gemail1}','${data.gsex1}','${data.glName1}','${data.gfName1}','${data.contact1}','${data.contact2}','${data.gAddress1}','${student_id}','${data.gRelation1}','${customguardian1Id}') `;
 
-            pool.query(sqlQuery, (error, result) => {console.log('guardian1 created successfully')});
+            pool.query(sqlQuery, (error, result) => {
+              console.log("guardian1 created successfully");
+            });
           }
 
           //inserting to guardian table when guardian info is posted together with student
@@ -579,8 +568,10 @@ createUserStudent: async (req, res) => {
             sqlQuery = `insert into guardian (gEmail,gSex,gLastName,gFirstName,gContact1,gContact2,gAddress,student_id,gRelation,userId ) values
               ('${data.gemail2}','${data.gsex2}','${data.glName2}','${data.gfName2}','${data.contact3}','${data.contact4}','${data.gAddress2}','${student_id}','${data.gRelation2}','${customguardian2Id}') `;
 
-              pool.query(sqlQuery, (error, result) => {console.log('guardian2 created successfully')});
-            }
+            pool.query(sqlQuery, (error, result) => {
+              console.log("guardian2 created successfully");
+            });
+          }
 
           let link =
             process.env.SERVERLINK + "/uploadsstudent/" + data.filename;
@@ -588,12 +579,14 @@ createUserStudent: async (req, res) => {
           //insert into student table
           sqlQuery = `insert into student (userId,student_id,firstName,lastName,otherName,class,section,religion,dateofbirth,gender) values
             ('${customStudentId}','${student_id}','${data.firstName}','${data.lastName}','${data.otherName}','${data.class}','${data.section}','${data.religion}','${data.dateofbirth}','${data.gender}')`;
+          let sqlQueryAccount = `insert into account (student_id,createdat,createdby) values ('${student_id}','${date}','${data.createdBy}')`;
 
           userCreaterStudent(
             sqlQuery,
             customStudentId,
             customguardian1Id,
-            customguardian2Id
+            customguardian2Id,
+            sqlQueryAccount
           );
         });
       }
@@ -724,8 +717,11 @@ createUserStudent: async (req, res) => {
           } else
             res
               .status(500)
-                       .json({ success: 0, error: "internal server error",message:error });
-
+              .json({
+                success: 0,
+                error: "internal server error",
+                message: error,
+              });
         });
       }
     });
@@ -841,7 +837,6 @@ createUserStudent: async (req, res) => {
                 role: results.role,
                 email: results.email,
                 token: jsontoken,
-
               },
             ];
             if (error) {
@@ -884,8 +879,7 @@ createUserStudent: async (req, res) => {
         // );
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
-
+          .json({ success: 0, error: "internal server error", message: error });
       }
 
       if (!result) {
@@ -919,8 +913,7 @@ createUserStudent: async (req, res) => {
         // );
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
-
+          .json({ success: 0, error: "internal server error", message: error });
       }
 
       if (!result) {
@@ -946,8 +939,7 @@ createUserStudent: async (req, res) => {
 
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
-
+          .json({ success: 0, error: "internal server error", message: error });
       }
 
       // logger.info(
@@ -967,8 +959,7 @@ createUserStudent: async (req, res) => {
 
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
-
+          .json({ success: 0, error: "internal server error", message: error });
       }
 
       // logger.info(
@@ -993,8 +984,7 @@ createUserStudent: async (req, res) => {
 
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
-
+          .json({ success: 0, error: "internal server error", message: error });
       }
 
       // logger.info(
@@ -1017,8 +1007,7 @@ createUserStudent: async (req, res) => {
 
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
-
+          .json({ success: 0, error: "internal server error", message: error });
       }
 
       // logger.info(
@@ -1029,12 +1018,12 @@ createUserStudent: async (req, res) => {
     });
   },
   getuserdata: (req, res) => {
-    let data =  req.body
-  //  if(data.role=='student')
-  // select * from student left join users on student.userId = users.userId where student.userId = 'z0puvv'; 
+    let data = req.body;
+    //  if(data.role=='student')
+    // select * from student left join users on student.userId = users.userId where student.userId = 'z0puvv';
     let sqlQuery = `select * from guardian  where student_id = '${data.id}' `;
-    console.log(sqlQuery)
-    
+    console.log(sqlQuery);
+
     pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
@@ -1043,14 +1032,13 @@ createUserStudent: async (req, res) => {
 
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
-
+          .json({ success: 0, error: "internal server error", message: error });
       }
 
       // logger.info(
       //   `${req.method} ${req.originalUrl},'success', fetch all users`
       // );
-       result.password=''
+      result.password = "";
       res.status(200).json({ success: 1, data: result });
     });
   },
@@ -1064,8 +1052,7 @@ createUserStudent: async (req, res) => {
         // );
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
-
+          .json({ success: 0, error: "internal server error", message: error });
       }
 
       if (!result) {
@@ -1092,8 +1079,7 @@ createUserStudent: async (req, res) => {
         // );
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
-
+          .json({ success: 0, error: "internal server error", message: error });
       }
 
       if (result.affectedRows != 1) {
@@ -1126,8 +1112,7 @@ createUserStudent: async (req, res) => {
         // );
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
-
+          .json({ success: 0, error: "internal server error", message: error });
       }
 
       if (result.affectedRows != 1) {
@@ -1186,8 +1171,11 @@ createUserStudent: async (req, res) => {
             // );
             return res
               .status(500)
-                       .json({ success: 0, error: "internal server error",message:error });
-
+              .json({
+                success: 0,
+                error: "internal server error",
+                message: error,
+              });
           }
 
           // logger.info(
@@ -1241,8 +1229,11 @@ createUserStudent: async (req, res) => {
             // );
             return res
               .status(500)
-                       .json({ success: 0, error: "internal server error",message:error });
-
+              .json({
+                success: 0,
+                error: "internal server error",
+                message: error,
+              });
           }
 
           if (result.affectedRows != 1) {
@@ -1334,8 +1325,7 @@ createUserStudent: async (req, res) => {
         // );
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
-
+          .json({ success: 0, error: "internal server error", message: error });
       }
 
       if (result.affectedRows != 1) {
@@ -1373,8 +1363,7 @@ createUserStudent: async (req, res) => {
         // );
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
-
+          .json({ success: 0, error: "internal server error", message: error });
       }
 
       if (result.affectedRows != 1) {
@@ -1410,8 +1399,7 @@ createUserStudent: async (req, res) => {
         // );
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
-
+          .json({ success: 0, error: "internal server error", message: error });
       }
 
       if (result.affectedRows != 1) {
@@ -1446,8 +1434,7 @@ createUserStudent: async (req, res) => {
         // );
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
-
+          .json({ success: 0, error: "internal server error", message: error });
       }
 
       if (result.affectedRows != 1) {
