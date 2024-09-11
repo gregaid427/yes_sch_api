@@ -7,7 +7,6 @@ const {
   getfeeById,
   getAllfee,
   updatefee,
-  // updatefeestatus,
   payfee,
   deleteSinglefee,
   addScholarship,
@@ -25,6 +24,15 @@ const {
   getPaymentRecords,
   getScholarshipEnroll,
   getAssignfeerecord,
+  getAssigncustom,
+  updatebalance,
+  reversefeepayment,
+  getfeerecordgroup,
+  generatefeebyclass,
+  generatefeebystudent,
+  deleteallasigned,
+  resetallaccount,
+  resetclassaccount
 } = require("./fee.controller");
 
 router.get("/", getAllfee);
@@ -38,17 +46,31 @@ router.post("/enrollscholarship", enrollScholarship);
 router.get("/scholarship", getScholarship);
 router.get("/paymentrecords", getPaymentRecords);
 
+router.post("/reversefee", reversefeepayment);
 
 router.post("/payfee", payfee);
 router.post("/preferences", preferences);
+router.post("/updatebal", updatebalance);
 
 router.post("/assignfee", assignfee);
+router.post("/generatefeebystudent", generatefeebystudent);
+router.post("/generatefeebyclass", generatefeebyclass);
 router.post("/generatefee", generatefee);
+router.post("/resetallaccount", resetallaccount);
+router.post("/resetclassaccount", resetclassaccount);
+
+
+
+
+router.get("/feerecordgroup", getfeerecordgroup);
 router.get("/feerecord", getfeerecord);
 router.post("/updatefeerecord", updatefeerecord);
+router.post("/assigncustom", getAssigncustom);
 router.get("/assignfeerecord", getAssignfeerecord);
 
 router.post("/", createfee);
+router.delete("/deleteallasigned", deleteallasigned);
+
 
 router.delete("/truncate", truncateTable);
 

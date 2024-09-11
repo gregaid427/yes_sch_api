@@ -63,8 +63,9 @@ module.exports = {
                          .json({ success: 0, error: "internal server error",message:error });
 
             }
-              let sqlQuery =
-                `SELECT * from class where isActive="true" order by class.title `;
+            
+            let sqlQuery = `select * from class where isActive = 'true' group by title`;
+
               pool.query(sqlQuery, (error, result) => {
                 console.log(result)
                 res.status(200).json({ success: 1, data: result });
@@ -93,8 +94,8 @@ module.exports = {
               }
   
               if (datas.length - 1 == i) {
-                let sqlQuery =
-                `SELECT * from class where isActive='true' order by class.title `;
+                let sqlQuery = `select * from class where isActive = 'true' group by title`;
+
                 pool.query(sqlQuery, (error, result) => {
                   console.log(result)
                   res.status(200).json({ success: 1, data: result });
