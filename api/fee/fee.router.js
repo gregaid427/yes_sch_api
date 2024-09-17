@@ -32,7 +32,9 @@ const {
   generatefeebystudent,
   deleteallasigned,
   resetallaccount,
-  resetclassaccount
+  resetclassaccount,
+  getallassignedfeerecord,
+  revokeScholarship
 } = require("./fee.controller");
 
 router.get("/", getAllfee);
@@ -42,6 +44,8 @@ router.post("/scholarship", addScholarship);
 router.post("/listscholarship", getScholarshipEnroll);
 
 router.post("/enrollscholarship", enrollScholarship);
+router.post("/revokescholarship", revokeScholarship);
+
 
 router.get("/scholarship", getScholarship);
 router.get("/paymentrecords", getPaymentRecords);
@@ -58,6 +62,8 @@ router.post("/generatefeebyclass", generatefeebyclass);
 router.post("/generatefee", generatefee);
 router.post("/resetallaccount", resetallaccount);
 router.post("/resetclassaccount", resetclassaccount);
+router.get("/getallassignedfeerecord", getallassignedfeerecord);
+
 
 
 

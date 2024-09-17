@@ -170,7 +170,7 @@ module.exports = {
     const data = JSON.parse(req.body.data);
     console.log(data);
 
-    let link = process.env.SERVERLINK + "/uploadsstudent/" + data.filename;
+    let link = process.env.SERVERLINK + "/" + data.filename;
     let sqlQuery = `update student set filename='${data.filename}',imagelink = '${link}'
      where userId = '${data.id}' `;
 
@@ -195,7 +195,7 @@ module.exports = {
     await uploadFile1(req, res);
     const data = JSON.parse(req.body.data);
 
-    let link = process.env.SERVERLINK + "/uploadlogo/" + data.filename;
+    let link = process.env.SERVERLINK + "/" + data.filename;
     let sqlQuery = `update school set filename='${data.filename}',logolink = '${link}'
      where id = '1' `;
 
@@ -566,7 +566,7 @@ module.exports = {
             }
 
           let link =
-            process.env.SERVERLINK + "/uploadsstudent/" + data.filename;
+            process.env.SERVERLINK + "/" + data.filename;
 
           //insert into student table
           sqlQuery = `insert into student (userId,student_id,firstName,lastName,otherName,class,section,religion,dateofbirth,gender) values

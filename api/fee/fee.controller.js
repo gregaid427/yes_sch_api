@@ -101,6 +101,7 @@ async function AssignFeeByClass(data) {
           }
         });
       });
+      let set = await promise4;
 
       if (i == feedata.length - 1) {
         registerLog(
@@ -109,12 +110,13 @@ async function AssignFeeByClass(data) {
           "none",
           "Applied",
           date,
-          `Assign fee for ${data.class}`
+          `Assign fee for ${data.class}`,
+          set
         );
 
         setTimeout(() => {
           resolve2(true);
-        }, 4500);
+        }, 1000);
 
         // let sqlQuery = `select * from assignfeecartegory order by id desc`;
         // pool.query(sqlQuery, (error, result) => {
@@ -392,9 +394,9 @@ module.exports = {
       res.status(200).json({ success: 1, data: result });
     });
   },
-  resetclassaccount: async(req, res) => {
+  resetclassaccount: async (req, res) => {
     let data = req.body;
-    console.log(data)
+    console.log(data);
     const promise8 = await new Promise((resolve, reject) => {
       let sqlQuery = `select student_id from student where class in (${data.class}) `;
       pool.query(sqlQuery, (error, result) => {
@@ -409,14 +411,13 @@ module.exports = {
         resolve(result);
       });
     });
-    let fetchedStudent = await promise8
+    let fetchedStudent = await promise8;
 
     const promise2 = await new Promise((resolve, reject) => {
       let info = fetchedStudent;
-      console.log(info)
-      if(fetchedStudent.length == 0){
-        res.status(200).json({ success: 2, message: 'Class Has No Student' });
-
+      console.log(info);
+      if (fetchedStudent.length == 0) {
+        res.status(200).json({ success: 2, message: "Class Has No Student" });
       }
       for (let i = 0; i < info.length; i++) {
         let sdtID = info[i].student_id;
@@ -444,7 +445,9 @@ module.exports = {
 
         if (i == info.length - 1) {
           resolve(gg);
-          res.status(200).json({ success: 1, message: 'All Accounts Updated successfully' });
+          res
+            .status(200)
+            .json({ success: 1, message: "All Accounts Updated successfully" });
 
           console.log("done updating Selected Class Account bal");
         }
@@ -452,18 +455,11 @@ module.exports = {
     });
 
     let arrearsduplicate = promise2;
-
-
-
-
-
-
- 
   },
 
-  resetallaccount : (req, res) => {
+  resetallaccount: (req, res) => {
     let data = req.body;
-    console.log(data)
+    console.log(data);
     let sqlQuery = `update account set accountbalance ='${data.amount}'`;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
@@ -476,9 +472,13 @@ module.exports = {
           .json({ success: 0, error: "internal server error", message: error });
       }
 
-      console.log(`${req.method} ${req.originalUrl},'success', reset all account`);
+      console.log(
+        `${req.method} ${req.originalUrl},'success', reset all account`
+      );
 
-      res.status(200).json({ success: 1, message: 'All Accounts Updated successfully' });
+      res
+        .status(200)
+        .json({ success: 1, message: "All Accounts Updated successfully" });
     });
   },
 
@@ -539,6 +539,24 @@ module.exports = {
   },
   getfeerecord: (req, res) => {
     let sqlQuery = `select DISTINCT(class.title), assignfeecartegory.* from class left join assignfeecartegory on class.title = assignfeecartegory.class`;
+    pool.query(sqlQuery, (error, result) => {
+      if (error) {
+        console.log(
+          `${req.method} ${req.originalUrl}, 'server error', fetch all fee`
+        );
+
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error", message: error });
+      }
+
+      console.log(`${req.method} ${req.originalUrl},'success', fetch all fee`);
+
+      res.status(200).json({ success: 1, data: result });
+    });
+  },
+  getallassignedfeerecord: (req, res) => {
+    let sqlQuery = `select * from assignfeecartegory `;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(
@@ -635,14 +653,38 @@ module.exports = {
       res.status(200).json({ success: 1, data: result });
     });
   },
+  revokeScholarship: (req, res) => {
+    let data = req.body;
+    
+    let sqlQuery = `Delete  from scholarshipenroll where id = '${data.id}'`;
+    pool.query(sqlQuery, (error, result) => {
+      if (error) {
+        console.log(
+          `${req.method} ${req.originalUrl}, 'server error', fetch all fee`
+        );
+
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error", message: error });
+      }
+
+      console.log(`${req.method} ${req.originalUrl},'success', 'revoked scholarship`);
+      if (result.affectedRows == 1) {
+        res.status(200).json({ success: 1, data: 'Revoked Successfully' });
+      }
+    });
+  },
   getScholarshipEnroll: async (req, res) => {
     let data = req.body;
 
     async function query(data) {
       if (data.type == "All") {
-        return `select scholarshipenroll.*, student.class, student.firstName,student.lastName, student.otherName, student.section from scholarshipenroll left join student on scholarshipenroll.student_id = student.student_id`;
+        console.log("all");
+
+        return `select scholarshipenroll.*, student.class, student.firstName,student.lastName, student.otherName from scholarshipenroll left join student on scholarshipenroll.student_id = student.student_id`;
       } else {
-        return `select scholarshipenroll.*, student.class,  student.firstName,student.lastName, student.otherName, student.section from scholarshipenroll left join student on scholarshipenroll.student_id = student.student_id where student.class = '${data.class}'`;
+        console.log("custom");
+        return `select scholarshipenroll.*, student.class,  student.firstName,student.lastName, student.otherName from scholarshipenroll left join student on scholarshipenroll.student_id = student.student_id where student.class = '${data.class}'`;
       }
     }
 
@@ -655,9 +697,11 @@ module.exports = {
           .json({ success: 0, error: "internal server error", message: error });
       }
 
-      console.log(`${req.method} ${req.originalUrl},'success', fetch all fee`);
-
-      res.status(200).json({ success: 1, data: result });
+      console.log(
+        `${req.method} ${req.originalUrl},'success', fetch scholarship list`
+      );
+      console.log(result);
+      res.status(200).json({ success: 1, data: result, type:data.type });
     });
   },
 
@@ -1247,12 +1291,13 @@ module.exports = {
     pool.query(sqlQuery, (error, results, fields) => {
       if (error) {
         console.log(error);
-         console.log("Delete table values error");
-        res.status(500).json({ success: 0, Message: 'Error Deleting records' });
-
+        console.log("Delete table values error");
+        res.status(500).json({ success: 0, Message: "Error Deleting records" });
       }
       console.log("Delete table successfull");
-      res.status(200).json({ success: 1, Message: 'Table Truncated Successfully' });
+      res
+        .status(200)
+        .json({ success: 1, Message: "Table Truncated Successfully" });
     });
   },
 

@@ -14,7 +14,7 @@ module.exports = {
    // date = date.toUTCString();
 
     
-    let link = process.env.SERVERLINK + "/uploadexpense/" + data.filename;
+    let link = process.env.SERVERLINK + "/" + data.filename;
 
     let sqlQuery = `insert into expense (name,date,expensehead,createdby,invoice,description,amount,filename,link,createdat) values
            ('${data.name}','${data.date}','${data.expensehead}','${data.createdby}','${data.invoice}','${data.description}','${data.amount}','${data.filename}','${link}','${date}')`;

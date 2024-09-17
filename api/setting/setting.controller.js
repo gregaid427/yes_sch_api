@@ -263,7 +263,7 @@ module.exports = {
     console.log(data)
 
     let link =
-    process.env.SERVERLINK + "/uploadsstudent/" + data.filename;
+    process.env.SERVERLINK + "/" + data.filename;
     let sqlQuery = `update student set filename='${data.filename}',imagelink = '${link}'
      where userId = '${data.id}' `;
 
@@ -660,7 +660,7 @@ module.exports = {
           }
 
           let link =
-            process.env.SERVERLINK + "/uploadsstudent/" + data.filename;
+            process.env.SERVERLINK + "/" + data.filename;
 
           //insert into student table
           sqlQuery = `insert into student (userId,student_id,firstName,lastName,otherName,class,section,religion,dateofbirth,gender,g1fname,g1lastname,g1sex,g1address,g1email,g1contact1,g1relation,g1contact2,g2fname,g2lastname,g2sex,g2address,g2email,g2contact1,g2relation,g2contact2) values

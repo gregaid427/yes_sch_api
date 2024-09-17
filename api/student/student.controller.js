@@ -616,7 +616,7 @@ module.exports = {
     await uploadFile(req, res);
     const data = JSON.parse(req.body.data);
 
-    let link = process.env.SERVERLINK + "/uploadsStudent/" + data.filename;
+    let link = process.env.SERVERLINK + "/" + data.filename;
     let sqlQuery = `update student set filename='${data.filename}',imagelink = '${link}'
      where student_id = ${data.id} `;
 

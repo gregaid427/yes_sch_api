@@ -10,7 +10,7 @@ const {
   truncateTable,
   
 
-} = require("./user.controller");
+} = require("./section.controller");
 
 
 router.get("/",  getAllSection);

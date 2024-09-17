@@ -12,6 +12,8 @@ const expenseRouter = require("./api/expense/expense.router");
 const sessionRouter = require("./api/session/session.router");
 const settingRouter = require("./api/setting/setting.router");
 const feeRouter = require("./api/fee/fee.router");
+const examRouter = require("./api/exam/exam.router");
+
 
 
 //const patientsRouter = require("./api/patients/patients.router");
@@ -33,6 +35,9 @@ global.__basedir = __dirname;
 //app.use(bodyParser.urlencoded())
 
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static('uploadlogo'))
+app.use(express.static('uploadexpense'))
+app.use(express.static('uploadsStudent'))
 //  app.use(function(req,res,next){
 // res.header("Access-Control-Allow","*");
 // res.header("Access-Control-Allow-Headers","X-Requested-With");
@@ -48,6 +53,8 @@ app.use("/api/expense", expenseRouter);
 app.use("/api/session", sessionRouter);
 app.use("/api/setting", settingRouter);
 app.use("/api/fee", feeRouter);
+app.use("/api/exam", examRouter);
+
 
 
 // app.use("/api/linkedaccounts", linkedaccountsRouter);
