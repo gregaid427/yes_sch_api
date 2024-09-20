@@ -1,10 +1,12 @@
 const pool = require("../../config/database.js");
 // const logger = require("../../util/logger.js");
+var createHash = require("hash-generator");
 
-function getClassByName(email, callBack) {
+function checkGradTitleExist(data, callBack) {
   pool.query(
-    `select * from class where title = ? `,
-    [email],
+    `select * from grade where gradetitle = ? `,
+    [data],
+
     (error, results, fields) => {
       if (error) {
         callBack(error);
@@ -14,10 +16,11 @@ function getClassByName(email, callBack) {
   );
 }
 
-function getsectionByName(email, callBack) {
+function checkExamGroupExist(data, callBack) {
   pool.query(
-    `select * from section where sectionName = ? `,
-    [email],
+    `select * from grade where gradetitle = ? `,
+    [data],
+
     (error, results, fields) => {
       if (error) {
         callBack(error);
@@ -25,193 +28,293 @@ function getsectionByName(email, callBack) {
       return callBack(null, results[0]);
     }
   );
+}
+function checkExamExist(data, callBack) {
+  pool.query(
+    `select * from exam where class = '${data.class}' and section = '${data.section}' and session = '${data.session}' and examgroup = '${data.examgroup}' `,
+
+    (error, results, fields) => {
+      if (error) {
+        callBack(error);
+      }
+      return callBack(null, results[0]);
+    }
+  );
+}
+async function creategradegroup(
+  title,
+  min,
+  max,
+  examscore,
+  classscore,
+  createdby,
+  notes,
+  grade,
+  remarks,
+  otherscore
+) {
+  const promise1 = await new Promise((resolve, reject) => {
+    let date = new Date();
+    date = date.toLocaleDateString("en-CA");
+    let sqlQuery = `insert into grade (gradetitle,minscore,maxscore,exampercent,classworkpercent,createdby,createdat,notes,grades,scoreremarks,otherscore) values
+ ('${title}','${min}','${max}','${examscore}','${classscore}','${createdby}','${date}','${notes}','${grade}','${remarks}','${otherscore}')`;
+
+    pool.query(sqlQuery, (error, results, fields) => {
+      if (error) {
+        console.log(error);
+        resolve(false);
+        return console.log("error creating grade group");
+      }
+      resolve(true);
+      console.log("grade group logged created successfully");
+    });
+  });
+
+  return promise1;
 }
 
 let date = new Date();
-date = date.toUTCString();
 module.exports = {
-  createClass: async (req, res) => {
-    const data = req.body;
+  creategradegroup: async (req, res) => {
+    let data = req.body;
 
-    const classId = Math.floor(Math.random() * 9000 + 1000);
+    const promise1 = await new Promise((resolve, reject) => {
+      checkGradTitleExist(data.title, (err, results) => {
+        if (results) {
+          console.log("Create Grade Group Title Exists");
+          resolve(true);
+          return res
+            .status(200)
+            .json({ success: 0, data: null, message: "Group Title Exists" });
+        } else {
+          for (let i = 0; i < data.grades.length; i++) {
+            let title = data.title;
+            let notes = data.notes;
+            let examscore = data.examScore;
+            let classscore = data.classscore;
+            let otherscore = data.otherScore;
 
-    getClassByName(data.title, (err, results) => {
-      if (results) {
-        return res.status(200).json({
-          success: 0,
-          message: "Class Name Already Exists",
-          data: [],
-        });
-      }
+            let createdby = data.createdby;
 
-      // if not create user
-      else {
-        console.log(data.sections);
-        if (data.sections[0] == null) {
-          console.log('pppppppppppp')
+            let min = data.grades[i][0];
+            let max = data.grades[i][1];
+            let grade = data.grades[i][2];
+            let remarks = data.grades[i][3];
+            console.log(data.grades[i]);
+            let create = creategradegroup(
+              title,
+              min,
+              max,
+              examscore,
+              classscore,
+              createdby,
+              notes,
+              grade,
+              remarks,
+              otherscore
+            );
+            if (create == false)
+              res.status(200).json({
+                success: 0,
+                data: undefined,
+                message: "Internal Server Error",
+              });
 
-          let sqlQuery = `insert into class (classId,title,createdAt,createdBy,isActive,instructor) values
-          ('${classId}','${data.title}','${date}','${data.createdBy}','true','${data.instructor}')`;
-          pool.query(sqlQuery, (error, result) => {
-            if (error) {
-              console.log(error)
-              // logger.info(
-              //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, Error create new Class`
-              // );
-              return res
-                .status(500)
-                         .json({ success: 0, error: "internal server error",message:error });
+            if (i + 1 == data.grades.length) {
+              let bb = create;
+              console.log(bb);
+              console.log("successful creation");
 
-            }
-            
-            let sqlQuery = `select * from class where isActive = 'true' group by title`;
-
+              let sqlQuery = `SELECT DISTINCT(grade.gradetitle), exampercent,classworkpercent,gradeid,createdby,otherscorepercent from grade group by gradetitle order by gradeid desc`;
               pool.query(sqlQuery, (error, result) => {
-                console.log(result)
+                console.log(error);
+
+                if (error) {
+                  // logger.info(
+                  //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all Class`
+                  // );
+                  console.log(error);
+
+                  return res.status(500).json({
+                    success: 0,
+                    error: "internal server error",
+                    message: error,
+                  });
+                }
+
+                // logger.info(
+                //   `${req.method} ${req.originalUrl},'success', fetch all Class`
+                // );
+
                 res.status(200).json({ success: 1, data: result });
               });
-            
-          });
-        } 
-        else {
-          let datas = data.sections;
-        
-          for (let i = 0; i < datas.length; i++) {
-            let section = datas[i];
-            console.log(section);
-  
-            let sqlQuery = `insert into class (classId,title,createdAt,createdBy,isActive,instructor,section) values
-             ('${classId}','${data.title}','${date}','${data.createdBy}','true','${data.instructor}','${section}')`;
-            pool.query(sqlQuery, (error, result) => {
-              if (error) {
-                // logger.info(
-                //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, Error create new Class`
-                // );
-                return res
-                  .status(500)
-                           .json({ success: 0, error: "internal server error",message:error });
-
-              }
-  
-              if (datas.length - 1 == i) {
-                let sqlQuery = `select * from class where isActive = 'true' group by title`;
-
-                pool.query(sqlQuery, (error, result) => {
-                  console.log(result)
-                  res.status(200).json({ success: 1, data: result });
-                });
-              }
-            });
+            }
           }
-
-    
         }
-      }
+      });
     });
   },
-
-  // createClassSection: async (req, res) => {
-
-  //   getsectionByName(sectiondata.sectionname, (err, results) => {
-  //     if (results) {
-  //       return res.status(200).json({
-  //         success: 0,
-  //         message: "Section Name Already Exists",
-  //         data: [],
-  //       });
-  //     }
-
-  //     // if not create user
-  //     else {
-
-  //   const data = req.body;
-
-  //
-
-  //   let sqlQuery = `insert into section (classId,sectionName,createdAt,createdBy,isActive) values
-  //          ('${data.classId}','${data.sectionName}','${date}','${data.createdBy}','${data.isActive}')`;
-  //   pool.query(sqlQuery, (error, result) => {
-  //     if (error) {
-  //       logger.info(
-  //         `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, create new Class section`
-  //       );
-  //       return res
-  //         .status(500)
-  //                  .json({ success: 0, error: "internal server error",message:error });
-
-  //     }
-
-  //     if (result.affectedRows == 1) {
-  //       logger.info(`${req.method} ${req.originalUrl}, create new Class section`);
-  //       res.status(200)
-  //       .json({ success: 1, Message: "create new Class section successful" });
-  //     }
-  //   });
-  // }
-
-  // });
-
-  // },
-  createClassSection: async (req, res) => {
-    const data = req.body;
-
-    getsectionByName(data.sectionName, (err, results) => {
+  createnewexam: async (req, res) => {
+    let data = req.body;
+    checkExamExist(data, (err, results) => {
       if (results) {
-        return res.status(200).json({
-          success: 0,
-          message: "Section Name Already Exists",
-          data: [],
-        });
-      }
+        console.log("Create new Exam  Exists For Academic Session");
+        return res
+          .status(200)
+          .json({
+            success: 0,
+            data: null,
+            message: "Exam Already Exist For Academic Session",
+          });
+      } else {
+        function hashgenerator(num) {
+          return createHash(num);
+        }
+        var code = hashgenerator(6);
+        let date = new Date();
+        date = date.toLocaleDateString("en-CA");
 
-      // if not create user
-      else {
-        const data = req.body;
+      if(data.section == 'None'){
+        let sqlQuery1 = `insert into exam (examcode,createdat,createdby,notes,examgroup,class,subject,session) values
+        ('${code}','${date}','${data.createdby}','${data.notes}','${data.examgroup}','${data.class}','${data.subjects}','${data.session}')`;
+      pool.query(sqlQuery1, (error, result) => {
+        if (error) {
+          // logger.info(
+          //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all Class`
+          // );
+          console.log("Error creating examgroup");
+          console.log(error);
 
-        let sqlQuery = `insert into sectiongroup (sectionName,createdAt,createdBy,isActive) values
-           ('${data.sectionName}','${date}','${data.createdBy}','true')`;
-        pool.query(sqlQuery, (error, result) => {
+          return res.status(500).json({
+            success: 0,
+            error: "internal server error",
+            message: error,
+          });
+        }
+        let sqlQuery = `SELECT * from exam order by examsid desc `;
+        pool.query(sqlQuery, (error, resultz) => {
+          console.log(error);
+
           if (error) {
             // logger.info(
-            //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, create new Class section`
+            //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all Class`
             // );
-            return res
-              .status(500)
-                       .json({ success: 0, error: "internal server error",message:error });
+            console.log(error);
 
-          }
-
-          if (result.affectedRows == 1) {
-            // logger.info(
-            //   `${req.method} ${req.originalUrl}, create new Class section`
-            // );
-            let sqlQuery = `select * from sectiongroup where isActive = 'true'`;
-            pool.query(sqlQuery, (error, result) => {
-              res.status(200).json({ success: 1, data: result });
+            return res.status(500).json({
+              success: 0,
+              error: "internal server error",
+              message: error,
             });
           }
+
+          console.log(
+            `${req.method} ${req.originalUrl},'success', fetch all exam`
+          );
+
+          res.status(200).json({ success: 1, data: resultz });
+        });
+      });
+      }else{
+        let sqlQuery1 = `insert into exam (examcode,createdat,createdby,notes,examgroup,class,section,subject,session) values
+        ('${code}','${date}','${data.createdby}','${data.notes}','${data.examgroup}','${data.class}','${data.section}','${data.subjects}','${data.session}')`;
+      pool.query(sqlQuery1, (error, result) => {
+        if (error) {
+          // logger.info(
+          //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all Class`
+          // );
+          console.log("Error creating examgroup");
+          console.log(error);
+
+          return res.status(500).json({
+            success: 0,
+            error: "internal server error",
+            message: error,
+          });
+        }
+        let sqlQuery = `SELECT * from exam order by examsid desc `;
+        pool.query(sqlQuery, (error, resultz) => {
+          console.log(error);
+
+          if (error) {
+            // logger.info(
+            //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all Class`
+            // );
+            console.log(error);
+
+            return res.status(500).json({
+              success: 0,
+              error: "internal server error",
+              message: error,
+            });
+          }
+
+          console.log(
+            `${req.method} ${req.originalUrl},'success', fetch all exam`
+          );
+
+          res.status(200).json({ success: 1, data: resultz });
+        });
+      });
+      }
+      }
+    });
+  },
+  createexamgroup: async (req, res) => {
+    let data = req.body;
+
+    checkExamGroupExist(data.title, (err, results) => {
+      if (results) {
+        console.log("Create Exam Group Title Exists");
+        resolve(true);
+        return res
+          .status(200)
+          .json({ success: 0, data: null, message: "Group Title Exists" });
+      } else {
+        let sqlQuery1 = `insert into examgroup (grouptitle,createdat,createdby,session) values
+          ('${data.title}','${date}','${data.createdby}','${data.session}')`;
+        pool.query(sqlQuery1, (error, result) => {
+          if (error) {
+            // logger.info(
+            //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all Class`
+            // );
+            console.log("Error creating examgroup");
+
+            return res.status(500).json({
+              success: 0,
+              error: "internal server error",
+              message: error,
+            });
+          }
+          let sqlQuery = `SELECT * from examgroup `;
+          pool.query(sqlQuery, (error, resultz) => {
+            console.log(error);
+
+            if (error) {
+              // logger.info(
+              //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all Class`
+              // );
+              console.log(error);
+
+              return res.status(500).json({
+                success: 0,
+                error: "internal server error",
+                message: error,
+              });
+            }
+
+            // logger.info(
+            //   `${req.method} ${req.originalUrl},'success', fetch all Class`
+            // );
+
+            res.status(200).json({ success: 1, data: resultz });
+          });
         });
       }
     });
   },
-
-  getClassByClassId: async (req, res) => {
-  
-
-    let sqlQuery1 = `CREATE TABLE examresult2022 (
-  id int(39) DEFAULT NULL,
-  title int(10) DEFAULT NULL,
-  hoper varchar(10) DEFAULT NULL
-) ;`;
-
-    pool.query(sqlQuery1, (error, result1) => {
-      console.log(error);
-      console.log(result1);
-    });
-  },
-  getAllClassNo: (req, res) => {
-    let sqlQuery = 
-    `SELECT * from class where isActive='true' order by class.title` ;
+  getexamlist: (req, res) => {
+    let sqlQuery = `SELECT * from exam order by examsid desc  `;
 
     pool.query(sqlQuery, (error, result) => {
       console.log(error);
@@ -224,19 +327,85 @@ module.exports = {
 
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
-
+          .json({ success: 0, error: "internal server error", message: error });
       }
 
+      console.log(`${result} ${req.originalUrl},'success', fetch all Exam`);
+
+      res.status(200).json({ success: 1, data: result });
+    });
+  },
+  getexamgroup: (req, res) => {
+    let sqlQuery = `SELECT * from examgroup  `;
+
+    pool.query(sqlQuery, (error, result) => {
+      console.log(error);
+
+      if (error) {
+        // logger.info(
+        //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all Class`
+        // );
+        console.log(error);
+
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error", message: error });
+      }
+
+      console.log(`${result} ${req.originalUrl},'success', fetch all Class`);
+
+      res.status(200).json({ success: 1, data: result });
+    });
+  },
+  getgradegroup: (req, res) => {
+    let sqlQuery = `SELECT DISTINCT(grade.gradetitle), exampercent,classworkpercent,gradeid,createdby,otherscorepercent from grade group by gradetitle order by gradeid desc`;
+
+    pool.query(sqlQuery, (error, result) => {
+      console.log(error);
+
+      if (error) {
+        // logger.info(
+        //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all Class`
+        // );
+        console.log(error);
+
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error", message: error });
+      }
+
+      console.log(`${result} ${req.originalUrl},'success', fetch all Class`);
+
+      res.status(200).json({ success: 1, data: result });
+    });
+  },
+  searchcustom: (req, res) => {
+    let data = req.body
+    let sqlQuery = `select * from exam where session = '${data.session}' and examgroup = '${data.examgroup}' `;
+    pool.query(sqlQuery, (error, result) => {
+      console.log(error);
+
+      if (error) {
+        // logger.info(
+        //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all sections`
+        // );
+        console.log(error);
+
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error", message: error });
+      }
+
+
       // logger.info(
-      //   `${req.method} ${req.originalUrl},'success', fetch all Class`
+      //   `${req.method} ${req.originalUrl},'success', fetch all sections`
       // );
 
       res.status(200).json({ success: 1, data: result });
     });
   },
-  getAllClass: (req, res) => {
-    let sqlQuery = `select * from class where isActive = 'true' group by title`;
+  getdetailgradegroup: (req, res) => {
+    let sqlQuery = `select * from grade`;
     pool.query(sqlQuery, (error, result) => {
       console.log(error);
 
@@ -248,8 +417,7 @@ module.exports = {
 
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
-
+          .json({ success: 0, error: "internal server error", message: error });
       }
 
       // logger.info(
@@ -273,8 +441,7 @@ module.exports = {
 
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
-
+          .json({ success: 0, error: "internal server error", message: error });
       }
 
       // logger.info(
@@ -299,8 +466,7 @@ module.exports = {
 
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
-
+          .json({ success: 0, error: "internal server error", message: error });
       }
 
       // logger.info(
@@ -323,8 +489,7 @@ module.exports = {
 
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
-
+          .json({ success: 0, error: "internal server error", message: error });
       }
 
       // logger.info(
@@ -344,8 +509,7 @@ module.exports = {
 
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
-
+          .json({ success: 0, error: "internal server error", message: error });
       }
 
       // logger.info(
@@ -369,8 +533,7 @@ module.exports = {
         // );
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
-
+          .json({ success: 0, error: "internal server error", message: error });
       }
 
       if (result.affectedRows != 1) {
@@ -384,7 +547,7 @@ module.exports = {
       if (result.affectedRows == 1) {
         // logger.info(`${req.method} ${req.originalUrl}, delete Class  by id`);
         //return table data
-        let sqlQuery = `SELECT * from class where isActive='true' order by class.title` ;
+        let sqlQuery = `SELECT * from class where isActive='true' order by class.title`;
         pool.query(sqlQuery, (error, result) => {
           res.status(200).json({ success: 1, data: result });
         });
@@ -405,8 +568,7 @@ module.exports = {
         // );
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
-
+          .json({ success: 0, error: "internal server error", message: error });
       }
 
       if (result.affectedRows != 1) {
@@ -436,8 +598,7 @@ module.exports = {
         // );
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
-
+          .json({ success: 0, error: "internal server error", message: error });
       }
 
       if (result.affectedRows != 1) {
@@ -470,8 +631,7 @@ module.exports = {
         // );
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
-
+          .json({ success: 0, error: "internal server error", message: error });
       }
 
       if (result.affectedRows != 1) {
@@ -503,8 +663,7 @@ module.exports = {
         // );
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
-
+          .json({ success: 0, error: "internal server error", message: error });
       }
 
       if (result.affectedRows != 1) {
@@ -519,7 +678,7 @@ module.exports = {
       if (result.affectedRows == 1) {
         // logger.info(`${req.method} ${req.originalUrl}, delete Class  by id`);
         //return table data
-        let sqlQuery = `SELECT * from class where isActive='true' order by class.title` ;
+        let sqlQuery = `SELECT * from class where isActive='true' order by class.title`;
         pool.query(sqlQuery, (error, result) => {
           res.status(200).json({ success: 1, data: result });
         });
@@ -538,8 +697,7 @@ module.exports = {
         // );
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
-
+          .json({ success: 0, error: "internal server error", message: error });
       }
 
       if (result.affectedRows != 1) {
@@ -571,8 +729,7 @@ module.exports = {
         // );
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
-
+          .json({ success: 0, error: "internal server error", message: error });
       }
       if (result.affectedRows == 1) {
         // logger.info(`${req.method} ${req.originalUrl}, delete all records`);
@@ -597,8 +754,7 @@ module.exports = {
         // );
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
-
+          .json({ success: 0, error: "internal server error", message: error });
       }
 
       if (result.affectedRows != 1) {

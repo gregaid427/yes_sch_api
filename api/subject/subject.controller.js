@@ -3,36 +3,61 @@ const pool = require("../../config/database.js");
 var createHash = require("hash-generator");
 
 let date = new Date();
-date = date.toUTCString();function hashgenerator(num) {
+date = date.toUTCString();
+function hashgenerator(num) {
   return createHash(num);
 }
+function checkSubjectExist(data, callBack) {
+  pool.query(
+    `select * from subject where subjectname = '${data.subjectName}' and type = '${data.type}' `,
 
+    (error, results, fields) => {
+      if (error) {
+        callBack(error);
+      }
+      return callBack(null, results[0]);
+    }
+  );
+}
 module.exports = {
   createsubject: async (req, res) => {
     const data = req.body;
-    let code = hashgenerator(5);
-    let sqlQuery = `insert into subject (subjectname,createdat,createdby,type,subjectcode) values
-           ('${data.subjectName}','${date}','${data.createdBy}','${data.type}','${code}')`;
-    pool.query(sqlQuery, (error, result) => {
-      if (error) {
-        // logger.info(
-        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, create new subject`
-        // );
-        return res
-          .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
 
-      }
-
-      if (result.affectedRows == 1) {
-        // logger.info(`${req.method} ${req.originalUrl}, create new  subject`);
-      
-        let sqlQuery = `select * from subject`;
-        pool.query(sqlQuery, (error, result) => {
-          res.status(200).json({ success: 1, data: result });
+    checkSubjectExist(data, (err, results) => {
+      if (results) {
+        console.log("Create new Exam  Exists For Academic Session");
+        return res.status(200).json({
+          success: 0,
+          data: null,
+          message: "Exam Already Exist For Academic Session",
         });
+      } else {
+        let code = hashgenerator(5);
+        let sqlQuery = `insert into subject (subjectname,createdat,createdby,type,subjectcode) values
+           ('${data.subjectName.toUpperCase()}','${date}','${data.createdBy}','${data.type}','${code}')`;
+        pool.query(sqlQuery, (error, result) => {
+          if (error) {
+            // logger.info(
+            //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, create new subject`
+            // );
+            return res
+              .status(500)
+              .json({
+                success: 0,
+                error: "internal server error",
+                message: error,
+              });
+          }
 
+          if (result.affectedRows == 1) {
+            // logger.info(`${req.method} ${req.originalUrl}, create new  subject`);
 
+            let sqlQuery = `select * from subject`;
+            pool.query(sqlQuery, (error, result) => {
+              res.status(200).json({ success: 1, data: result });
+            });
+          }
+        });
       }
     });
   },
@@ -47,8 +72,7 @@ module.exports = {
         // );
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
-
+          .json({ success: 0, error: "internal server error", message: error });
       }
 
       if (!result) {
@@ -74,8 +98,7 @@ module.exports = {
 
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
-
+          .json({ success: 0, error: "internal server error", message: error });
       }
 
       // logger.info(
@@ -98,8 +121,7 @@ module.exports = {
         // );
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
-
+          .json({ success: 0, error: "internal server error", message: error });
       }
 
       if (result.affectedRows != 1) {
@@ -113,17 +135,17 @@ module.exports = {
 
       if (result.affectedRows == 1) {
         // logger.info(`${req.method} ${req.originalUrl}, update subject data`);
-         let sqlQuery = `select * from subject`;
+        let sqlQuery = `select * from subject`;
         pool.query(sqlQuery, (error, result) => {
           res.status(200).json({ success: 1, data: result });
         });
       }
     });
   },
-  
+
   deleteSingleSubject: (req, res) => {
     const id = req.params.subjectId;
-     let sqlQuery = `delete from subject where id = ${id}`;
+    let sqlQuery = `delete from subject where id = ${id}`;
 
     pool.query(sqlQuery, (error, result) => {
       if (error) {
@@ -132,8 +154,7 @@ module.exports = {
         // );
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
-
+          .json({ success: 0, error: "internal server error", message: error });
       }
 
       if (result.affectedRows != 1) {
@@ -167,8 +188,7 @@ module.exports = {
         // );
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
-
+          .json({ success: 0, error: "internal server error", message: error });
       }
 
       if (result.affectedRows != 1) {

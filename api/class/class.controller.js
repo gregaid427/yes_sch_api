@@ -48,7 +48,6 @@ module.exports = {
       else {
         console.log(data.sections);
         if (data.sections[0] == null) {
-          console.log('pppppppppppp')
 
           let sqlQuery = `insert into class (classId,title,createdAt,createdBy,isActive,instructor) values
           ('${classId}','${data.title}','${date}','${data.createdBy}','true','${data.instructor}')`;
