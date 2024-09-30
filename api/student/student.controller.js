@@ -435,6 +435,43 @@ module.exports = {
       res.status(200).json({ success: 1, data: result });
     });
   },
+  getstudentcustom: (req, res) => {
+    let data = req.body;
+
+    function getresulttype(data) {
+      if (data.section == null) {
+        return `select student.student_id,student.firstName,student.otherName, student.lastName,student.gender,student.section, student.class from student where student.class = '${data.class}'`;
+      }
+      if (data.section == "All Sections") {
+        return `select student.student_id,student.firstName,student.otherName, student.lastName,student.gender,student.section, student.class from student where student.class = '${data.class}'`;
+      } else {
+        return `select student.student_id,student.firstName,student.otherName, student.lastName,student.gender,student.section, student.class from student where student.class = '${data.class}'  and student.section = '${data.section}'`;
+      }
+    }
+    pool.query(getresulttype(data), async (error, resultz) => {
+      if (error) {
+        console.log(
+          `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all student by class`
+        );
+      } else {
+        let result = [{ jjj: "pppppp" }, { jjj: "pppppp" }, { jjj: "pppppp" }];
+        async function jsonConvert(result) {
+          console.log("result");
+          console.log(result);
+
+          result.map((obj, index) => {
+            obj.examScore = "";
+            obj.classWorkScore = "";
+            obj.othersScore = "";
+          });
+          return result;
+        }
+        let bnb = await jsonConvert(resultz);
+        res.status(200).json({ success: 1, data: bnb });
+        console.log(bnb);
+      }
+    });
+  },
   getstudentbyClassbal: (req, res) => {
     const clazz = req.body.class;
     console.log(clazz);
@@ -444,10 +481,8 @@ module.exports = {
         logger.info(
           `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all student by class`
         );
-
-        
       }
-      console.log(result)
+      console.log(result);
 
       const promise1 = await new Promise((resolve, reject) => {
         let sqlQuery = `select * from assignfeecartegory where class = '${clazz}'`;
@@ -456,18 +491,18 @@ module.exports = {
             logger.info(
               `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all student by class`
             );
-           
+
             // return res
             //   .status(500)
             //            .json({ success: 0, error: "internal server error",message:error });
           }
-          console.log(results)
+          console.log(results);
 
           resolve(results);
         });
       });
 
-       let info = await promise1;
+      let info = await promise1;
       //  console.log(info)
 
       // logger.info(
@@ -487,10 +522,8 @@ module.exports = {
         logger.info(
           `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all student by class`
         );
-
-       
       }
-      console.log(result)
+      console.log(result);
       const promise1 = await new Promise((resolve, reject) => {
         let sqlQuery = `select * from assignfeecartegory where class = '${clazz}'`;
         pool.query(sqlQuery, (error, results) => {
@@ -498,7 +531,7 @@ module.exports = {
             console.log(
               `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all student by class`
             );
-          
+
             // return res
             //   .status(500)
             //            .json({ success: 0, error: "internal server error",message:error });
@@ -508,14 +541,13 @@ module.exports = {
       });
 
       let info = await promise1;
-      console.log(info)
+      console.log(info);
 
       // logger.info(
       //   `${req.method} ${req.originalUrl},'success', fetch all student by class`
       // );
 
-      res.status(200).json({ success: 1, data: result ,info: info});
-     
+      res.status(200).json({ success: 1, data: result, info: info });
     });
   },
 

@@ -16,7 +16,8 @@ const {
   getstudentbyClassPromote,
   getstudentbyClassCustomBal,
   getstudentbyClassbal,
-  bulkAdmission
+  bulkAdmission,
+  getstudentcustom
 } = require("./student.controller");
 
 
@@ -26,6 +27,8 @@ router.post("/custom",  getstudentbyClass);
 
 router.post("/custom1account",  getstudentbyClassCustomBal);
 router.post("/customaccount",  getstudentbyClassbal);
+router.post("/studentcustom",  getstudentcustom);
+
 
 router.post("/custom1promote",  getstudentbyClassCustomPromote);
 router.post("/customPromote",  getstudentbyClassPromote);

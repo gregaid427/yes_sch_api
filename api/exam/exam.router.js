@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const { checkToken } = require("../../auth/token_validation");
-const {creategradegroup,getdetailgradegroup,getgradegroup,createexamgroup,getexamgroup, getexamlist, createnewexam,searchcustom} = require("./exam.controller");
+const {creategradegroup,getdetailgradegroup,getexamsubject,getgradegroup,createexamgroup,getexamgroup, getexamlist, createnewexam,searchcustom,examresult, getgradegroupbyName, getexamresult} = require("./exam.controller");
 
 router.post("/gradegroup", creategradegroup);
 router.post("/examgroup", createexamgroup);
@@ -10,6 +10,13 @@ router.get("/detailgradegroup", getdetailgradegroup);
 router.get("/examlist", getexamlist);
 router.post("/newexam", createnewexam);
 router.post("/searchcustom", searchcustom);
+router.post("/getexamresult", getexamresult);
+router.post("/examresult", examresult);
+
+router.post("/singlegrade", getgradegroupbyName);
+router.post("/examsubject", getexamsubject);
+
+
 
 
 

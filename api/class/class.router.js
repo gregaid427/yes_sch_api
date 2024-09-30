@@ -17,15 +17,19 @@ const {
   updateSection,
   truncateTable,
   getAllClassNo,
-  deletesinglegroup
+  deletesinglegroup,
+  allclassexam
 
 } = require("./class.controller");
+
 
 
 router.post("/",  createClass);
 router.get("/",  getAllClassWithSection);
 router.get("/all/",  getAllClass);
+router.post("/allclassexam/",  allclassexam);
 router.get("/allno/",  getAllClassNo);
+
 
 router.get("/section",  getAllSection);
 router.get("/groupsection",  getAllSectiongroup);

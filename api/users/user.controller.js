@@ -156,13 +156,11 @@ module.exports = {
               }
             });
           } else
-            res
-              .status(500)
-              .json({
-                success: 0,
-                error: "internal server error",
-                message: error,
-              });
+            res.status(500).json({
+              success: 0,
+              error: "internal server error",
+              message: error,
+            });
         });
       }
     });
@@ -178,13 +176,14 @@ module.exports = {
      where userId = '${data.id}' `;
 
     pool.query(sqlQuery, (error, result) => {
-        console.log(result)
-        console.log(error)
+      console.log(result);
+      console.log(error);
 
-      if (error){
+      if (error) {
         return res
           .status(500)
-          .json({ success: 0, Message: "Error Uploadeding Image" });}
+          .json({ success: 0, Message: "Error Uploadeding Image" });
+      }
 
       if (result.affectedRows == 1) {
         return res
@@ -195,13 +194,10 @@ module.exports = {
   },
 
   setSchoolLogo: async (req, res) => {
-   
-
-
     await uploadFile1(req, res);
     const data = JSON.parse(req.body.data);
 
-    let link = process.env.SERVERLINK +"/"+ data.filename;
+    let link = process.env.SERVERLINK + "/" + data.filename;
     let sqlQuery = `update school set filename='${data.filename}',logolink = '${link}'
      where id = '1' `;
 
@@ -507,13 +503,11 @@ module.exports = {
             message: "Student and/or Guardian created successfully",
           });
         } else
-          res
-            .status(500)
-            .json({
-              success: 0,
-              error: "internal server error",
-              message: error,
-            });
+          res.status(500).json({
+            success: 0,
+            error: "internal server error",
+            message: error,
+          });
       });
     }
 
@@ -576,9 +570,7 @@ module.exports = {
             });
           }
 
-
-          let link =
-            process.env.SERVERLINK + "/" + data.filename;
+          let link = process.env.SERVERLINK + "/" + data.filename;
 
           //insert into student table
           sqlQuery = `insert into student (userId,student_id,firstName,lastName,otherName,class,section,religion,dateofbirth,gender) values
@@ -719,13 +711,11 @@ module.exports = {
               }
             });
           } else
-            res
-              .status(500)
-              .json({
-                success: 0,
-                error: "internal server error",
-                message: error,
-              });
+            res.status(500).json({
+              success: 0,
+              error: "internal server error",
+              message: error,
+            });
         });
       }
     });
@@ -1173,13 +1163,11 @@ module.exports = {
             // logger.info(
             //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, verify email by token`
             // );
-            return res
-              .status(500)
-              .json({
-                success: 0,
-                error: "internal server error",
-                message: error,
-              });
+            return res.status(500).json({
+              success: 0,
+              error: "internal server error",
+              message: error,
+            });
           }
 
           // logger.info(
@@ -1231,13 +1219,11 @@ module.exports = {
             // logger.info(
             //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update user password`
             // );
-            return res
-              .status(500)
-              .json({
-                success: 0,
-                error: "internal server error",
-                message: error,
-              });
+            return res.status(500).json({
+              success: 0,
+              error: "internal server error",
+              message: error,
+            });
           }
 
           if (result.affectedRows != 1) {

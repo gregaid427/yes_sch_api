@@ -264,6 +264,36 @@ module.exports = {
       res.status(200).json({ success: 1, data: result });
     });
   },
+  allclassexam : (req, res) => {
+    let data = req.body
+console.log(data)
+    let sqlQuery  = `select * from examresultcode where class = '${data.classes}' and section = '${data.section}' and session = '${data.session}' and examgroup = '${data.examgroup}' and subject = '${data.subject}' `
+console.log(sqlQuery)
+    pool.query(sqlQuery, (error, result) => {
+      console.log(error);
+
+      if (error) {
+        // logger.info(
+        //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all Class`
+        // );
+        console.log(error);
+
+        return res
+          .status(500)
+                   .json({ success: 0, error: "internal server error",message:error });
+
+      }
+
+      // logger.info(
+      //   `${req.method} ${req.originalUrl},'success', fetch all Class`
+      // );
+      console.log('result is sssss');
+      console.log(result);
+
+
+      res.status(200).json({ success: 1, data: result });
+    });
+  },
   getAllClass: (req, res) => {
     let sqlQuery = `select * from class where isActive = 'true' group by title`;
     pool.query(sqlQuery, (error, result) => {
