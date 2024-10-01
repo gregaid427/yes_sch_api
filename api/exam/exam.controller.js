@@ -732,6 +732,30 @@ module.exports = {
       res.status(200).json({ success: 1, data: result });
     });
   },
+  singlereport: (req, res) => {
+    let data = req.body;
+    let sqlQuery = `select * from examresult where session = '${data.session}' and examgroup = '${data.examgroup}' and student_id = '${data.stdid}'  `;
+    pool.query(sqlQuery, (error, result) => {
+      console.log(error);
+
+      if (error) {
+        // logger.info(
+        //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all sections`
+        // );
+        console.log(error);
+
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error", message: error });
+      }
+
+      // logger.info(
+      //   `${req.method} ${req.originalUrl},'success', fetch all sections`
+      // );
+
+      res.status(200).json({ success: 1, data: result });
+    });
+  },
   getdetailgradegroup: (req, res) => {
     let sqlQuery = `select * from grade`;
     pool.query(sqlQuery, (error, result) => {
