@@ -37,6 +37,34 @@ async function setposition(val) {
   });
   return promise1;
 }
+
+async function getStudentsubjectresult(data) {
+  const promise1 = await new Promise((resolve, reject) => {
+    let sqlQuery = `select examresult.*, student.firstName,student.lastName,student.otherName from examresult left join student on examresult.student_id = student.student_id where examresult.session = '${data.session}' and examresult.examgroup = '${data.examgroup}' and examresult.student_id = '${data.id}'  `;
+
+    console.log(sqlQuery);
+    pool.query(sqlQuery, (error, results, fields) => {
+      if (error) {
+        console.log(error);
+        resolve(null);
+        return console.log("result retrieve error");
+      }
+      if (results == null) {
+        // logger.info(
+        //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all sections`
+        // );
+        console.log('No results');
+
+        return res
+          .status(200)
+          .json({ success: 0,data:[], message: 'No reults Available' });
+      }
+      resolve(results);
+      console.log("result retrieved successfully");
+    });
+  });
+  return promise1;
+}
 async function updateResultposition(position, examid, student_id) {
   const promise1 = await new Promise((resolve, reject) => {
     let sqlQuery = `update examresult set position = '${position}' where examid = '${examid}' and student_id = '${student_id}' `;
@@ -736,7 +764,7 @@ module.exports = {
     let data = req.body;
     let sqlQuery = `select * from examresult where session = '${data.session}' and examgroup = '${data.examgroup}' and student_id = '${data.stdid}'  `;
     pool.query(sqlQuery, (error, result) => {
-      console.log(error);
+      console.log(result);
 
       if (error) {
         // logger.info(
@@ -748,12 +776,105 @@ module.exports = {
           .status(500)
           .json({ success: 0, error: "internal server error", message: error });
       }
+      if (result.length == 0) {
+        // logger.info(
+        //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all sections`
+        // );
+
+        return res
+          .status(200)
+          .json({ success: 0, data:[], message: 'No Resullts Available' });
+      }
 
       // logger.info(
       //   `${req.method} ${req.originalUrl},'success', fetch all sections`
       // );
 
       res.status(200).json({ success: 1, data: result });
+    });
+  },
+  getClassreport: async (req, res) => {
+    let data = req.body;
+    let sqlQuery =
+      data.section != null
+        ? `select student_id, firstName,lastName,otherName  from student where class = '${data.clazz}' and section = '${data.section}'  `
+        : `select student_id, firstName,lastName,otherName  from student where class = '${data.clazz}'  `;
+
+    pool.query(sqlQuery, async(error, result) => {
+      console.log(sqlQuery);
+
+      if (error) {
+        // logger.info(
+        //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all sections`
+        // );
+        console.log(error);
+
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error", message: error });
+      }
+      if (result) {
+        // logger.info(
+        //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all sections`
+        // );
+        console.log('No results');
+
+        return res
+          .status(200)
+          .json({ success: 0,data:[], message: 'No reults Available' });
+      }
+      let finalArray =[]
+      for (let i = 0; i < result.length; i++) {
+        console.log(result[i].student_id)
+
+        let datas = {
+          id: result[i].student_id,
+          session: data.session,
+          examgroup:data.examgroup
+        }
+        let retrieved = await getStudentsubjectresult(datas);
+        console.log(retrieved)
+       
+        if(retrieved.length != 0) finalArray.push(retrieved)
+
+          if(i + 1 == result.length) {
+            let value = retrieved
+            console.log('done retrieval')
+            res.status(200).json({ success: 1, data: finalArray });
+          }
+    
+      }
+
+    
+
+
+
+      // let sqlQuery = `select * from examresult where session = '${data.session}' and examgroup = '${data.examgroup}' and student_id = '${data.stdid}'  `;
+      // pool.query(sqlQuery, async (error, result) => {
+      //   console.log(error);
+
+      //   if (error) {
+      //     // logger.info(
+      //     //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all sections`
+      //     // );
+      //     console.log(error);
+
+      //     return res
+      //       .status(500)
+      //       .json({
+      //         success: 0,
+      //         error: "internal server error",
+      //         message: error,
+      //       });
+      //   }
+      
+
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'success', fetch all sections`
+        // );
+
+      //   res.status(200).json({ success: 1, data: result });
+      // });
     });
   },
   getdetailgradegroup: (req, res) => {
