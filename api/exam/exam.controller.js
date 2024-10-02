@@ -877,6 +877,31 @@ module.exports = {
       // });
     });
   },
+  setremark: (req, res) => {
+    let data = req.body
+    let sqlQuery = `update examresult set teacherreamark ='${data.remark}' where session = '${data.session}' and examgroup = '${data.examgroup}' and student_id = '${data.id}' `;
+    pool.query(sqlQuery, (error, result) => {
+      console.log(error);
+
+      if (error) {
+        // logger.info(
+        //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all Class`
+        // );
+        console.log(error);
+
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error", message: error });
+      }
+
+    console.log(
+         `${req.method} ${req.originalUrl},'success', remark set successfully`
+      );
+
+      res.status(200).json({ success: 1, data: result });
+    });
+  },
+
   getdetailgradegroup: (req, res) => {
     let sqlQuery = `select * from grade`;
     pool.query(sqlQuery, (error, result) => {
