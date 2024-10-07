@@ -32,8 +32,9 @@ date = date.toUTCString();
 module.exports = {
   createClass: async (req, res) => {
     const data = req.body;
+    const currentYear = new Date().getFullYear();
 
-    const classId = Math.floor(Math.random() * 9000 + 1000);
+    const classId = Math.floor(Math.random() * 9000 + 1000 + currentYear);
 
     getClassByName(data.title, (err, results) => {
       if (results) {
