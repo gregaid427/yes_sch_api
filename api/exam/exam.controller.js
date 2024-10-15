@@ -112,7 +112,7 @@ async function setposition(val) {
       }
     }
   });
-  console.log(promise1)
+  console.log(promise1);
   return promise1;
 }
 
@@ -144,7 +144,9 @@ async function setOverallpositions(data) {
     });
   });
   let val = await promise1[0].total;
-  console.log("result retrieved successfullyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy");
+  console.log(
+    "result retrieved successfullyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy"
+  );
   console.log(val);
   const promise2 = await new Promise((resolve, reject) => {
     let sqlQuery = `update examresult set overallscore = ${val} WHERE student_id = '${data.id}'`;
@@ -293,7 +295,7 @@ FROM
   );
 }
 
-async function creategradegroup(
+async function  creategradegroup(
   title,
   min,
   max,
@@ -303,14 +305,15 @@ async function creategradegroup(
   notes,
   grade,
   remarks,
-  otherscore
+  otherscore,
+  code
 ) {
   const promise1 = await new Promise((resolve, reject) => {
     let date = new Date();
     date = date.toLocaleDateString("en-CA");
-    let sqlQuery = `insert into grade (gradetitle,minscore,maxscore,exampercent,classworkpercent,createdby,createdat,notes,grades,scoreremarks,otherscorepercent) values
- ('${title}','${min}','${max}','${examscore}','${classscore}','${createdby}','${date}','${notes}','${grade}','${remarks}','${otherscore}')`;
-
+    let sqlQuery = `insert into grade (gradetitle,minscore,gradecode,maxscore,exampercent,classworkpercent,createdby,createdat,notes,grades,scoreremarks,otherscorepercent) values
+ ('${title}','${min}','${code}','${max}','${examscore}','${classscore}','${createdby}','${date}','${notes}','${grade}','${remarks}','${otherscore}')`;
+    console.log(sqlQuery);
     pool.query(sqlQuery, (error, results, fields) => {
       if (error) {
         console.log(error);
@@ -347,7 +350,8 @@ async function insertResult(
   examtable,
   session,
   examgroup,
-  classcode,size
+  classcode,
+  size
 ) {
   const promise1 = await new Promise((resolve, reject) => {
     let date = new Date();
@@ -371,11 +375,41 @@ async function insertResult(
 
 let date = new Date();
 module.exports = {
-  creategradegroup: async (req, res) => {
+  updategradegroup: async (req, res) => {
     let data = req.body;
 
+    const promise2 = await new Promise((resolve, reject) => {
+      
+      let sqlQuery = `Delete from grade where gradecode = '${data.code}'  `;
+
+      console.log(sqlQuery);
+      pool.query(sqlQuery, (error, results, fields) => {
+        if (error) {
+          console.log(error);
+          resolve(null);
+          return console.log(error);
+        }
+        if (results == null) {
+          // logger.info(
+          //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all sections`
+          // );
+          console.log("No results");
+
+          return res
+            .status(200)
+            .json({ success: 0, data: [], message: "No reults Available" });
+        }
+        console.log(results);
+
+        resolve(results);
+        console.log("result deleted successfully");
+      });
+    });
+    let val = await promise2;
+
     const promise1 = await new Promise((resolve, reject) => {
-      checkGradTitleExist(data.title, (err, results) => {
+      console.log(val);
+      checkGradTitleExist(data.title,async (err, results) => {
         if (results) {
           console.log("Create Grade Group Title Exists");
           resolve(true);
@@ -385,6 +419,7 @@ module.exports = {
         } else {
           for (let i = 0; i < data.grades.length; i++) {
             let title = data.title;
+            let code = data.code;
             let notes = data.notes;
             let examscore = data.examScore;
             let classscore = data.classscore;
@@ -392,12 +427,12 @@ module.exports = {
 
             let createdby = data.createdby;
 
-            let min = data.grades[i][0];
-            let max = data.grades[i][1];
-            let grade = data.grades[i][2];
-            let remarks = data.grades[i][3];
+            let min = data.grades[i].minscore;
+            let max = data.grades[i].maxscore;
+            let grade = data.grades[i].grades;
+            let remarks = data.grades[i].scoreremarks;
             console.log(data.grades[i]);
-            let create = creategradegroup(
+            let create = await creategradegroup(
               title,
               min,
               max,
@@ -407,7 +442,8 @@ module.exports = {
               notes,
               grade,
               remarks,
-              otherscore
+              otherscore,
+              code
             );
             if (create == false)
               res.status(200).json({
@@ -421,7 +457,7 @@ module.exports = {
               console.log(bb);
               console.log("successful creation");
 
-              let sqlQuery = `SELECT DISTINCT(grade.gradetitle), exampercent,classworkpercent,gradeid,createdby,otherscorepercent from grade group by gradetitle order by gradeid desc`;
+              let sqlQuery = `SELECT DISTINCT(grade.gradetitle), exampercent,classworkpercent,gradeid,gradecode,createdby,otherscorepercent from grade group by gradetitle order by gradeid desc`;
               pool.query(sqlQuery, (error, result) => {
                 console.log(error);
 
@@ -442,6 +478,89 @@ module.exports = {
                 //   `${req.method} ${req.originalUrl},'success', fetch all Class`
                 // );
 
+                res.status(200).json({ success: 1, data: result });
+              });
+            }
+          }
+        }
+      });
+    });
+  },
+  creategradegroup: async (req, res) => {
+    let data = req.body;
+    console.log(data);
+    const promise1 = await new Promise((resolve, reject) => {
+      checkGradTitleExist(data.title,async (err, results) => {
+        if (results) {
+          console.log("Create Grade Group Title Exists");
+          resolve(true);
+          return res
+            .status(200)
+            .json({ success: 0, data: null, message: "Group Title Exists" });
+        } else {
+          for (let i = 0; i < data.grades.length; i++) {
+            let title = data.title;
+            let code = data.code;
+            let notes = data.notes;
+            let examscore = data.examScore;
+            let classscore = data.classscore;
+            let otherscore = data.otherScore;
+
+            let createdby = data.createdby;
+
+            let min = data.grades[i][0];
+            let max = data.grades[i][1];
+            let grade = data.grades[i][2];
+            let remarks = data.grades[i][3];
+            console.log(data.grades[i]);
+            let create = await creategradegroup(
+              title,
+              min,
+              max,
+              examscore,
+              classscore,
+              createdby,
+              notes,
+              grade,
+              remarks,
+              otherscore,
+              code
+            );
+            if (create == false)
+              res.status(200).json({
+                success: 0,
+                data: undefined,
+                message: "Internal Server Error",
+              });
+
+            if (i + 1 == data.grades.length) {
+              let bb = create;
+              console.log(bb);
+              console.log("successful creation");
+
+              let sqlQuery = `SELECT DISTINCT(grade.gradetitle), exampercent,classworkpercent,gradeid,gradecode,createdby,otherscorepercent from grade group by gradetitle order by gradeid desc`;
+            
+            
+              pool.query(sqlQuery, (error, result) => {
+                console.log(error);
+
+                if (error) {
+                  // logger.info(
+                  //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all Class`
+                  // );
+                  console.log(error);
+
+                  return res.status(500).json({
+                    success: 0,
+                    error: "internal server error",
+                    message: error,
+                  });
+                }
+
+                // logger.info(
+                //   `${req.method} ${req.originalUrl},'success', fetch all Class`
+                // );
+                console.log(result);
                 res.status(200).json({ success: 1, data: result });
               });
             }
@@ -608,6 +727,31 @@ module.exports = {
       }
     });
   },
+  gradegroupbyid: (req, res) => {
+    let data = req.body;
+    let sqlQuery = `SELECT * from grade where gradecode='${data.code}' `;
+
+    pool.query(sqlQuery, (error, result) => {
+      console.log(error);
+
+      if (error) {
+        // logger.info(
+        //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all Class`
+        // );
+        console.log(error);
+
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error", message: error });
+      }
+
+      console.log(
+        `${result} ${req.originalUrl},'success', fetch grade group by code`
+      );
+
+      res.status(200).json({ success: 1, data: result });
+    });
+  },
   getexamlist: (req, res) => {
     let sqlQuery = `SELECT * from examresultcode order by id desc  `;
 
@@ -685,7 +829,7 @@ module.exports = {
     let examtable = data.examtable;
     let examgroup = data.examgroup;
     let classcode = data.classcode;
-    let size =  data.classsize
+    let size = data.classsize;
     let exampercent = data.exampercent;
     let classpercent = data.classpercent;
     let otherpercent = data.otherpercent;
@@ -752,7 +896,8 @@ module.exports = {
                 examtable,
                 session,
                 examgroup,
-                classcode,size
+                classcode,
+                size
               );
 
               if (i + 1 == data.result.length && create == true) {
@@ -822,6 +967,173 @@ module.exports = {
       }
     });
   },
+  Updateexamresult: async (req, res) => {
+    let data = req.body;
+    let examid = data.examid;
+    //let createdby = data.createdby;
+    let session = data.session;
+    let subject = data.subject;
+    let examtable = data.examtable;
+    let examgroup = data.examgroup;
+    let classcode = data.classcode;
+    let size = data.classsize;
+    let exampercent = data.exampercent;
+    let classpercent = data.classpercent;
+    let otherpercent = data.otherpercent;
+
+    const promise1 = await new Promise((resolve, reject) => {
+      let sqlQuery = `Delete from examresult where examid = '${data.examid}'  `;
+
+      console.log(sqlQuery);
+      pool.query(sqlQuery, (error, results, fields) => {
+        if (error) {
+          console.log(error);
+          resolve(null);
+          return console.log("result retrieve error");
+        }
+        if (results == null) {
+          // logger.info(
+          //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all sections`
+          // );
+          console.log("No results");
+
+          return res
+            .status(200)
+            .json({ success: 0, data: [], message: "No reults Available" });
+        }
+        console.log(results);
+
+        resolve(results);
+        console.log("result deleted successfully");
+      });
+    });
+    let val = await promise1;
+    console.log("promise1");
+
+    let sqlQuery = `update examresultcode set createdby = '${data.createdby}', createdat = '${date}' where code = '${examid}'`;
+
+    pool.query(sqlQuery, async (error, resulty) => {
+      console.log(sqlQuery);
+      if (error) {
+        // logger.info(
+        //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all Class`
+        // );
+        console.log(error);
+
+        return res.status(500).json({
+          success: 0,
+          error: "internal server error",
+          message: error,
+        });
+      } else if (resulty) {
+        console.log(error);
+        console.log(data.result.length);
+        console.log("Yet to run");
+
+        for (let i = 0; i < data.result.length; i++) {
+          console.log("running");
+          let title = data.title;
+          let notes = data.notes;
+          let student_id = data.result[i].student_id;
+          let examscore =
+            data.result[i].examscore == "" ? 0 : data.result[i].examscore;
+          let classscore =
+            data.result[i].classworkscore == ""
+              ? 0
+              : data.result[i].classworkscore;
+          let otherscore =
+            data.result[i].othersscore == "" ? 0 : data.result[i].othersscore;
+          let totalscore = Math.ceil(
+            (examscore == 0 ? 0 : examscore * (exampercent / 100)) +
+              (otherscore == 0 ? 0 : otherscore * (otherpercent / 100)) +
+              (classscore == 0 ? 0 : classscore * (classpercent / 100))
+          );
+
+          let Grader = await gradeMaker(totalscore, data.gradeArray);
+
+          let create = await insertResult(
+            examid,
+            subject,
+            student_id,
+            totalscore,
+            classscore,
+            examscore,
+            Grader[1],
+            Grader[0],
+            otherscore,
+            examtable,
+            session,
+            examgroup,
+            classcode,
+            size
+          );
+          console.log(data.result.length);
+
+          if (i + 1 == data.result.length && create == true) {
+            console.log(create);
+            let vv = create;
+            console.log("Successsssssssssssssssssssssssssssssssssss");
+            //get result inorder to set positions
+            let sqlQuery = `SELECT examresult.*, student.firstName,student.lastName,student.otherName from examresult left join student on examresult.student_id = student.student_id where examid = '${examid}'`;
+            pool.query(sqlQuery, async (error, result) => {
+              console.log(error);
+
+              if (error) {
+                // logger.info(
+                //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all Class`
+                // );
+                console.log(error);
+
+                return res.status(500).json({
+                  success: 0,
+                  error: "internal server error",
+                  message: error + "result inserted but no position set",
+                });
+              }
+
+              console.log(
+                `${result} ${req.originalUrl},'success', fetch all result for positioning`
+              );
+              let sortedArray = await setposition(result);
+              console.log("sortedArray array is");
+              console.log(sortedArray.length);
+
+              if (sortedArray.length) {
+                for (let i = 0; i < sortedArray.length; i++) {
+                  let cover = await updateResultposition(
+                    sortedArray[i].classposition,
+                    sortedArray[i].examid,
+                    sortedArray[i].student_id
+                  );
+                  console.log(cover);
+                }
+                if (i + 1 == sortedArray.length) {
+                  return res.status(200).json({
+                    success: 1,
+                    data: sortedArray,
+                  });
+                }
+              }
+            });
+          }
+          if (i + 1 == data.result.length && create == false) {
+            console.log(create);
+            let vv = create;
+
+            return res.status(200).json({
+              success: 0,
+              data: [],
+              message: "Error inserting Result",
+            });
+          }
+        }
+      }
+
+      // console.log(` ${req.originalUrl},'success', fetch all Class`);
+
+      // res.status(200).json({ success: 1, data: resulty });
+    });
+  },
   getexamsubject: (req, res) => {
     let data = req.body;
     let sqlQuery = `select * from examresultcode where class = '${data.class}' and section = '${data.section}' and session = '${data.session}' and examgroup = '${data.examgroup}' `;
@@ -868,8 +1180,31 @@ module.exports = {
       res.status(200).json({ success: 1, data: result });
     });
   },
+  getexambycode: (req, res) => {
+    let data = req.body;
+    let sqlQuery = `SELECT examresult.*,student.firstName,student.lastName,student.otherName,student.class,student.section from examresult left join student on examresult.student_id = student.student_id where examresult.examid = '${data.id}'`;
+    console.log(sqlQuery);
+    pool.query(sqlQuery, (error, result) => {
+      console.log(error);
+
+      if (error) {
+        // logger.info(
+        //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all Class`
+        // );
+        console.log(error);
+
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error", message: error });
+      }
+
+      console.log(`${result} ${req.originalUrl},'success', fetch all Class`);
+
+      res.status(200).json({ success: 1, data: result });
+    });
+  },
   getgradegroup: (req, res) => {
-    let sqlQuery = `SELECT DISTINCT(grade.gradetitle), exampercent,classworkpercent,gradeid,createdby,otherscorepercent from grade group by gradetitle order by gradeid desc`;
+    let sqlQuery = `SELECT DISTINCT(grade.gradetitle), exampercent,classworkpercent,gradeid,createdby,gradecode,otherscorepercent from grade group by gradetitle order by gradeid desc`;
 
     pool.query(sqlQuery, (error, result) => {
       console.log(error);
@@ -1041,8 +1376,6 @@ module.exports = {
           console.log("done retrieval");
         }
       }
-
-     
     });
   },
   getClassreport: async (req, res) => {
@@ -1121,6 +1454,37 @@ module.exports = {
 
       //   res.status(200).json({ success: 1, data: result });
       // });
+    });
+  },
+  updateexamcartegory: (req, res) => {
+    let data = req.body;
+    let sqlQuery = `update examgroup set grouptitle ='${data.title}' where id = '${data.id}' `;
+    pool.query(sqlQuery, (error, result) => {
+      console.log(error);
+
+      if (error) {
+        // logger.info(
+        //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all Class`
+        // );
+        console.log(error);
+
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error", message: error });
+      }
+
+      console.log(
+        `${req.method} ${req.originalUrl},'success', update exam cartegory successful`
+      );
+      let sqlQuery = `select * from examgroup`;
+      pool.query(sqlQuery, (error, result) => {
+        console.log(error);
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'success', fetch all Class`
+        // );
+
+        res.status(200).json({ success: 1, data: result });
+      });
     });
   },
   setremark: (req, res) => {
