@@ -13,6 +13,8 @@ const sessionRouter = require("./api/session/session.router");
 const settingRouter = require("./api/setting/setting.router");
 const feeRouter = require("./api/fee/fee.router");
 const examRouter = require("./api/exam/exam.router");
+const attendanceRouter = require("./api/attendance/attendance.router");
+
 
 
 
@@ -54,6 +56,7 @@ app.use("/api/session", sessionRouter);
 app.use("/api/setting", settingRouter);
 app.use("/api/fee", feeRouter);
 app.use("/api/exam", examRouter);
+app.use("/api/attendance", attendanceRouter);
 
 
 
