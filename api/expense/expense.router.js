@@ -24,7 +24,7 @@ router.post("/custom",  getcustomexpense);
 router.get("/",  getallexpense);
 router.post("/head",  createExpenseHead);
 router.post("/update",  updateExpense);
-router.post("/updatehead",  updateExpenseHead);
+router.patch("/updatehead",  updateExpenseHead);
 
 router.post("/",  createExpense);
 router.get("/:expense_id",  getExpenseById);

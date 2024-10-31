@@ -25,7 +25,7 @@ const {
 
 
 router.post("/",  createClass);
-router.get("/",  getAllClassWithSection);
+router.post("/getclasswithsection",  getAllClassWithSection);
 router.get("/all/",  getAllClass);
 router.post("/allclassexam/",  allclassexam);
 router.get("/allno/",  getAllClassNo);

@@ -34,7 +34,8 @@ const {
   resetallaccount,
   resetclassaccount,
   getallassignedfeerecord,
-  revokeScholarship
+  revokeScholarship,
+  updatefeecart
 } = require("./fee.controller");
 
 router.get("/", getAllfee);
@@ -57,6 +58,7 @@ router.post("/preferences", preferences);
 router.post("/updatebal", updatebalance);
 
 router.post("/assignfee", assignfee);
+
 router.post("/generatefeebystudent", generatefeebystudent);
 router.post("/generatefeebyclass", generatefeebyclass);
 router.post("/generatefee", generatefee);
@@ -82,6 +84,8 @@ router.delete("/truncate", truncateTable);
 
 router.get("/:fee_id", getfeeById);
 router.patch("/item", updatefee);
+router.patch("/feecart", updatefeecart);
+
 // router.patch("/status/:fee_id",  updatefeestatus);
 router.post("/cartegorydel", deleteSingleCartfee);
 router.delete("/scholarship/:id", deletescholarship);

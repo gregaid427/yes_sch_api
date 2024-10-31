@@ -296,12 +296,24 @@ module.exports = {
       }
 
       if (result.affectedRows == 1) {
-       console.log(
-       `${req.method} ${req.originalUrl}, update inventory cartegory data`
-       );
-        return res.status(200).json({
-          success: 1,
-          message: "update inventory cartegory data success",
+        let sqlQuery = `select * from inventorycartegory  where isActive = 'true'`;
+        pool.query(sqlQuery, (error, result) => {
+          if (error) {
+           console.log(
+           `${req.method} ${req.originalUrl}, 'server error', fetch all Inventory`
+           );
+    
+            return res
+              .status(500)
+                       .json({ success: 0, error: "internal server error",message:error });
+    
+          }
+    
+         console.log(
+         `${req.method} ${req.originalUrl},'success', fetch all Inventory`
+         );
+    
+          res.status(200).json({ success: 1, data: result });
         });
       }
     });

@@ -79,8 +79,8 @@ module.exports = {
 
       // if not create user
       else {
-        let sqlQuery = `insert into staff (userId,sEmail,sGender,sLastName,sFirstName,contact1,contact2,address,definedRole,info) values
-          ('${customStaffId}','${data.email}','${data.sex}','${data.lname}','${data.fname}','${data.contact1}','${data.contact2}','${data.address}','${data.role}','${data.info}')`;
+        let sqlQuery = `insert into staff (userId,sEmail,sGender,sLastName,sFirstName,contact1,contact2,address,definedRole,info,rolecode) values
+          ('${customStaffId}','${data.email}','${data.sex}','${data.lname}','${data.fname}','${data.contact1}','${data.contact2}','${data.address}','${data.role}','${data.info}','${data.rolecode}')`;
 
         pool.query(sqlQuery, (error, result) => {
           console.log(error);
@@ -864,10 +864,11 @@ module.exports = {
   },
 
   getUserByUserId: (req, res) => {
-    const id = parseInt(req.params.userId);
-    let sqlQuery = `select * from users where userId = ${id}`;
+    const data = req.body;
+    let sqlQuery = `select * from users left join staff on users.userId = staff.UserId where users.userId = '${data.id}' `;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
+        console.log(error)
         // logger.info(
         //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch user by id`
         // );
@@ -876,16 +877,22 @@ module.exports = {
           .json({ success: 0, error: "internal server error", message: error });
       }
 
-      if (!result) {
+      if (result == []) {
         // logger.info(
         //   `${req.method} ${req.originalUrl}, fetch user by id: no record found`
         // );
         return res
           .status(200)
-          .json({ success: 1, error: "fetch user by id: no record found" });
+          .json({ success: 0, error: "Error Fetching Data" });
       }
       // logger.info(`${req.method} ${req.originalUrl}, fetch user by id`);
-      res.status(200).json({ success: 1, data: result });
+      console.log(result)
+      if (result.length) {
+
+        result[0].password = null
+        console.log(result)
+        res.status(200).json({ success: 1, data: result });
+      }
     });
   },
 
@@ -897,8 +904,8 @@ module.exports = {
       role == "student"
         ? `select * from student where userId = '${id}'`
         : role == "staff"
-        ? `select * from staff where userId = '${id}'`
-        : `select * from guardian where userId = '${id}'`;
+          ? `select * from staff where userId = '${id}'`
+          : `select * from guardian where userId = '${id}'`;
 
     pool.query(query, (error, result) => {
       if (error) {
@@ -1368,7 +1375,7 @@ module.exports = {
       if (result.affectedRows == 1) {
         // logger.info(`${req.method} ${req.originalUrl}, delete subject  by id`);
         let sqlQuery1 = `update users set isActive ='False' where userId = '${id}'`;
-        pool.query(sqlQuery1, (error, result) => {});
+        pool.query(sqlQuery1, (error, result) => { });
 
         let sqlQuery = `select * from staff left join users on staff.userId = users.userId  where users.role = 'staff'`;
         pool.query(sqlQuery, (error, result) => {
@@ -1404,7 +1411,7 @@ module.exports = {
       if (result.affectedRows == 1) {
         // logger.info(`${req.method} ${req.originalUrl}, delete subject  by id`);
         let sqlQuery1 = `delete from users where userId = '${id}'`;
-        pool.query(sqlQuery1, (error, result) => {});
+        pool.query(sqlQuery1, (error, result) => { });
 
         let sqlQuery = `select * from staff left join users on staff.userId = users.userId  where users.role = 'staff'`;
         pool.query(sqlQuery, (error, result) => {

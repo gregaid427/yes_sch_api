@@ -177,23 +177,25 @@ module.exports = {
     });
   },
   getdaterecords: (req, res) => {
-    let value = req.body.date;
+    let value = req.body;
     section = value.section;
-
+console.log(value)
     let sqlQuery =
       section == "All Sections"
         ? `select  attendance.* from attendance where datetaken = '${value.date}' and classid = '${value.class}'  group by groupecode`
-        : `select  attendance.* from attendance where datetaken = '${value.date}' and classid = '${value.class}' and section = '${value.section}' group by groupecode`;
+        : `select  attendance.* from attendance where datetaken = '${value.date}' and classid = '${value.class}' and section = '${section}' group by groupecode`;
     pool.query(sqlQuery, (error, result) => {
+      console.log(sqlQuery)
       if (error) {
+        console.log(error)
         // logger.info(
         //   `${req.method} ${req.originalUrl}, 'server error', fetch all session`
         // );
-
         return res
           .status(500)
           .json({ success: 0, error: "internal server error", message: error });
       }
+      console.log(result)
 
       // logger.info(
       //   `${req.method} ${req.originalUrl},'success', fetch all session`

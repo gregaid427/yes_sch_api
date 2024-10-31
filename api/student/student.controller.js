@@ -8,6 +8,26 @@ let date = new Date();
 date = date.toUTCString();
 let createHash = require("hash-generator");
 
+async function updateGuardianInfo(data) {
+  const promise1 = await new Promise((resolve, reject) => {
+    let sqlQuery = `UPDATE guardian SET gFirstName = '${data.gfName}', gLastName = '${data.glName}', gContact1 = '${data.contact1}', gContact2 = '${data.contact2}', gEmail = '${data.gemail}', gAddress = '${data.gAddress}', gSex = '${data.gsex}', gRelation = '${data.gRelation}' WHERE guardian.userId = '${data.id}'`;
+
+    console.log(sqlQuery);
+    pool.query(sqlQuery, (error, results, fields) => {
+      if (error) {
+        console.log(error);
+        console.log("error inserting guardian info");
+
+        return resolve(null);
+      }
+
+      console.log("guardian info inserted successfully");
+      return resolve(true);
+    });
+  });
+  return promise1;
+}
+
 async function register(mydata) {
   async function extractdata(mydata) {
     let data = {
@@ -695,6 +715,14 @@ module.exports = {
       }
 
       if (result.affectedRows == 1) {
+        let data1 = data.g1
+        let data2 = data.g2
+        console.log(data1)
+        console.log(data2)
+
+        if (data.g1.id) updateGuardianInfo(data1);
+        if (data.g2.id) updateGuardianInfo(data2);
+
         // logger.info(`${req.method} ${req.originalUrl}, update user data`);
         return res
           .status(200)

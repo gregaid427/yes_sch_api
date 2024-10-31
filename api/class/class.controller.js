@@ -395,7 +395,8 @@ console.log(sqlQuery)
     });
   },
   getAllClassWithSection: (req, res) => {
-    let sqlQuery = `select class.classId, class.title ,section.sectionName from class inner join section on class.classId = section.classId  order by class.title asc`;
+    let data = req.body
+    let sqlQuery = `select * from class where title ='${data.title}'`;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
@@ -433,7 +434,7 @@ console.log(sqlQuery)
 
       }
 
-      if (result.affectedRows != 1) {
+      if (!result) {
         // logger.info(
         //   `${req.method} ${req.originalUrl}, update Class data: no record found`
         // );
@@ -441,14 +442,14 @@ console.log(sqlQuery)
           .status(200)
           .json({ success: 0, error: "update Class data: no record found" });
       }
-      if (result.affectedRows == 1) {
+    
         // logger.info(`${req.method} ${req.originalUrl}, delete Class  by id`);
         //return table data
         let sqlQuery = `SELECT * from class where isActive='true' order by class.title` ;
         pool.query(sqlQuery, (error, result) => {
           res.status(200).json({ success: 1, data: result });
         });
-      }
+      
     });
   },
 
@@ -647,10 +648,10 @@ console.log(sqlQuery)
   deleteSectionbyClass: (req, res) => {
     const id = req.body;
     console.log(id);
-    let sqlQuery = `delete from section where classId = '${id.class}' and sectionName = '${id.section}'`;
+    let sqlQuery = `delete from class where title = '${id.title}' and section = '${id.section}'`;
 
     pool.query(sqlQuery, (error, result) => {
-      console.log(result.affectedRows);
+      console.log(result);
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl} ${req.sqlQuery},'DB error:'${error.sqlMessage}, delete Class section by id`
@@ -674,9 +675,25 @@ console.log(sqlQuery)
         // logger.info(
         //   `${req.method} ${req.originalUrl}, delete Class section  by id`
         // );
-        return res.status(200).json({
-          success: 1,
-          message: "Class section deleted successfully",
+
+        let sqlQuery = `select * from class where title ='${id.title}'`;
+        pool.query(sqlQuery, (error, result) => {
+          if (error) {
+            // logger.info(
+            //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all Class with section`
+            // );
+    
+            return res
+              .status(500)
+                       .json({ success: 0, error: "internal server error",message:error });
+    
+          }
+    
+          // logger.info(
+          //   `${req.method} ${req.originalUrl},'success', fetch all Class with section`
+          // );
+    
+          res.status(200).json({ success: 1, data: result });
         });
       }
     });

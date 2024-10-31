@@ -53,7 +53,7 @@ router.post("/userdata",  getuserdata);
 router.get("/userbyrole",  getUserByUserIdRole);
 
 
-router.get("/:userId",  getUserByUserId);
+router.post("/userid",  getUserByUserId);
 router.get("/pin/:userId",  getOTPpin);
 
 router.post("/login", login);

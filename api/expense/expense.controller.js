@@ -217,8 +217,8 @@ module.exports = {
     });
   },
   updateExpenseHead: async (req, res) => {
-    const data = req.body.data;
-    let sqlQuery = `update expensehead set expensehead ='${data.expensehead}',date='${date}',createdby='${data.createdby}',invoice='${data.notes}'  where id = ${data.id}`;
+    const data = req.body;
+    let sqlQuery = `update expensehead set expensehead ='${data.expensehead}',createdat='${date}',createdby='${data.createdby}',notes='${data.notes}' where id = ${data.id}`;
 
     pool.query(sqlQuery, (error, result) => {
       if (error) {
