@@ -1100,11 +1100,68 @@ module.exports = {
       });
     });
   },
+  updatestaff: async(req, res) => {
+    const data = req.body;
+console.log(data)
 
+const saltRounds = 10;
+
+let password = await bcrypt.hash(data.password, saltRounds);
+    let sqlQuery = data.password == null ? `update users set email ='${data.email}',createdBy='${data.createdBy}',role='${data.role}',rolecode='${data.rolecode}' where userId = '${data.userId}'` :`update users set email ='${data.email}',createdBy='${data.createdBy}',role='${data.role}',rolecode='${data.rolecode}',password='${password}' where userId = '${data.userId}'`;
+
+    pool.query(sqlQuery, (error, result) => {
+      console.log(sqlQuery)
+      if (error) {
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update user data`
+        // );
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error", message: error });
+      }
+
+      if (result.affectedRows != 1) {
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, update user data: no record found`
+        // );
+        return res
+          .status(200)
+          .json({ success: 0, error: "update user data: no record found" });
+      }
+
+      if (result.affectedRows == 1) {
+        // logger.info(`${req.method} ${req.originalUrl}, update user data`);
+
+
+        let sqlQuery = `update staff set sEmail ='${data.email}',sFirstName='${data.fname}',sLastName='${data.lname}',contact1='${data.contact1}',contact2='${data.contact2}',sGender ='${data.sex}',rolecode='${data.rolecode}' where userId = '${data.userId}'`;
+
+       
+    
+        pool.query(sqlQuery, (error, result) => {
+          console.log(result);
+          console.log(error);
+          if (error) {
+            // logger.info(
+            //   `${req.method} ${req.originalUrl}, 'server error', fetch all users`
+            // );
+    
+            return res
+              .status(500)
+              .json({ success: 0, error: "internal server error", message: error });
+          }
+        });
+
+
+        return res
+          .status(200)
+          .json({ success: 1, error: "update user data success" });
+      }
+    });
+  },
   updateUsers: (req, res) => {
     const data = req.body;
 
-    let sqlQuery = `update users set email ='${data.email}',firstName='${data.firstName}',lastName='${data.lastName}',otherName='${data.otherName}',contact1='${data.contact1}',contact2='${data.contact2}',gender ='${data.gender}',createdBy='${data.createdBy}',role='${data.role}',active='${data.active}' where userId = ${data.userId}`;
+    let sqlQuery = `update users set email ='${data.email}',firstName='${data.firstName}',lastName='${data.lastName}',otherName='${data.otherName}',contact1='${data.contact1}',contact2='${data.contact2}',gender ='${data.gender}',createdBy='${data.createdBy}',role='${data.role}',active='${data.active}' where userId = '${data.userId}'`;
 
     pool.query(sqlQuery, (error, result) => {
       if (error) {

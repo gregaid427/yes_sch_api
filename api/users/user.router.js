@@ -24,13 +24,14 @@ const {
   schoolinfo,
   getuserdata,
   setSchoolLogo,
-  schoolinfoupdate
+  schoolinfoupdate,
+  updatestaff
 } = require("./user.controller");
 router.post("/logoschool",  setSchoolLogo);
 
 router.post("/picture",  setStudentPicture);
 router.get("/staff",  getAllStaff);
-
+router.post("/updatestaff",  updatestaff);
 router.post("/deletestaff/:id",  deleteStaff);
 router.post("/inactivestaff/:id",  InactiveStaff);
 router.post("/activestaff/:id",  activeStaff);
