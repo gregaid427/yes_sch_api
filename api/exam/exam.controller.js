@@ -1203,6 +1203,80 @@ module.exports = {
       res.status(200).json({ success: 1, data: result });
     });
   },
+  deletexamgrade: (req, res) => {
+    console.log(req)
+
+    const id = req.body.id;
+    let sqlQuery = `delete from grade where gradecode = '${id}'`;
+
+    pool.query(sqlQuery, (error, result) => {
+      console.log(result)
+      if (error) {
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete Class by id`
+        // );
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error", message: error });
+      }
+
+      if (result.affectedRows != 1) {
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, delete Class by  id: no Class record found`
+        // );
+        return res.status(200).json({
+          success: 0,
+          message: error,
+          error: "Error deleteing",
+        });
+      }
+      if (result.affectedRows) {
+        // logger.info(`${req.method} ${req.originalUrl}, delete Class  by id`);
+        //return table data
+        let sqlQuery = `SELECT DISTINCT(grade.gradetitle), exampercent,classworkpercent,gradeid,gradecode,createdby,otherscorepercent from grade group by gradetitle order by gradeid desc`;
+        pool.query(sqlQuery, (error, result) => {
+          res.status(200).json({ success: 1, data: result });
+        });
+      }
+    });
+  },
+  deleteGroup: (req, res) => {
+    console.log(req)
+
+    const id = req.body.id;
+    let sqlQuery = `delete from examgroup where id = '${id}'`;
+
+    pool.query(sqlQuery, (error, result) => {
+      console.log(result)
+      if (error) {
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete Class by id`
+        // );
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error", message: error });
+      }
+
+      if (result.affectedRows != 1) {
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, delete Class by  id: no Class record found`
+        // );
+        return res.status(200).json({
+          success: 0,
+          message: error,
+          error: "Error deleteing",
+        });
+      }
+      if (result.affectedRows == 1) {
+        // logger.info(`${req.method} ${req.originalUrl}, delete Class  by id`);
+        //return table data
+        let sqlQuery = `SELECT * from examgroup`;
+        pool.query(sqlQuery, (error, result) => {
+          res.status(200).json({ success: 1, data: result });
+        });
+      }
+    });
+  },
   getgradegroup: (req, res) => {
     let sqlQuery = `SELECT DISTINCT(grade.gradetitle), exampercent,classworkpercent,gradeid,createdby,gradecode,otherscorepercent from grade group by gradetitle order by gradeid desc`;
 

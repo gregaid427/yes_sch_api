@@ -5,6 +5,18 @@ var createHash = require("hash-generator");
 let date = new Date();
 date = date.toUTCString();
 
+function getUserByEmail(email, callBack) {
+  pool.query(
+    `select * from inventory where itemName = ? `,
+    [email],
+    (error, results, fields) => {
+      if (error) {
+        callBack(error);
+      }
+      return callBack(null, results[0]);
+    }
+  );
+}
 
 module.exports = {
   createInventory: async (req, res) => {
@@ -14,9 +26,18 @@ module.exports = {
     function hashgenerator(num) {
       return createHash(num);
     }
+    console.log('new inventory')
 
     let code = hashgenerator(6);
-
+    getUserByEmail(data.itemName, (err, results) => {
+      if (results) {
+        return res.status(200).json({
+          success: 0,
+          message: "Item Name Already Exists",
+          data: [],
+        });
+      }
+      else {
     let sqlQuery = `insert into inventory (itemName,itemId,cartegory,quantity,CreatedBy,supplier,createdAt,supplierContact1,supplierContact2,SupplierInfo,isActive,description) values
  ('${data.itemName}','${code}','${data.cartegory}',${data.quantity},'${data.CreatedBy}','${data.supplier}','${date}','${data.supplierContact1}','${data.supplierContact2}','${data.SupplierInfo}','true','${data.description}')`;
     pool.query(sqlQuery, (error, result) => {
@@ -40,6 +61,8 @@ module.exports = {
         });
       }
     });
+    } 
+  });
   },
   addstockInventory: async (req, res) => {
     const data = req.body;

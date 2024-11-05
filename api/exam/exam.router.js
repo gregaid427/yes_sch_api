@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const { checkToken } = require("../../auth/token_validation");
-const {genrateclassreport,creategradegroup,updategradegroup,getexambycode,gradegroupbyid,updateexamcartegory,Updateexamresult,getdetailgradegroup,getexamsubject,setremark,getgradegroup,singlereport,createexamgroup,getexamgroup, getexamlist, createnewexam,searchcustom,addexamresult, getgradegroupbyName, getexamresult, getClassreport} = require("./exam.controller");
+const {genrateclassreport,creategradegroup,updategradegroup,deletexamgrade,deleteGroup,getexambycode,gradegroupbyid,updateexamcartegory,Updateexamresult,getdetailgradegroup,getexamsubject,setremark,getgradegroup,singlereport,createexamgroup,getexamgroup, getexamlist, createnewexam,searchcustom,addexamresult, getgradegroupbyName, getexamresult, getClassreport} = require("./exam.controller");
 
 router.post("/gradegroup", creategradegroup);
 router.post("/examgroup", createexamgroup);
@@ -8,6 +8,10 @@ router.get("/examgroup", getexamgroup);
 router.get("/gradegroup", getgradegroup);
 
 router.post("/updategradegroup", updategradegroup);
+router.post("/deletegroup", deleteGroup);
+router.post("/deletexamgrade", deletexamgrade);
+
+
 
 router.get("/detailgradegroup", getdetailgradegroup);
 router.get("/examlist", getexamlist);

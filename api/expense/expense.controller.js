@@ -10,10 +10,10 @@ module.exports = {
     console.log(req);
     const data = JSON.parse(req.body.data);
     let date = new Date();
-    date = `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}`
-   // date = date.toUTCString();
+    date = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`
+    // date = date.toUTCString();
 
-    
+
     let link = process.env.SERVERLINK + "/" + data.filename;
 
     let sqlQuery = `insert into expense (name,date,expensehead,createdby,invoice,description,amount,filename,link,createdat) values
@@ -25,7 +25,7 @@ module.exports = {
         // );
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
+          .json({ success: 0, error: "internal server error", message: error });
 
       }
 
@@ -41,7 +41,7 @@ module.exports = {
   createExpenseHead: async (req, res) => {
     const data = req.body;
 
-    
+
     let sqlQuery = `insert into expensehead (expensehead,createdat,createdby,notes) values
            ('${data.expensehead}','${date}','${data.createdby}','${data.notes}')`;
     pool.query(sqlQuery, (error, result) => {
@@ -51,7 +51,7 @@ module.exports = {
         // );
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
+          .json({ success: 0, error: "internal server error", message: error });
 
       }
 
@@ -75,7 +75,7 @@ module.exports = {
         // );
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
+          .json({ success: 0, error: "internal server error", message: error });
 
       }
 
@@ -126,7 +126,7 @@ module.exports = {
 
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
+          .json({ success: 0, error: "internal server error", message: error });
 
       }
 
@@ -148,7 +148,7 @@ module.exports = {
 
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
+          .json({ success: 0, error: "internal server error", message: error });
 
       }
 
@@ -170,7 +170,7 @@ module.exports = {
 
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
+          .json({ success: 0, error: "internal server error", message: error });
 
       }
 
@@ -183,25 +183,33 @@ module.exports = {
   },
 
   updateExpense: async (req, res) => {
+    //console.log('call')
     await uploadFile(req, res);
-    const data = JSON.parse(req.body.data);
-    let sqlQuery = `update expense set name ='${data.expense}',date='${data.date}',expensehead='${data.expensehead}',invoice='${data.invoice}',amount='${data.amount}',documentlink='${data.link}',createdby='${data.createdby}',filename='${data.filename}'   where id = ${data.id}`;
+    console.log(req)
 
+    const data = JSON.parse(req.body.data);
+    let sqlQuery = `update expense set name ='${data.expensename}',date='${data.date}',expensehead='${data.expensehead}',invoice='${data.invoice}',amount='${data.amount}',documentlink='${data.link}',createdby='${data.createdby}',filename='${data.filename}'   where id = '${data.id}'`;
+    console.log(sqlQuery)
     pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update expense data`
         // );
+        console.log(error)
+
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
+          .json({ success: 0, error: "internal server error", message: error });
 
       }
+      console.log(result)
 
       if (result.affectedRows != 1) {
         // logger.info(
         //   `${req.method} ${req.originalUrl}, update expense data: no record found`
         // );
+        //console.log(reu)
+
         return res
           .status(200)
           .json({ success: 0, error: "update expense data: no record found" });
@@ -227,9 +235,10 @@ module.exports = {
         // );
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
+          .json({ success: 0, error: "internal server error", message: error });
 
       }
+      console.log(result)
 
       if (result.affectedRows != 1) {
         // logger.info(
@@ -260,7 +269,7 @@ module.exports = {
         // );
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
+          .json({ success: 0, error: "internal server error", message: error });
 
       }
 
@@ -291,7 +300,7 @@ module.exports = {
         // );
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
+          .json({ success: 0, error: "internal server error", message: error });
 
       }
       if (result.affectedRows == 1) {
@@ -304,7 +313,7 @@ module.exports = {
             // );
             return res
               .status(500)
-                       .json({ success: 0, error: "internal server error",message:error });
+              .json({ success: 0, error: "internal server error", message: error });
 
           }
           if (result.affectedRows == 1) {
@@ -331,7 +340,7 @@ module.exports = {
         // );
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
+          .json({ success: 0, error: "internal server error", message: error });
 
       }
 
@@ -367,7 +376,7 @@ module.exports = {
         // );
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
+          .json({ success: 0, error: "internal server error", message: error });
 
       }
 
@@ -401,7 +410,7 @@ module.exports = {
         // );
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
+          .json({ success: 0, error: "internal server error", message: error });
 
       }
 

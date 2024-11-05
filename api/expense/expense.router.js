@@ -20,10 +20,10 @@ const {
 
 router.get("/head",  getallexpensehead);
 router.post("/custom",  getcustomexpense);
+router.post("/update",  updateExpense);
 
 router.get("/",  getallexpense);
 router.post("/head",  createExpenseHead);
-router.post("/update",  updateExpense);
 router.patch("/updatehead",  updateExpenseHead);
 
 router.post("/",  createExpense);
