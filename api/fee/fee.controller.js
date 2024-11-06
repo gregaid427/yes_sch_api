@@ -304,6 +304,34 @@ module.exports = {
       }
     });
   },
+  updatescholarship: async (req, res) => {
+    const data = req.body;
+    console.log(data);
+
+
+    let sqlQuery = `update scholarshiplist set title = '${data.title}',amount = '${data.amount}',createdby='${data.CreatedBy}',createdat='${date}',percent ='${data.percent}',feecartapplicable ='${data.applicable}',type='${data.type}' where id='${data.id}' `;
+
+    pool.query(sqlQuery, (error, result) => {
+      if (error) {
+        console.log(
+          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update scholarship`
+        );
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error", message: error });
+      }
+      if (result.affectedRows == 1) {
+        console.log(
+          `${req.method} ${req.originalUrl},Success update scholarship`
+        );
+        let sqlQuery = `select * from scholarshiplist `;
+        pool.query(sqlQuery, (error, result) => {
+          res.status(200).json({ success: 1, data: result });
+        });
+      }
+    });
+  },
+
   addScholarship: async (req, res) => {
     const data = req.body;
     console.log(data);

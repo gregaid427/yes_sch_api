@@ -35,7 +35,8 @@ const {
   resetclassaccount,
   getallassignedfeerecord,
   revokeScholarship,
-  updatefeecart
+  updatefeecart,
+  updatescholarship
 } = require("./fee.controller");
 
 router.get("/", getAllfee);
@@ -43,6 +44,8 @@ router.get("/cart", getCart);
 router.post("/cart", createfeeCartegory);
 router.post("/scholarship", addScholarship);
 router.post("/listscholarship", getScholarshipEnroll);
+
+router.post("/updatescholarship", updatescholarship);
 
 router.post("/enrollscholarship", enrollScholarship);
 router.post("/revokescholarship", revokeScholarship);
