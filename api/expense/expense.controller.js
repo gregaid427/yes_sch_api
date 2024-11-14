@@ -23,6 +23,7 @@ module.exports = {
         // logger.info(
         //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, create new expense`
         // );
+        console.log(error)
         return res
           .status(500)
           .json({ success: 0, error: "internal server error", message: error });
@@ -433,3 +434,6 @@ module.exports = {
     });
   },
 };
+
+
+// setTimeout(() => toast.dismiss(), 2000);

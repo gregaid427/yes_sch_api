@@ -8,11 +8,11 @@ date = date.toUTCString();
 async function AssignFeeByClass(data) {
   return new Promise(async (resolve2, reject) => {
     let feedata = data;
-  //  console.log(feedatas);
+    //  console.log(feedatas);
     for (const feedatas of feedata) {
       console.log('fee datas isssssssssssssssssssssssssssssssssssssssssssssssssssssssssss')
-     
-     console.log(feedata)
+
+      console.log(feedata)
       let name = feedatas.name;
       let amt = feedatas.amt;
       let clazz = feedatas.class;
@@ -102,49 +102,48 @@ async function AssignFeeByClass(data) {
               }
             }
 
-          let hh = await  update(name, singlestudent);
-          console.log(hh)
+            let hh = await update(name, singlestudent);
+            console.log(hh)
           }
         });
       });
       let set = await promise4;
 
-     
+
     }
     // if (i == feedata.length - 1) {
-      registerLog(
-        "Assign Fee",
-        data.createdby,
-        "none",
-        "Applied",
-        date,
-        `Assign fee for ${data.class}`,
-        'set'
-      );
+    registerLog(
+      "Assign Fee",
+      data.createdby,
+      "none",
+      "Applied",
+      date,
+      `Assign fee for ${data.class}`,
+      'set'
+    );
 
-      setTimeout(() => {
-        resolve2(true);
-      }, 3000);
+    setTimeout(() => {
+      resolve2(true);
+    }, 3000);
 
-      // let sqlQuery = `select * from assignfeecartegory order by id desc`;
-      // pool.query(sqlQuery, (error, result) => {
-      //   res.status(200).json({ success: 1, data: result });
-      // });
-      // console.log("Fees Assign logged Successfully");
-    }
-
-
+    // let sqlQuery = `select * from assignfeecartegory order by id desc`;
+    // pool.query(sqlQuery, (error, result) => {
+    //   res.status(200).json({ success: 1, data: result });
+    // });
+    // console.log("Fees Assign logged Successfully");
+  }
 
 
-  //}
-);
+
+
+    //}
+  );
 }
 
 async function RecordAssignFee(data) {
   let sqlQuery = `insert into assignfeerecord (class,total,createdat,status,createdby) values
-     ('${data.class}','${data.total}','${date.slice(0, 17)}','pending','${
-    data.createdby
-  }')`;
+     ('${data.class}','${data.total}','${date.slice(0, 17)}','pending','${data.createdby
+    }')`;
 
   pool.query(sqlQuery, (error, results, fields) => {
     if (error) {
@@ -169,6 +168,36 @@ function checkFeeExist(data, callBack) {
 }
 
 async function RecordAssignFeeclass(data) {
+
+  //clear initial asigned fee record for chosen class(es)
+
+  const promise2 = await new Promise((resolve, reject) => {
+    for (let i = 0; i < data.fee.length; i++) {
+
+
+
+
+
+      let sqlQuery = `delete from assignfeecartegory where class = '${data.class}'  `;
+
+      pool.query(sqlQuery, (error, results, fields) => {
+        if (error) {
+          console.log(error);
+          return console.log(
+            " error deleting initial records "
+          );
+        }
+        resolve(results);
+
+      });
+
+
+
+    }
+  });
+
+  const val = await promise2
+
   const promise1 = await new Promise((resolve, reject) => {
     for (let i = 0; i < data.fee.length; i++) {
       let name = data.fee[i][0];
@@ -309,8 +338,8 @@ module.exports = {
     console.log(data);
 
 
-    let sqlQuery = `update scholarshiplist set title = '${data.title}',amount = '${data.amount}',createdby='${data.CreatedBy}',createdat='${date}',percent ='${data.percent}',feecartapplicable ='${data.applicable}',type='${data.type}' where id='${data.id}' `;
-
+    let sqlQuery = `update scholarshiplist set title = '${data.title}',amount = '${data.amount}',createdby='${data.CreatedBy}',createdat='${date}',percent ='${data.percent}',feecartapplicable ='${data.applicable}',applicable ='${data.applicable}',type='${data.type}' where id='${data.id}' `;
+console.log(sqlQuery)
     pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(
@@ -1222,7 +1251,7 @@ module.exports = {
   assignfee: async (req, res) => {
     const data = req.body;
 
- //   const promise1 = await new Promise((resolve, reject) => {});
+    //   const promise1 = await new Promise((resolve, reject) => {});
 
     async function forEachAsync(data) {
       let classdata = data.class;
@@ -1288,13 +1317,10 @@ module.exports = {
           let date = new Date();
           console.log(date.toLocaleDateString("en-CA"));
           let sqlQuery = `insert into feepaymentrecords (student_id,stdname,class,amountpaid,mode,balbeforepayment,balanceafterpayment,date,collectedby,receiptid,arrears,activity) values
-         ('${data.id}','${data.name}','${data.class}','${data.amountpaid}','${
-            data.mode
-          }','${data.balbeforepayment}','${
-            data.balanceafterpayment
-          }','${date.toLocaleDateString("en-CA")}','${data.collectedby}','${
-            data.receiptid
-          }','${data.arrears}','Fee Payment')`;
+         ('${data.id}','${data.name}','${data.class}','${data.amountpaid}','${data.mode
+            }','${data.balbeforepayment}','${data.balanceafterpayment
+            }','${date.toLocaleDateString("en-CA")}','${data.collectedby}','${data.receiptid
+            }','${data.arrears}','Fee Payment')`;
           pool.query(sqlQuery, (error, result) => {
             if (error) {
               console.log(

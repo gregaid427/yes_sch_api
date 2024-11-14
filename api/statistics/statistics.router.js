@@ -8,6 +8,8 @@ const {
   getAllStat4,
   getAllStat5,
   getAllStat6,
+  getAllStat7,
+
 
 
 
@@ -20,6 +22,8 @@ router.get("/3",  getAllStat3);
 router.get("/4",  getAllStat4);
 router.get("/5",  getAllStat5);
 router.get("/6",  getAllStat6);
+router.get("/7",  getAllStat7);
+
 
 
 

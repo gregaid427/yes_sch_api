@@ -88,7 +88,7 @@ module.exports = {
           .json({ success: 0, message: "Product Non Exist" });
       }
       if (result) {
-       console.log(`${req.method} ${req.originalUrl}, item Exists`);
+       console.log(`${req.method} ${req.originalUrl}, item Stocked successfully`);
 
         let myresult = parseInt(result[0].quantity) + parseInt(data.quantity);
         let sqlQuery2 = `update inventory set quantity='${myresult}' where itemName = '${data.item}'`;
@@ -397,7 +397,7 @@ module.exports = {
   },
   deleteSingleInventory: (req, res) => {
     const id = req.params.id;
-     let sqlQuery = `delete from inventory where id = ${id}`;
+     let sqlQuery = `delete from inventory where id = '${id}'`;
    // let sqlQuery = `delete from inventory`;
 
     pool.query(sqlQuery, (error, result) => {
@@ -466,9 +466,11 @@ module.exports = {
     });
   },
   deleteSingleInventorystock: (req, res) => {
-    const id = req.params.id;
-     let sqlQuery = `delete from inventorystock where id = ${id}`;
+    const id = req.body.id;
+    console.log(id)
+     let sqlQuery = `delete from inventorystock where id = '${id}'`;
    // let sqlQuery = `delete from inventory`;
+   console.log(sqlQuery)
 
     pool.query(sqlQuery, (error, result) => {
       if (error) {

@@ -41,7 +41,7 @@ router.patch("/item",  updateInventory);
 router.delete("/cartegory/:id",  deleteSingleCartstock);
 
 router.delete("/:id",  deleteSingleInventory);
-router.delete("/stock/:id",  deleteSingleInventorystock);
+router.post("/stock/delete",  deleteSingleInventorystock);
 
 
 module.exports = router;

@@ -102,4 +102,20 @@ module.exports = {
       return res.status(200).json({ success: 1, data: result });
     });
   },
+  getAllStat7: (req, res) => {
+    let sqlQuery5 = `SELECT class,count(student_id) as count from student where isActive='true' group by student.class;  `;
+
+    pool.query(sqlQuery5, (error, result) => {
+      if (error) {
+        // logger.info(
+        //   `${req.method} ${req.originalUrl}, 'server error', result1 `
+        // );
+        return res
+          .status(500)
+                   .json({ success: 0, error: "internal server error",message:error });
+
+      }
+      return res.status(200).json({ success: 1, data: result });
+    });
+  },
 };

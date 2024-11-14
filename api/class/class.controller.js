@@ -60,26 +60,26 @@ module.exports = {
               // );
               return res
                 .status(500)
-                         .json({ success: 0, error: "internal server error",message:error });
+                .json({ success: 0, error: "internal server error", message: error });
 
             }
-            
+
             let sqlQuery = `select * from class where isActive = 'true' group by title`;
 
-              pool.query(sqlQuery, (error, result) => {
-                console.log(result)
-                res.status(200).json({ success: 1, data: result });
-              });
-            
+            pool.query(sqlQuery, (error, result) => {
+              console.log(result)
+              res.status(200).json({ success: 1, data: result });
+            });
+
           });
-        } 
+        }
         else {
           let datas = data.sections;
-        
+
           for (let i = 0; i < datas.length; i++) {
             let section = datas[i];
             console.log(section);
-  
+
             let sqlQuery = `insert into class (classId,title,createdAt,createdBy,isActive,instructor,section) values
              ('${classId}','${data.title}','${date}','${data.createdBy}','true','${data.instructor}','${section}')`;
             pool.query(sqlQuery, (error, result) => {
@@ -89,10 +89,10 @@ module.exports = {
                 // );
                 return res
                   .status(500)
-                           .json({ success: 0, error: "internal server error",message:error });
+                  .json({ success: 0, error: "internal server error", message: error });
 
               }
-  
+
               if (datas.length - 1 == i) {
                 let sqlQuery = `select * from class where isActive = 'true' group by title`;
 
@@ -104,7 +104,7 @@ module.exports = {
             });
           }
 
-    
+
         }
       }
     });
@@ -177,7 +177,7 @@ module.exports = {
             // );
             return res
               .status(500)
-                       .json({ success: 0, error: "internal server error",message:error });
+              .json({ success: 0, error: "internal server error", message: error });
 
           }
 
@@ -214,7 +214,7 @@ module.exports = {
           // );
           return res
             .status(500)
-                     .json({ success: 0, error: "internal server error",message:error });
+            .json({ success: 0, error: "internal server error", message: error });
 
         }
 
@@ -239,9 +239,9 @@ module.exports = {
       //////////
     });
   },
-  getAllClassNo: (req, res) => {
-    let sqlQuery = 
-    `SELECT * from class where isActive='true' order by class.title` ;
+  getClassTudentStat: (req, res) => {
+    let sqlQuery =
+      `SELECT class,count(student_id) from student where isActive='true' group by student.class`;
 
     pool.query(sqlQuery, (error, result) => {
       console.log(error);
@@ -254,7 +254,7 @@ module.exports = {
 
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
+          .json({ success: 0, error: "internal server error", message: error });
 
       }
 
@@ -265,11 +265,10 @@ module.exports = {
       res.status(200).json({ success: 1, data: result });
     });
   },
-  allclassexam : (req, res) => {
-    let data = req.body
-console.log(data)
-    let sqlQuery  = `select * from examresultcode where class = '${data.classes}' and section = '${data.section}' and session = '${data.session}' and examgroup = '${data.examgroup}' and subject = '${data.subject}' `
-console.log(sqlQuery)
+  getAllClassNo: (req, res) => {
+    let sqlQuery =
+      `SELECT * from class where isActive='true' order by class.title`;
+
     pool.query(sqlQuery, (error, result) => {
       console.log(error);
 
@@ -281,7 +280,34 @@ console.log(sqlQuery)
 
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
+          .json({ success: 0, error: "internal server error", message: error });
+
+      }
+
+      // logger.info(
+      //   `${req.method} ${req.originalUrl},'success', fetch all Class`
+      // );
+
+      res.status(200).json({ success: 1, data: result });
+    });
+  },
+  allclassexam: (req, res) => {
+    let data = req.body
+    console.log(data)
+    let sqlQuery = `select * from examresultcode where class = '${data.classes}' and section = '${data.section}' and session = '${data.session}' and examgroup = '${data.examgroup}' and subject = '${data.subject}' `
+    console.log(sqlQuery)
+    pool.query(sqlQuery, (error, result) => {
+      console.log(error);
+
+      if (error) {
+        // logger.info(
+        //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all Class`
+        // );
+        console.log(error);
+
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error", message: error });
 
       }
 
@@ -308,7 +334,7 @@ console.log(sqlQuery)
 
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
+          .json({ success: 0, error: "internal server error", message: error });
 
       }
 
@@ -333,7 +359,7 @@ console.log(sqlQuery)
 
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
+          .json({ success: 0, error: "internal server error", message: error });
 
       }
 
@@ -359,7 +385,7 @@ console.log(sqlQuery)
 
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
+          .json({ success: 0, error: "internal server error", message: error });
 
       }
 
@@ -383,7 +409,7 @@ console.log(sqlQuery)
 
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
+          .json({ success: 0, error: "internal server error", message: error });
 
       }
 
@@ -405,7 +431,7 @@ console.log(sqlQuery)
 
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
+          .json({ success: 0, error: "internal server error", message: error });
 
       }
 
@@ -430,7 +456,7 @@ console.log(sqlQuery)
         // );
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
+          .json({ success: 0, error: "internal server error", message: error });
 
       }
 
@@ -442,14 +468,14 @@ console.log(sqlQuery)
           .status(200)
           .json({ success: 0, error: "update Class data: no record found" });
       }
-    
-        // logger.info(`${req.method} ${req.originalUrl}, delete Class  by id`);
-        //return table data
-        let sqlQuery = `SELECT * from class where isActive='true' order by class.title` ;
-        pool.query(sqlQuery, (error, result) => {
-          res.status(200).json({ success: 1, data: result });
-        });
-      
+
+      // logger.info(`${req.method} ${req.originalUrl}, delete Class  by id`);
+      //return table data
+      let sqlQuery = `SELECT * from class where isActive='true' order by class.title`;
+      pool.query(sqlQuery, (error, result) => {
+        res.status(200).json({ success: 1, data: result });
+      });
+
     });
   },
 
@@ -466,7 +492,7 @@ console.log(sqlQuery)
         // );
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
+          .json({ success: 0, error: "internal server error", message: error });
 
       }
 
@@ -497,7 +523,7 @@ console.log(sqlQuery)
         // );
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
+          .json({ success: 0, error: "internal server error", message: error });
 
       }
 
@@ -531,7 +557,7 @@ console.log(sqlQuery)
         // );
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
+          .json({ success: 0, error: "internal server error", message: error });
 
       }
 
@@ -564,7 +590,7 @@ console.log(sqlQuery)
         // );
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
+          .json({ success: 0, error: "internal server error", message: error });
 
       }
 
@@ -580,7 +606,7 @@ console.log(sqlQuery)
       if (result.affectedRows == 1) {
         // logger.info(`${req.method} ${req.originalUrl}, delete Class  by id`);
         //return table data
-        let sqlQuery = `SELECT * from class where isActive='true' order by class.title` ;
+        let sqlQuery = `SELECT * from class where isActive='true' order by class.title`;
         pool.query(sqlQuery, (error, result) => {
           res.status(200).json({ success: 1, data: result });
         });
@@ -599,7 +625,7 @@ console.log(sqlQuery)
         // );
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
+          .json({ success: 0, error: "internal server error", message: error });
 
       }
 
@@ -632,7 +658,7 @@ console.log(sqlQuery)
         // );
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
+          .json({ success: 0, error: "internal server error", message: error });
 
       }
       if (result.affectedRows == 1) {
@@ -658,7 +684,7 @@ console.log(sqlQuery)
         // );
         return res
           .status(500)
-                   .json({ success: 0, error: "internal server error",message:error });
+          .json({ success: 0, error: "internal server error", message: error });
 
       }
 
@@ -682,17 +708,17 @@ console.log(sqlQuery)
             // logger.info(
             //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all Class with section`
             // );
-    
+
             return res
               .status(500)
-                       .json({ success: 0, error: "internal server error",message:error });
-    
+              .json({ success: 0, error: "internal server error", message: error });
+
           }
-    
+
           // logger.info(
           //   `${req.method} ${req.originalUrl},'success', fetch all Class with section`
           // );
-    
+
           res.status(200).json({ success: 1, data: result });
         });
       }
