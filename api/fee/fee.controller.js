@@ -339,7 +339,7 @@ module.exports = {
 
 
     let sqlQuery = `update scholarshiplist set title = '${data.title}',amount = '${data.amount}',createdby='${data.CreatedBy}',createdat='${date}',percent ='${data.percent}',feecartapplicable ='${data.applicable}',applicable ='${data.applicable}',type='${data.type}' where id='${data.id}' `;
-console.log(sqlQuery)
+    console.log(sqlQuery)
     pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(
@@ -896,6 +896,7 @@ console.log(sqlQuery)
   generatefee: async (req, res) => {
     const data = req.body;
 
+    // set fee payable to 0 balance
     const promise5 = await new Promise((resolve, reject) => {
       let sqlQuery = `update account set feepayable = 0`;
       pool.query(sqlQuery, (error, result) => {
@@ -910,14 +911,14 @@ console.log(sqlQuery)
       });
     });
 
-    let reset = promise5;
+    let reset = await promise5;
     const promise2 = await new Promise((resolve, reject) => {
       let sqlQuery = `select class, amount as amt , feename as name from assignfeecartegory order by id desc`;
       pool.query(sqlQuery, (error, result) => {
         // res.status(200).json({ success: 1, data: result });
         resolve(result);
       });
-      console.log("Fees Assign logged Successfully");
+      console.log("Fees Cartegory fetched");
     });
     console.log(promise2[0].name);
     let fetchedFeecart = promise2;
@@ -1099,7 +1100,7 @@ console.log(sqlQuery)
     console.log(data.class);
 
     const promise8 = await new Promise((resolve, reject) => {
-      let sqlQuery = `select student_id from student where class in (${data.class}) `;
+      let sqlQuery = `select student_id from student where class in (${data.class}) and student.isActive = 'true'; `;
       pool.query(sqlQuery, (error, result) => {
         if (error) {
           return res.status(500).json({
@@ -1150,7 +1151,7 @@ console.log(sqlQuery)
     let arrearsduplicate = promise2;
 
     const promise7 = await new Promise((resolve, reject) => {
-      let sqlQuery = `select class, amount as amt , feename as name from assignfeecartegory where class in (${data.class}) order by id desc`;
+      let sqlQuery = `select class, amount as amt , feename as name from assignfeecartegory where class in (${data.class}) and student.isActive = 'true' order by id desc`;
       pool.query(sqlQuery, (error, result) => {
         //  res.status(200).json({ success: 1, data: result });
         resolve(result);
@@ -1164,7 +1165,7 @@ console.log(sqlQuery)
     console.log(assign);
 
     async function generateFee() {
-      let sqlQuery1 = `select account.feepayable as val,account.student_id as stdid,account.scholarship, account.accountbalance as bal from account left join student on account.student_id = student.student_id where student.class in (${data.class})`;
+      let sqlQuery1 = `select account.feepayable as val,account.student_id as stdid,account.scholarship, account.accountbalance as bal from account left join student on account.student_id = student.student_id where student.class in (${data.class}) and student.isActive = 'true'`;
       const promise1 = await new Promise((resolve, reject) => {
         pool.query(sqlQuery1, async (error, result) => {
           if (error) {
@@ -1337,7 +1338,7 @@ console.log(sqlQuery)
           console.log(data.infotype);
 
           if (data.infotype == "All Sections") {
-            let sqlQuery = `select student.userId,student.student_id,student.firstName,student.otherName, student.lastName,student.gender, student.class,student.section,account.* from student left join account on student.student_id=account.student_id where student.class = '${data.class}'`;
+            let sqlQuery = `select student.userId,student.student_id,student.firstName,student.otherName, student.lastName,student.gender, student.class,student.section,account.* from student left join account on student.student_id=account.student_id where student.class = '${data.class}' `;
             pool.query(sqlQuery, (error, result) => {
               if (error) {
                 return res.status(500).json({
@@ -1449,7 +1450,7 @@ console.log(sqlQuery)
       }
 
       if (results.affectedRows == 1) {
-        let sqlQuery = `select student.*, account.preference  from student left join account on student.student_id = account.student_id   where student.class='${data.class}' `;
+        let sqlQuery = `select student.*, account.preference  from student left join account on student.student_id = account.student_id   where student.class='${data.class}' and student.isActive = 'true'; `;
         pool.query(sqlQuery, (error, result) => {
           res.status(200).json({ success: 1, data: result });
         });
