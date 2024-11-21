@@ -265,8 +265,8 @@ module.exports = {
         if (result.affectedRows == 1) {
           // insert first guardian into users table
           if (data.gfName1 != "") {
-            let sqlQuery1 = `insert into users (email,createdAt,createdBy,pincode,role,password ,userId) values
-          ('${data.gemail1}','${date}','${data.createdBy}',${userPin1},'parent','${hashedPass1}','${customguardian1Id}')`;
+            let sqlQuery1 = `insert into users (email,createdAt,createdBy,pincode,role,password ,userId,pass) values
+          ('${data.gemail1}','${date}','${data.createdBy}',${userPin1},'parent','${hashedPass1}','${customguardian1Id}','${gaurdian2Pass}')`;
 
             pool.query(sqlQuery1, (error, result) => {
               if (error) {
@@ -332,8 +332,8 @@ module.exports = {
 
           // insert second guardian into users table
           if (data.gfName2 != "") {
-            let sqlQuery1 = `insert into users (email,createdAt,createdBy,pincode,role,password,userId ) values
-          ('${data.gemail2}','${date}','${data.createdBy}',${userPin1},'parent','${hashedPass2}','${customguardian2Id}')`;
+            let sqlQuery1 = `insert into users (email,createdAt,createdBy,pincode,role,password,userId,pass ) values
+          ('${data.gemail2}','${date}','${data.createdBy}',${userPin1},'parent','${hashedPass2}','${customguardian2Id}','${gaurdian2Pass}')`;
 
             pool.query(sqlQuery1, (error, result) => {
               if (error) {
@@ -399,8 +399,8 @@ module.exports = {
 
           // insert student into users table
           if (data.firstName != "") {
-            let sqlQuery1 = `insert into users (email,createdAt,createdBy,pincode,role,password,userId) values
-          ('${data.email}','${date}','${data.createdBy}',${userPin},'student','${hashedPass}','${customStudentId}')`;
+            let sqlQuery1 = `insert into users (email,createdAt,createdBy,pincode,role,password,userId,pass) values
+          ('${data.email}','${date}','${data.createdBy}',${userPin},'student','${hashedPass}','${customStudentId}','${studentPass}')`;
 
             pool.query(sqlQuery1, (error, result) => {
               if (error) {
@@ -1018,10 +1018,72 @@ module.exports = {
       res.status(200).json({ success: 1, data: result });
     });
   },
-  getuserdata: (req, res) => {
+  getuserdata: async (req, res) => {
     let data = req.body;
+    const promise5 = await new Promise((resolve, reject) => {
+      let sqlQuery = `select userid from guardian where student_id = '${data.id}' `;
+      pool.query(sqlQuery, (error, result) => {
+        if (error) {
+         // reject('error')
+          return res.status(500).json({
+            success: 0,
+            error: "internal server error",
+            message: error,
+          });
+        }
+        console.log(result);
+        resolve(result);
+      });
+    });
+    let arr = promise5
     //  if(data.role=='student')
     // select * from student left join users on student.userId = users.userId where student.userId = 'z0puvv';
+    const promise9 = await new Promise((resolve, reject) => {
+      let sqlQuery = `select email, pass from users where userId = '${data.userid}' `;
+      pool.query(sqlQuery, (error, result) => {
+        if (error) {
+         // reject('error')
+          return res.status(500).json({
+            success: 0,
+            error: "internal server error",
+            message: error,
+          });
+        }
+        console.log(result);
+        resolve(result);
+      });
+    });
+    const promise7 = await new Promise((resolve, reject) => {
+      let sqlQuery = `select email, pass from users where userId = '${data.userid}' `;
+      pool.query(sqlQuery, (error, result) => {
+        if (error) {
+         // reject('error')
+          return res.status(500).json({
+            success: 0,
+            error: "internal server error",
+            message: error,
+          });
+        }
+        console.log(result);
+        resolve(result);
+      });
+    });
+    const promise8 = await new Promise((resolve, reject) => {
+      let sqlQuery = `select email, pass from users where userId = '${data.userid}' `;
+      pool.query(sqlQuery, (error, result) => {
+        if (error) {
+         // reject('error')
+          return res.status(500).json({
+            success: 0,
+            error: "internal server error",
+            message: error,
+          });
+        }
+        console.log(result);
+        resolve(result);
+      });
+    });
+    console.log(promise8)
     let sqlQuery = `select * from guardian  where student_id = '${data.id}' `;
     console.log(sqlQuery);
 
@@ -1040,7 +1102,7 @@ module.exports = {
       //   `${req.method} ${req.originalUrl},'success', fetch all users`
       // );
       result.password = "";
-      res.status(200).json({ success: 1, data: result });
+      res.status(200).json({ success: 1, data: result ,info:promise8, info1:promise9,info2:promise7 });
     });
   },
   getOTPpin: (req, res) => {

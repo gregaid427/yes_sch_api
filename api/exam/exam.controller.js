@@ -834,8 +834,9 @@ module.exports = {
     let classpercent = data.classpercent;
     let otherpercent = data.otherpercent;
 
-    let sqlQuery = `insert into examresultcode (code,subject,class,section,session,examgroup,createdat,createdby) values
-          ('${data.examid}','${subject}','${data.classes}','${data.section}','${data.session}','${data.examgroup}','${date}','${data.createdby}')`;
+
+    let sqlQuery = `insert into examresultcode (code,subject,class,section,session,examgroup,createdat,createdby,chosengrade) values
+          ('${data.examid}','${subject}','${data.classes}','${data.section}','${data.session}','${data.examgroup}','${date}','${data.createdby}','${data.chosengrade}')`;
 
     checkExamResultCodeExist(data, (err, results) => {
       if (results) {
@@ -1043,11 +1044,18 @@ module.exports = {
               : data.result[i].classworkscore;
           let otherscore =
             data.result[i].othersscore == "" ? 0 : data.result[i].othersscore;
+        
+
           let totalscore = Math.ceil(
             (examscore == 0 ? 0 : examscore * (exampercent / 100)) +
               (otherscore == 0 ? 0 : otherscore * (otherpercent / 100)) +
               (classscore == 0 ? 0 : classscore * (classpercent / 100))
           );
+          console.log(exampercent)
+          console.log(otherpercent)
+          console.log(classpercent)
+          console.log(totalscore)
+          console.log('pppppppppppppppppppppppppppppppppppppppppppppppppppppp')
 
           let Grader = await gradeMaker(totalscore, data.gradeArray);
 
@@ -1159,7 +1167,7 @@ module.exports = {
   },
   getgradegroupbyName: (req, res) => {
     let data = req.body;
-    let sqlQuery = `select minscore,maxscore,grades,scoreremarks from grade where gradetitle = '${data.title}'`;
+    let sqlQuery = `select * from grade where gradetitle = '${data.title}'`;
 
     pool.query(sqlQuery, (error, result) => {
       console.log(error);

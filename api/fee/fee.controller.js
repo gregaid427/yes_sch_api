@@ -436,7 +436,32 @@ module.exports = {
       }
     });
   },
+  getstudentrecord: (req, res) => {
+    const id = req.body.id
+    let sqlQuery = `select * from feepaymentrecords where student_id = '${id}'  order by date desc limit  10`;
+    pool.query(sqlQuery, (error, result) => {
+      if (error) {
+        console.log(
+          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch fee by id`
+        );
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error", message: error });
+      }
 
+      if (!result) {
+        console.log(
+          `${req.method} ${req.originalUrl}, fetch fee by id: no record found`
+        );
+        return res.status(200).json({
+          success: 1,
+          data:[],
+        });
+      }
+      console.log(`${req.method} ${req.originalUrl}, fetch fee by id`);
+      res.status(200).json({ success: 1, data: result });
+    });
+  },
   getfeeById: (req, res) => {
     const id = parseInt(req.params.fee_id);
     let sqlQuery = `select * from fee where fee_id = ${id}`;
