@@ -1080,7 +1080,6 @@ module.exports = {
           if (i + 1 == data.result.length && create == true) {
             console.log(create);
             let vv = create;
-            console.log("Successsssssssssssssssssssssssssssssssssss");
             //get result inorder to set positions
             let sqlQuery = `SELECT examresult.*, student.firstName,student.lastName,student.otherName from examresult left join student on examresult.student_id = student.student_id where examid = '${examid}'`;
             pool.query(sqlQuery, async (error, result) => {
