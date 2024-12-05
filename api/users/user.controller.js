@@ -573,8 +573,8 @@ module.exports = {
           let link = process.env.SERVERLINK + "/" + data.filename;
 
           //insert into student table
-          sqlQuery = `insert into student (userId,student_id,firstName,lastName,otherName,class,section,religion,dateofbirth,gender) values
-            ('${customStudentId}','${student_id}','${data.firstName}','${data.lastName}','${data.otherName}','${data.class}','${data.section}','${data.religion}','${data.dateofbirth}','${data.gender}')`;
+          sqlQuery = `insert into student (userId,student_id,cartegory,firstName,lastName,otherName,class,section,religion,dateofbirth,gender) values
+            ('${customStudentId}','${student_id}','${data.cartegory}','${data.firstName}','${data.lastName}','${data.otherName}','${data.class}','${data.section}','${data.religion}','${data.dateofbirth}','${data.gender}')`;
           let sqlQueryAccount = `insert into account (student_id,createdat,createdby) values ('${student_id}','${date}','${data.createdBy}')`;
 
           userCreaterStudent(

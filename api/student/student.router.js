@@ -17,7 +17,7 @@ const {
   getstudentbyClassCustomBal,
   getstudentbyClassbal,
   bulkAdmission,
-  getstudentcustom
+  getstudentcustom,updatefeecart,getCart,createstudentCartegory,deleteSingleStudentCart
 } = require("./student.controller");
 
 
@@ -40,7 +40,10 @@ router.post("/selectedpromote",  selectedpromote);
 router.post("/studentlogo",  setStudentLogo);
 router.post("/bulkAdmission",  bulkAdmission);
 
-
+router.post("/delStudentCart",  deleteSingleStudentCart);
+router.post("/createstudentcart",  createstudentCartegory);
+router.get("/getcart",  getCart);
+router.post("/updatestudentcart",  updatefeecart);
 
 
 

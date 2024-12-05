@@ -4,10 +4,13 @@ const jwt = require("jsonwebtoken");
 const pool = require("../../config/database.js");
 // const logger = require("../../util/logger.js");
 const uploadFile = require("./upload.js");
+
 let date = new Date();
 date = date.toUTCString();
 let createHash = require("hash-generator");
-
+function hashgenerator(num) {
+  return createHash(num);
+}
 async function updateGuardianInfo(data) {
   const promise1 = await new Promise((resolve, reject) => {
     let sqlQuery = `UPDATE guardian SET gFirstName = '${data.gfName}', gLastName = '${data.glName}', gContact1 = '${data.contact1}', gContact2 = '${data.contact2}', gEmail = '${data.gemail}', gAddress = '${data.gAddress}', gSex = '${data.gsex}', gRelation = '${data.gRelation}' WHERE guardian.userId = '${data.id}'`;
@@ -324,7 +327,7 @@ module.exports = {
         let i = 0;
         while (i < myArray.length) {
           let sqlQuery = `update student set status = 'current' ,class='${data.prevclass}' where student_id ='${myArray[i]}'`;
-          pool.query(sqlQuery, (error, result) => {});
+          pool.query(sqlQuery, (error, result) => { });
           i++;
           if (i == myArray.length)
             res.status(200).json({
@@ -789,6 +792,128 @@ module.exports = {
         return res.status(200).json({
           success: 1,
           message: "delete all record success",
+        });
+      }
+    });
+  },
+
+
+  //////////////////////////////
+  deleteSingleStudentCart: (req, res) => {
+    const data = req.body;
+    console.log(data);
+    let sqlQuery = `delete from studentscartegory where id = '${data.id}'`;
+    // let sqlQuery = `delete from fee`;
+
+    pool.query(sqlQuery, (error, result) => {
+      if (error) {
+        console.log(
+          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete fee Cartegory by id`
+        );
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error", message: error });
+      }
+
+      if (result.affectedRows != 1) {
+        console.log(
+          `${req.method} ${req.originalUrl}, delete fee Cartegory by  id: no fee Cartegory record found`
+        );
+        return res.status(200).json({
+          success: 0,
+          error: "delete fee Cartegory by id: no fee cartegory record found",
+          message: error,
+        });
+      }
+      if (result.affectedRows == 1) {
+        let sqlQuery = `select * from studentscartegory `;
+        pool.query(sqlQuery, (error, result) => {
+          res.status(200).json({ success: 1, data: result });
+        });
+      }
+    });
+  },
+
+  createstudentCartegory: (req, res) => {
+    const data = req.body;
+    let hash = hashgenerator(7);
+    console.log(data);
+    let sqlQuery = `insert into studentscartegory (title,cartid,createdby,createdat,description) values
+  ('${data.name}','${hash}','${data.createdby}','${date}','${data.description}')`;
+    pool.query(sqlQuery, (error, result) => {
+      if (error) {
+        console.log(
+          `${req.method}  ${error.sqlMessage}, ${req.originalUrl}, 'server error', create  fee cartegory`
+        );
+
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error", message: error });
+      }
+
+      console.log(
+        `${req.method} ${req.originalUrl},'success', create  fee cartegory`
+      );
+      if (result.affectedRows == 1) {
+        console.log(`${req.method} ${req.originalUrl},Success create new fee`);
+
+        console.log(
+          `${req.method} ${req.originalUrl},Success create new column field`
+        );
+        let sqlQuery = `select * from studentscartegory `;
+        pool.query(sqlQuery, (error, result) => {
+          res.status(200).json({ success: 1, data: result });
+        });
+      }
+    });
+  },
+  getCart: (req, res) => {
+    let sqlQuery = `select * from studentscartegory`;
+    pool.query(sqlQuery, (error, result) => {
+      if (error) {
+        console.log(
+          `${req.method} ${req.originalUrl}, 'server error', fetch all fee`
+        );
+
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error", message: error });
+      }
+
+      console.log(`${req.method} ${req.originalUrl},'success', fetch all fee`);
+
+      res.status(200).json({ success: 1, data: result });
+    });
+  },
+  updatefeecart: (req, res) => {
+    const data = req.body;
+
+    let sqlQuery = `update studentscartegory set title ='${data.name}',description='${data.description}',CreatedBy='${data.createdby}',createdat='${date}' where id = ${data.id}`;
+
+    pool.query(sqlQuery, (error, result) => {
+      if (error) {
+        console.log(
+          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update fee data`
+        );
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error", message: error });
+      }
+
+      if (result.affectedRows != 1) {
+        console.log(
+          `${req.method} ${req.originalUrl}, update fee data: no record found`
+        );
+        return res.status(200).json({
+          success: 0,
+          error: "update fee data: no record found",
+        });
+      }
+
+      if (result.affectedRows == 1) {
+        let sqlQuery = `select * from studentscartegory`;
+        pool.query(sqlQuery, (error, result) => {
+          res.status(200).json({ success: 1, data: result });
         });
       }
     });

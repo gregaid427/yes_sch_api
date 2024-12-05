@@ -12,7 +12,7 @@ const {
   addScholarship,
   getScholarship,
   getCart,
-  generatefee,
+  generatefeeallstudent,
   getfeerecord,
   updatefeerecord,
   deleteSinglefeestock,
@@ -67,7 +67,7 @@ router.post("/assignfee", assignfee);
 
 router.post("/generatefeebystudent", generatefeebystudent);
 router.post("/generatefeebyclass", generatefeebyclass);
-router.post("/generatefee", generatefee);
+router.post("/generatefee", generatefeeallstudent);
 router.post("/resetallaccount", resetallaccount);
 router.post("/resetclassaccount", resetclassaccount);
 router.get("/getallassignedfeerecord", getallassignedfeerecord);
