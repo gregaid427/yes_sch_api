@@ -386,17 +386,21 @@ async function CreateAssignFeeClass(data) {
     let sqlQuery = `insert into assignfeecartegory (class,scartegory,feename,amount,createdat,createdby,total) values
      ('${data.class}','${data.scartegory}','${name}','${amt}','${date}','${data.createdby}','${data.total}')`;
 
+     const promise2 = await new Promise((resolve, reject) => {
     pool.query(sqlQuery, (error, results, fields) => {
       if (error) {
         console.log(error);
+        resolve('false')
+
         return console.log("assignfeecartegory log error --new fee cart");
       }
-      //   resolve(results);
+         resolve(results);
       console.log(
         "assignfeecartegory logged successfully --new fee cart"
       );
     });
-
+    let result = promise2
+  });
   }
 
 }
@@ -1236,7 +1240,7 @@ module.exports = {
 
     //select feepayable from db to be used for calculation
     const promise7 = await new Promise((resolve, reject) => {
-      let sqlQuery = `select class, amount as amt , feename as name,scartegory as cart from assignfeecartegory where class = '${data.class}' `;
+      let sqlQuery = `select class, amount as amt , feename as name,scartegory as cart from assignfeecartegory where class = '${data.class}' and scartegory ='${data.cartegory}' `;
       pool.query(sqlQuery, (error, result) => {
         //  res.status(200).json({ success: 1, data: result });
         resolve(result);
