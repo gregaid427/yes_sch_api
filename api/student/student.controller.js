@@ -416,7 +416,7 @@ module.exports = {
   getstudentbyClass: (req, res) => {
     const clazz = req.body.class;
     console.log(clazz);
-    let sqlQuery = `select userId,student_id,firstName,otherName, lastName,gender, class,section,dateofbirth,religion,imagelink,filename  from student where class = '${clazz}' and isActive='true' and status='current'`;
+    let sqlQuery = `select userId,student_id,firstName,otherName, lastName,gender, class,section,dateofbirth,religion,imagelink,filename,cartegory  from student where class = '${clazz}' and isActive='true' and status='current'`;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
@@ -439,7 +439,7 @@ module.exports = {
     const clazz = req.body.class;
     const section = req.body.section;
 
-    let sqlQuery = `select userId,student_id,firstName,otherName, lastName,gender, class,section from student where class = '${clazz}' and section = '${section}' and isActive='true' and status='current'`;
+    let sqlQuery = `select userId,student_id,firstName,otherName, lastName,gender, class,section,cartegory from student where class = '${clazz}' and section = '${section}' and isActive='true' and status='current'`;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
@@ -463,12 +463,12 @@ module.exports = {
 
     function getresulttype(data) {
       if (data.section == null) {
-        return `select student.student_id,student.firstName,student.otherName, student.lastName,student.gender,student.section, student.class from student where student.class = '${data.class}'`;
+        return `select student.student_id,student.firstName,student.otherName, student.lastName,student.gender,student.section, student.class,student.cartegory,student.cartegory from student where student.class = '${data.class}'`;
       }
       if (data.section == "All Sections") {
-        return `select student.student_id,student.firstName,student.otherName, student.lastName,student.gender,student.section, student.class from student where student.class = '${data.class}'`;
+        return `select student.student_id,student.firstName,student.otherName, student.lastName,student.gender,student.section, student.class, student.cartegory,student.cartegory from student where student.class = '${data.class}'`;
       } else {
-        return `select student.student_id,student.firstName,student.otherName, student.lastName,student.gender,student.section, student.class from student where student.class = '${data.class}'  and student.section = '${data.section}'`;
+        return `select student.student_id,student.firstName,student.otherName, student.lastName,student.gender,student.section, student.cartegory,student.cartegory from student where student.class = '${data.class}'  and student.section = '${data.section}'`;
       }
     }
     pool.query(getresulttype(data), async (error, resultz) => {
@@ -498,7 +498,7 @@ module.exports = {
   getstudentbyClassbal: (req, res) => {
     const clazz = req.body.class;
     console.log(clazz);
-    let sqlQuery = `select student.userId,student.student_id,student.firstName,student.otherName, student.lastName,student.gender, student.class,student.section,account.* from student left join account on student.student_id=account.student_id where student.class = '${clazz}'`;
+    let sqlQuery = `select student.userId,student.student_id,student.firstName,student.otherName,student.cartegory, student.lastName,student.gender, student.class,student.section,account.* from student left join account on student.student_id=account.student_id where student.class = '${clazz}'`;
     pool.query(sqlQuery, async (error, result) => {
       if (error) {
         logger.info(
@@ -539,7 +539,7 @@ module.exports = {
     const clazz = req.body.class;
     const section = req.body.section;
 
-    let sqlQuery = `select student.userId,student.student_id,student.firstName,student.otherName, student.lastName,student.gender, student.class,student.section,account.accountbalance from student left join account on student.student_id=account.student_id where student.class = '${clazz}' and student.section = '${section}'`;
+    let sqlQuery = `select student.userId,student.student_id,student.firstName,student.otherName, student.lastName,student.gender,student.cartegory, student.class,student.section,account.accountbalance from student left join account on student.student_id=account.student_id where student.class = '${clazz}' and student.section = '${section}'`;
     pool.query(sqlQuery, async (error, result) => {
       if (error) {
         logger.info(

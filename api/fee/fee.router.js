@@ -37,7 +37,9 @@ const {
   revokeScholarship,
   updatefeecart,
   getstudentrecord,
-  updatescholarship
+  updatescholarship,
+  getAssignRecordAction,
+  totalfee
 } = require("./fee.controller");
 
 router.get("/", getAllfee);
@@ -64,6 +66,10 @@ router.post("/preferences", preferences);
 router.post("/updatebal", updatebalance);
 
 router.post("/assignfee", assignfee);
+
+router.get("/getAssignRecordAction", getAssignRecordAction);
+router.post("/totalfee", totalfee);
+
 
 router.post("/generatefeebystudent", generatefeebystudent);
 router.post("/generatefeebyclass", generatefeebyclass);

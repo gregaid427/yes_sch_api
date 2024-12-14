@@ -3,7 +3,7 @@ const pool = require("../../config/database.js");
 var createHash = require("hash-generator");
 
 let date = new Date();
-date = date.toUTCString();
+date = date.toLocaleDateString("en-CA");
 
 async function AssignFeeByClass(data) {
   return new Promise(async (resolve2, reject) => {
@@ -284,8 +284,8 @@ async function AssignFeeByStudent(data, id) {
 }
 
 async function RecordAssignFee(data) {
-  let sqlQuery = `insert into assignfeerecord (class,total,createdat,status,createdby) values
-     ('${data.class}','${data.total}','${date.slice(0, 17)}','pending','${data.createdby
+  let sqlQuery = `insert into assignfeerecord (class,total,cartegory,createdat,status,createdby) values
+     ('${data.class}','${data.total}','${data.scartegory}','${date}','pending','${data.createdby
     }')`;
 
   pool.query(sqlQuery, (error, results, fields) => {
@@ -356,7 +356,7 @@ async function CreateAssignFeeClass(data) {
 
   //clear initial asigned fee record for chosen class(es)
 
-  const promise2 = await new Promise((resolve, reject) => {
+  const promise = await new Promise((resolve, reject) => {
     for (let i = 0; i < data.fee.length; i++) {
 
       let sqlQuery = `delete from assignfeecartegory where class = '${data.class}' and scartegory = '${data.scartegory}' `;
@@ -373,12 +373,19 @@ async function CreateAssignFeeClass(data) {
     }
   });
 
-  const val = await promise2
+  const val = await promise
+
+console.log(data)
+for (const val of data.fee) {
 
 
-  for (let i = 0; i < data.fee.length; i++) {
-    let name = data.fee[i][0];
-    let amt = data.fee[i][1];
+const promise2 = await new Promise((resolve, reject) => {
+  function setrec(val){
+
+        console.log(val)
+
+    let name = val[0];
+    let amt = val[1];
 
     let date = new Date();
     date = date.toLocaleDateString("en-CA");
@@ -386,24 +393,40 @@ async function CreateAssignFeeClass(data) {
     let sqlQuery = `insert into assignfeecartegory (class,scartegory,feename,amount,createdat,createdby,total) values
      ('${data.class}','${data.scartegory}','${name}','${amt}','${date}','${data.createdby}','${data.total}')`;
 
-     const promise2 = await new Promise((resolve, reject) => {
-    pool.query(sqlQuery, (error, results, fields) => {
-      if (error) {
-        console.log(error);
-        resolve('false')
+      try {
+        pool.query(sqlQuery, (error, results, fields) => {
+          if (error) {
+            console.log(error);
+            resolve('false')
 
-        return console.log("assignfeecartegory log error --new fee cart");
+            return console.log("assignfeecartegory4 log error --new fee cart");
+          }
+         // resolve(results);
+          console.log(
+            "assignfeecartegory logged successfully --new fee cart"
+          );
+        });
+
+      } catch (error) {
       }
-         resolve(results);
-      console.log(
-        "assignfeecartegory logged successfully --new fee cart"
-      );
-    });
-    let result = promise2
-  });
+    ;
   }
+  setTimeout(() => {
+    setrec(val)
+    resolve(true);
+
+  }, 1000);}
+
+)
+let result = promise2
+console.log(result)
+
 
 }
+
+}
+
+
 
 function ActivityregisterLog(activity, user, amount, status, date, description) {
   let sqlQuery = `insert into financelog (activity,user,amount,createdAt,status,description) values
@@ -590,6 +613,70 @@ module.exports = {
       }
     });
   },
+  totalfee: (req, res) => {
+    let period = req.body.period
+    let session = req.body.session.sessionname
+
+    console.log(session)
+    //if (period == 'Current Session') return 
+
+    function getquery(period, session) {
+      if (period == 'Current Session') return `select  sum(amountpaid) as total from feepaymentrecords where session = '${session}' `
+      if (period == 'Today') return `select  sum(amountpaid) as total from feepaymentrecords where date = '${date}'`
+
+    }
+    let sqlQuery = getquery(period, session);
+    pool.query(sqlQuery, (error, result) => {
+      if (error) {
+        console.log(error)
+        console.log(
+          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch fee by id`
+        );
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error", message: error });
+      }
+
+      if (!result) {
+        console.log(
+          `${req.method} ${req.originalUrl}, fetch fee by id: no record found`
+        );
+        return res.status(200).json({
+          success: 1,
+          data: [],
+        });
+      }
+      console.log(`${req.method} ${req.originalUrl}, fetch fee by id`);
+      res.status(200).json({ success: 1, data: result });
+    });
+  },
+  getAssignRecordAction: (req, res) => {
+    const id = req.body.id
+    let sqlQuery = `select * from assignfeerecord order by id desc limit  100 `;
+    pool.query(sqlQuery, (error, result) => {
+      if (error) {
+        console.log(error)
+        console.log(
+          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch fee by id`
+        );
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error", message: error });
+      }
+
+      if (!result) {
+        console.log(
+          `${req.method} ${req.originalUrl}, fetch fee by id: no record found`
+        );
+        return res.status(200).json({
+          success: 1,
+          data: [],
+        });
+      }
+      console.log(`${req.method} ${req.originalUrl}, fetch fee by id`);
+      res.status(200).json({ success: 1, data: result });
+    });
+  },
   getstudentrecord: (req, res) => {
     const id = req.body.id
     let sqlQuery = `select * from feepaymentrecords where student_id = '${id}'  order by date desc limit  10`;
@@ -616,6 +703,7 @@ module.exports = {
       res.status(200).json({ success: 1, data: result });
     });
   },
+
   getfeeById: (req, res) => {
     const id = parseInt(req.params.fee_id);
     let sqlQuery = `select * from fee where fee_id = ${id}`;
@@ -1102,17 +1190,18 @@ module.exports = {
           resolve(false);
 
           return res.status(200).json({
-          success: 0,
-          error: "No Assigned Fee cartegory Available",
-        }); }
-        else{
+            success: 0,
+            error: "No Assigned Fee cartegory Available",
+          });
+        }
+        else {
           resolve(result);
 
         }
       });
       console.log("Fees Cartegory fetched");
     });
- 
+
     let fetchedFeecart = await promise2;
 
     let assign = await AssignFeeByClass(fetchedFeecart);
@@ -1580,11 +1669,11 @@ module.exports = {
           //record payment
           let date = new Date();
           console.log(date.toLocaleDateString("en-CA"));
-          let sqlQuery = `insert into feepaymentrecords (student_id,stdname,class,amountpaid,mode,balbeforepayment,balanceafterpayment,date,collectedby,receiptid,arrears,activity) values
+          let sqlQuery = `insert into feepaymentrecords (student_id,stdname,class,amountpaid,mode,balbeforepayment,balanceafterpayment,date,collectedby,receiptid,arrears,activity,session) values
          ('${data.id}','${data.name}','${data.class}','${data.amountpaid}','${data.mode
             }','${data.balbeforepayment}','${data.balanceafterpayment
             }','${date.toLocaleDateString("en-CA")}','${data.collectedby}','${data.receiptid
-            }','${data.arrears}','Fee Payment')`;
+            }','${data.arrears}','Fee Payment','${data.session}')`;
           pool.query(sqlQuery, (error, result) => {
             if (error) {
               console.log(
