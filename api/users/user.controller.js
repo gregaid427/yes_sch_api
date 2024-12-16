@@ -587,7 +587,7 @@ module.exports = {
           //insert into student table
           sqlQuery = `insert into student (userId,student_id,cartegory,firstName,lastName,otherName,class,section,religion,dateofbirth,gender) values
             ('${customStudentId}','${student_id}','${data.cartegory}','${capitalizeWords(data.firstName)}','${capitalizeWords(data.lastName)}','${capitalizeWords(data.otherName)}','${data.class}','${data.section}','${capitalizeWords(data.religion)}','${data.dateofbirth}','${data.gender}')`;
-          let sqlQueryAccount = `insert into account (student_id,createdat,createdby) values ('${student_id}','${date}','${data.createdBy}')`;
+          let sqlQueryAccount = `insert into account (student_id,cartegory,createdat,createdby) values ('${student_id}','${data.cartegory}','${date}','${data.createdBy}')`;
 
           userCreaterStudent(
             sqlQuery,

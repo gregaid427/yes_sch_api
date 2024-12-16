@@ -501,19 +501,19 @@ module.exports = {
     let sqlQuery = `select student.userId,student.student_id,student.firstName,student.otherName,student.cartegory, student.lastName,student.gender, student.class,student.section,account.* from student left join account on student.student_id=account.student_id where student.class = '${clazz}'`;
     pool.query(sqlQuery, async (error, result) => {
       if (error) {
-        logger.info(
+        console.log(
           `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all student by class`
         );
       }
       console.log(result);
 
       const promise1 = await new Promise((resolve, reject) => {
-        let sqlQuery = `select * from assignfeecartegory where class = '${clazz}'`;
+        let sqlQuery = `select * from assignfeecartegory where class = '${clazz}'  `;
         pool.query(sqlQuery, (error, results) => {
           if (error) {
-            logger.info(
-              `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all student by class`
-            );
+            // logger.info(
+            //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all student by class`
+            // );
 
             // return res
             //   .status(500)
@@ -548,7 +548,7 @@ module.exports = {
       }
       console.log(result);
       const promise1 = await new Promise((resolve, reject) => {
-        let sqlQuery = `select * from assignfeecartegory where class = '${clazz}'`;
+        let sqlQuery = `select * from assignfeecartegory where class = '${clazz}' `;
         pool.query(sqlQuery, (error, results) => {
           if (error) {
             console.log(
