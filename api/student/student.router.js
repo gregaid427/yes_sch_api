@@ -28,8 +28,6 @@ router.post("/custom",  getstudentbyClass);
 router.post("/custom1account",  getstudentbyClassCustomBal);
 router.post("/customaccount",  getstudentbyClassbal);
 router.post("/studentcustom",  getstudentcustom);
-
-
 router.post("/custom1promote",  getstudentbyClassCustomPromote);
 router.post("/customPromote",  getstudentbyClassPromote);
 router.get("/single/:student_id",  getstudentbiodata);

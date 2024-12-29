@@ -355,7 +355,7 @@ async function getfee(custom) {
 async function CreateAssignFeeClass(data) {
 
   //clear initial asigned fee record for chosen class(es)
-
+let cartid = hashgenerator(9)
   const promise = await new Promise((resolve, reject) => {
     for (let i = 0; i < data.fee.length; i++) {
 
@@ -375,54 +375,55 @@ async function CreateAssignFeeClass(data) {
 
   const val = await promise
 
-console.log(data)
-for (const val of data.fee) {
+  console.log(data)
+  for (const val of data.fee) {
 
 
-const promise2 = await new Promise((resolve, reject) => {
-  function setrec(val){
+    const promise2 = await new Promise((resolve, reject) => {
+      function setrec(val) {
 
         console.log(val)
 
-    let name = val[0];
-    let amt = val[1];
+        let name = val[0];
+        let amt = val[1];
 
-    let date = new Date();
-    date = date.toLocaleDateString("en-CA");
-    console.log(date);
-    let sqlQuery = `insert into assignfeecartegory (class,scartegory,feename,amount,createdat,createdby,total) values
-     ('${data.class}','${data.scartegory}','${name}','${amt}','${date}','${data.createdby}','${data.total}')`;
+        let date = new Date();
+        date = date.toLocaleDateString("en-CA");
+        console.log(date);
+        let sqlQuery = `insert into assignfeecartegory (class,scartegory,feename,amount,createdat,createdby,total,cartgroupid) values
+     ('${data.class}','${data.scartegory}','${name}','${amt}','${date}','${data.createdby}','${data.total}','${cartid}')`;
 
-      try {
-        pool.query(sqlQuery, (error, results, fields) => {
-          if (error) {
-            console.log(error);
-            resolve('false')
+        try {
+          pool.query(sqlQuery, (error, results, fields) => {
+            if (error) {
+              console.log(error);
+              resolve('false')
 
-            return console.log("assignfeecartegory4 log error --new fee cart");
-          }
-         // resolve(results);
-          console.log(
-            "assignfeecartegory logged successfully --new fee cart"
-          );
-        });
+              return console.log("assignfeecartegory4 log error --new fee cart");
+            }
+            // resolve(results);
+            console.log(
+              "assignfeecartegory logged successfully --new fee cart"
+            );
+          });
 
-      } catch (error) {
+        } catch (error) {
+        }
+        ;
       }
-    ;
+      setTimeout(() => {
+        setrec(val)
+        resolve(true);
+
+      }, 1000);
+    }
+
+    )
+    let result = promise2
+    console.log(result)
+
+
   }
-  setTimeout(() => {
-    setrec(val)
-    resolve(true);
-
-  }, 1000);}
-
-)
-let result = promise2
-console.log(result)
-
-
-}
 
 }
 
@@ -626,6 +627,63 @@ module.exports = {
 
     }
     let sqlQuery = getquery(period, session);
+    pool.query(sqlQuery, (error, result) => {
+      if (error) {
+        console.log(error)
+        console.log(
+          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch fee by id`
+        );
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error", message: error });
+      }
+
+      if (!result) {
+        console.log(
+          `${req.method} ${req.originalUrl}, fetch fee by id: no record found`
+        );
+        return res.status(200).json({
+          success: 1,
+          data: [],
+        });
+      }
+      console.log(`${req.method} ${req.originalUrl}, fetch fee by id`);
+      res.status(200).json({ success: 1, data: result });
+    });
+  },
+
+  getsinglebill: (req, res) => {
+    const data = req.body
+    let sqlQuery = `select * from assignfeecartegory where assignfeecartegory.scartegory = '${data.cart}' and assignfeecartegory.class = '${data.class}' `;
+    console.log(sqlQuery)
+
+    pool.query(sqlQuery, (error, result) => {
+      if (error) {
+        console.log(error)
+        console.log(
+          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch fee by id`
+        );
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error", message: error });
+      }
+
+      if (!result) {
+        console.log(
+          `${req.method} ${req.originalUrl}, fetch fee by id: no record found`
+        );
+        return res.status(200).json({
+          success: 1,
+          data: [],
+        });
+      }
+      console.log(`${result} ${req.originalUrl}, fetch fee by id`);
+      res.status(200).json({ success: 1, data: result });
+    });
+  },
+  getbulkbill: (req, res) => {
+    const data = req.body
+    let sqlQuery = `select student.*,assignfeecartegory.* from student right join assignfeecartegory on student.cartegory = assignfeecartegory.scartegory where assignfeecartegory.scartegory = '${data.cart}' and assignfeecartegory.class = '${data.class}' `;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(error)
@@ -894,9 +952,11 @@ module.exports = {
       res.status(200).json({ success: 1, data: result });
     });
   },
-  getallassignedfeerecord: (req, res) => {
-    let sqlQuery = `select * from assignfeecartegory `;
-    pool.query(sqlQuery, (error, result) => {
+  getallassignedfeerecord: async (req, res) => {
+    let arr = []
+
+    let sqlQuery = `select distinct(class.title) as title from class`;
+    pool.query(sqlQuery, async (error, result) => {
       if (error) {
         console.log(
           `${req.method} ${req.originalUrl}, 'server error', fetch all fee`
@@ -906,11 +966,93 @@ module.exports = {
           .status(500)
           .json({ success: 0, error: "internal server error", message: error });
       }
+      // console.log(result)
+      async function getcart() {
+        let sqlQuery1 = `select title from studentscartegory`;
+        const promise5 = await new Promise((resolve, reject) => {
+          pool.query(sqlQuery1, (error, resultz) => {
+            if (error) {
+              console.log(
+                `${req.method} ${req.originalUrl}, 'server error', fetch all fee`
+              );
 
-      console.log(`${req.method} ${req.originalUrl},'success', fetch all fee`);
+              return res
+                .status(500)
+                .json({ success: 0, error: "internal server error", message: error });
+            }
 
-      res.status(200).json({ success: 1, data: result });
+            console.log(`${req.method} ${req.originalUrl},'success', fetch all fee`);
+
+
+            resolve(resultz)
+            //  res.status(200).json({ success: 1, data: result });
+          });
+        });
+
+        return promise5
+      }
+      async function getdata(data, cart) {
+        let sqlQuery1 = `select * from assignfeecartegory  where class = '${data}' and scartegory = '${cart}'`;
+        const promise5 = await new Promise((resolve, reject) => {
+          pool.query(sqlQuery1, (error, resultz) => {
+            if (error) {
+              console.log(
+                `${req.method} ${req.originalUrl}, 'server error', fetch all fee`
+              );
+
+              return res
+                .status(500)
+                .json({ success: 0, error: "internal server error", message: error });
+            }
+
+            console.log(`${req.method} ${req.originalUrl},'success', fetch all fee`);
+
+
+            resolve(resultz)
+            //  res.status(200).json({ success: 1, data: result });
+          });
+        });
+
+        return promise5
+      }
+
+      let cart = await getcart()
+
+
+      for (const element of result) {
+        // console.log(element)
+        let gold = []
+        for (let i = 0; i < cart.length; i++) {
+
+
+          let val = await getdata(element.title, cart[i].title)
+          val.length == 0 ? gold.push([{ class: element.title, scartegory: cart[i].title }]) : gold.push(val)
+          console.log(val)
+
+          //  console.log(cart.length,cart.indexOf(elementz.title))
+          setTimeout(() => {
+
+            if (cart.length == i + 1) {
+              arr.push(gold)
+              gold = []
+            }
+          }, 500);
+
+        }
+
+      };
+
+
+
+
+      console.log(arr)
+      setTimeout(() => {
+        res.status(200).json({ success: 1, data: arr });
+      }, 3000);
+
     });
+
+
   },
 
   getAssigncustom: (req, res) => {
@@ -2030,12 +2172,46 @@ module.exports = {
       }
     });
   },
-  deleteSingleCartfee: (req, res) => {
+  updatecartitem: (req, res) => {
     const data = req.body;
     console.log(data);
-    let sqlQuery = `delete from feesgroup where id = '${data.id}'`;
+    let sqlQuery = `update  assignfeecartegory set amount = '${data.amount}' where id = '${data.id}'`;
     // let sqlQuery = `delete from fee`;
+    console.log(sqlQuery)
+    pool.query(sqlQuery, (error, result) => {
+      if (error) {
+        console.log(
+          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update fee Cartegory by id`
+        );
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error", message: error });
+      }
 
+      if (result.affectedRows != 1) {
+        console.log(
+          `${req.method} ${req.originalUrl}, delete fee Cartegory by  id: no fee Cartegory record found`
+        );
+        return res.status(200).json({
+          success: 0,
+          error: "update fee Cartegory by id: no fee cartegory record found",
+          message: error,
+        });
+      }
+      if (result.affectedRows == 1) {
+        let sqlQuery = `select * from feesgroup `;
+        pool.query(sqlQuery, (error, result) => {
+          res.status(200).json({ success: 1, data: result });
+        });
+      }
+    });
+  },
+  cartitemdel: (req, res) => {
+    const data = req.body;
+    console.log(data);
+    let sqlQuery = `delete from assignfeecartegory where id = '${data.id}'`;
+    // let sqlQuery = `delete from fee`;
+    console.log(sqlQuery)
     pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(
@@ -2064,9 +2240,43 @@ module.exports = {
       }
     });
   },
-  deleteSinglefeestock: (req, res) => {
-    const id = req.params.id;
-    let sqlQuery = `delete from feestock where id = ${id}`;
+  deleteSingleCartfee: (req, res) => {
+    const data = req.body;
+    console.log(data);
+    let sqlQuery = `delete from assignfeecartegory where class = '${data.class}' and scartegory = '${data.cart}'`;
+    // let sqlQuery = `delete from fee`;
+    console.log(sqlQuery)
+    pool.query(sqlQuery, (error, result) => {
+      if (error) {
+        console.log(
+          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete fee Cartegory by id`
+        );
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error", message: error });
+      }
+
+      if (result.affectedRows != 1) {
+        console.log(
+          `${req.method} ${req.originalUrl}, delete fee Cartegory by  id: no fee Cartegory record found`
+        );
+        return res.status(200).json({
+          success: 0,
+          error: "delete fee Cartegory by id: no fee cartegory record found",
+          message: error,
+        });
+      }
+      if (result.affectedRows == 1) {
+        let sqlQuery = `select * from feesgroup `;
+        pool.query(sqlQuery, (error, result) => {
+          res.status(200).json({ success: 1, data: result });
+        });
+      }
+    });
+  },
+  deletegroupFeeCart: (req, res) => {
+    const id = req.body.class;
+    let sqlQuery = `delete from assignfeecartegory where class = '${id}'`;
     // let sqlQuery = `delete from fee`;
 
     pool.query(sqlQuery, (error, result) => {

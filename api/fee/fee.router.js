@@ -15,7 +15,7 @@ const {
   generatefeeallstudent,
   getfeerecord,
   updatefeerecord,
-  deleteSinglefeestock,
+  deletegroupFeeCart,
   deleteSingleCartfee,
   deletescholarship,
   assignfee,
@@ -28,7 +28,9 @@ const {
   updatebalance,
   reversefeepayment,
   getfeerecordgroup,
+  updatecartitem,
   generatefeebyclass,
+  cartitemdel,
   generatefeebystudent,
   deleteallasigned,
   resetallaccount,
@@ -37,9 +39,11 @@ const {
   revokeScholarship,
   updatefeecart,
   getstudentrecord,
+  getsinglebill,
   updatescholarship,
   getAssignRecordAction,
-  totalfee
+  totalfee,
+  getbulkbill
 } = require("./fee.controller");
 
 router.get("/", getAllfee);
@@ -77,8 +81,11 @@ router.post("/generatefee", generatefeeallstudent);
 router.post("/resetallaccount", resetallaccount);
 router.post("/resetclassaccount", resetclassaccount);
 router.get("/getallassignedfeerecord", getallassignedfeerecord);
+router.post("/cartitemdel", cartitemdel);
 
 
+router.post("/getsinglebill", getsinglebill);
+router.post("/getbulkbill", getbulkbill);
 
 
 
@@ -97,13 +104,15 @@ router.delete("/truncate", truncateTable);
 router.get("/:fee_id", getfeeById);
 router.patch("/item", updatefee);
 router.patch("/feecart", updatefeecart);
+router.post("/updatecartitem", updatecartitem);
+
 
 // router.patch("/status/:fee_id",  updatefeestatus);
 router.post("/cartegorydel", deleteSingleCartfee);
 router.delete("/scholarship/:id", deletescholarship);
 
 router.delete("/:id", deleteSinglefee);
-router.delete("/stock/:id", deleteSinglefeestock);
+router.post("/groupcartdel", deletegroupFeeCart);
 
 module.exports = router;
 
@@ -1838,7 +1847,7 @@ module.exports = router;
 //       }
 //     });
 //   },
-//   deleteSinglefeestock: (req, res) => {
+//   deletegroupFeeCart: (req, res) => {
 //     const id = req.params.id;
 //     let sqlQuery = `delete from feestock where id = ${id}`;
 //     // let sqlQuery = `delete from fee`;

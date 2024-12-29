@@ -416,7 +416,7 @@ module.exports = {
   getstudentbyClass: (req, res) => {
     const clazz = req.body.class;
     console.log(clazz);
-    let sqlQuery = `select userId,student_id,firstName,otherName, lastName,gender, class,section,dateofbirth,religion,imagelink,filename,cartegory  from student where class = '${clazz}' and isActive='true' and status='current'`;
+    let sqlQuery = `select * from student where class = '${clazz}' and isActive='true' and status='current'`;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
@@ -437,9 +437,10 @@ module.exports = {
   },
   getstudentbyClassCustom: (req, res) => {
     const clazz = req.body.class;
+    
     const section = req.body.section;
 
-    let sqlQuery = `select userId,student_id,firstName,otherName, lastName,gender, class,section,cartegory from student where class = '${clazz}' and section = '${section}' and isActive='true' and status='current'`;
+    let sqlQuery = `select * from student where class = '${clazz}' and section = '${section}' and isActive='true' and status='current'`;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
@@ -514,7 +515,6 @@ module.exports = {
             // logger.info(
             //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all student by class`
             // );
-
             // return res
             //   .status(500)
             //            .json({ success: 0, error: "internal server error",message:error });
