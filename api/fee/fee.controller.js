@@ -142,144 +142,132 @@ async function AssignFeeByClass(data) {
   );
 }
 
-async function AssignFeeByStudent(data, id) {
-  return new Promise(async (resolve2, reject) => {
-    let feedata = data;
-    console.log(feedata);
-    for (const feedatas of feedata) {
-      console.log('fee datas isssssssssssssssssssssssssssssssssssssssssssssssssssssssssss')
+async function update(feedatas, student) {
 
-      console.log(feedata)
-      let name = feedatas.name;
-      let amt = feedatas.amt;
-      let clazz = feedatas.class;
-      let cart = feedatas.cart;
-
-
-      const promise4 = await new Promise((resolve1, reject) => {
-        let sqlQuery1 = `select * from account where student_id ='${id}' `;
-
-        pool.query(sqlQuery1, async (error, resultz) => {
-          console.log(sqlQuery1)
-
-          if (error) {
-            console.log(
-              `${req.method} ${req.originalUrl}, 'server error', fetch all fee`
-            );
-          }
-          let ss = await resultz;
-          console.log('rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr')
-          console.log(ss)
-
-          if (resultz.length == 0) {
-            return resolve1("none");
-          }
-
-          console.log(ss);
-          for (const result of resultz) {
-            let singlestudent = result.student_id;
-            let preference = result.preference;
-
-            let bb = ss;
-            let feedata = data.fee;
-
-            console.log("fee running" + name);
-
-            async function update(name, singlestudent) {
-              console.log(singlestudent);
-              let sqlQuery2 = `select feepayable as feepay, scholarship from account where student_id='${singlestudent}' `;
-              const promise = await new Promise((resolve, reject) => {
-                pool.query(sqlQuery2, async (error, resulty) => {
-                  if (error) {
-                    console.log(
-                      `${req.method} ${req.originalUrl}, 'server error', fetch all fee`
-                    );
-                  }
-                  console.log(
-                    "feeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee paaaaaaaaaaaaaaaaaaaaaaable"
-                  );
-                  resolve(resulty);
-                });
-              });
-
-              const promise1 = await new Promise((resolve, reject) => {
-                console.log(singlestudent);
-                let splitPreference = preference.split(",");
-                if (splitPreference.includes(name)) {
-                  resolve(false);
-                } else {
-                  resolve(true);
-                }
-              });
-
-              let prom = await promise1;
-              console.log(promise);
-
-              let val = await promise[0].feepay;
-              let scholarship = await promise[0].scholarship;
-
-              let amount = eval(amt + val);
-
-              let sqlQuery6 = `update account set feepayable = '${amount}'  where student_id = '${singlestudent}' `;
-              console.log(prom);
-              if (prom == true) {
-                console.log("update running" + val);
-
-                console.log("amount is" + amount);
-
-
-                pool.query(sqlQuery6, async (error, result) => {
-                  if (error) {
-                    console.log(
-                      `${req.method} ${req.originalUrl}, 'server error', fetch all fee`
-                    );
-                  }
-
-                  resolve1("done");
-                });
-              } else {
-                console.log(
-                  "faaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaalllllllllllseeeeeeee"
-                );
-                return reject("done");
-              }
-            }
-
-            let hh = await update(name, singlestudent);
-            console.log(hh)
-          }
-        });
-      });
-      let set = await promise4;
-
-
+  //check for preference wether it exist or not
+  const promise1 = await new Promise((resolve, reject) => {
+    let splitPreference = student.preference.split(",");
+    if (splitPreference.includes(feedatas.name)) {
+      resolve(false);
+    } else {
+      resolve(true);
     }
-    // if (i == feedata.length - 1) {
-    ActivityregisterLog(
-      "Assign Fee",
-      data.createdby,
-      "none",
-      "Applied",
-      date,
-      `Assign fee for ${data.class}`,
-      'set'
-    );
+  });
 
-    setTimeout(() => {
-      resolve2(true);
-    }, 3000);
+  let prom = await promise1;
+  let splitPreference = student.preference.split(",");
 
-    // let sqlQuery = `select * from assignfeecartegory order by id desc`;
-    // pool.query(sqlQuery, (error, result) => {
-    //   res.status(200).json({ success: 1, data: result });
-    // });
-    // console.log("Fees Assign logged Successfully");
+
+  async function checkpref(splitPreference) {
+
+    async function forEachAsync(splitPreference) {
+      let subfee = 0
+
+      for (const pref of splitPreference) {
+
+        if (pref.includes(feedatas.name)) {
+          console.log('Exempted ' + feedatas.name)
+        } else {
+          subfee = subfee + feedatas.amt
+          console.log('subfee is' + subfee)
+          console.log(subfee)
+
+        }
+
+      }
+      return subfee
+    }
+
+
+
+
+    let kk = await forEachAsync(splitPreference);
+
+
+
+
+
+    return kk
   }
 
 
+  let ll = await checkpref(splitPreference)
+
+  console.log('kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk')
+
+  console.log(ll)
+
+  const promise9 = await new Promise((resolve, reject) => {
+    let sqlQuery2 = `select feepayable as currentfeepayable from student where student_id = '${student.student_id}'`
+    pool.query(sqlQuery2, async (error, result) => {
+      if (error) {
+        console.log(
+          `${sqlQuery2} ${req.originalUrl}, 'server error', fetch all fee`
+        );
+      }
+
+      resolve(result);
+    });
+  });
+
+  let current = await promise9
+  console.log(current);
+  console.log(feedatas.amt);
 
 
-    //}
+  let amount = eval(Number(feedatas.amt) + Number(current[0].currentfeepayable));
+
+  let sqlQuery6 = `update student set feepayable = '${amount}'  where student_id = '${student.student_id}' `;
+  console.log(sqlQuery6);
+
+  // if (prom == true) {
+  //   console.log("update running" + feedatas.name);
+
+  //   console.log("amount is" + amount);
+
+
+  //   pool.query(sqlQuery6, async (error, result) => {
+  //     if (error) {
+  //       console.log(
+  //         `${req.method} ${req.originalUrl}, 'server error', fetch all fee`
+  //       );
+  //     }
+
+  //   });
+  // } else {
+  //   console.log(
+  //     "faaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaalllllllllllseeeeeeee"
+  //   );
+  // }
+}
+
+async function AssignFeeByStudent(feedata, stud) {
+  return new Promise(async (resolve2, reject) => {
+
+    console.log('assign function called');
+    let splitPreference = stud[0].preference.split(",");
+    let subfee = 0
+
+    for (const feedatas of feedata) {
+      for (const pref of splitPreference) {
+
+        if (pref.includes(feedatas.name)) {
+          console.log('Exempted ' + feedatas.name)
+        } else {
+          //  subfee.push(feedatas.amt)
+          subfee = subfee + feedatas.amt
+          console.log('subfee is' + subfee + feedatas.amt)
+
+        }
+
+      }
+
+    }
+
+    resolve2(subfee);
+
+  }
+
   );
 }
 
@@ -355,7 +343,7 @@ async function getfee(custom) {
 async function CreateAssignFeeClass(data) {
 
   //clear initial asigned fee record for chosen class(es)
-let cartid = hashgenerator(9)
+  let cartid = hashgenerator(9)
   const promise = await new Promise((resolve, reject) => {
     for (let i = 0; i < data.fee.length; i++) {
 
@@ -432,6 +420,18 @@ let cartid = hashgenerator(9)
 function ActivityregisterLog(activity, user, amount, status, date, description) {
   let sqlQuery = `insert into financelog (activity,user,amount,createdAt,status,description) values
      ('${activity}','${user}','${amount}','${date}','applied','${description}')`;
+
+  pool.query(sqlQuery, (error, results, fields) => {
+    if (error) {
+      console.log(error);
+      return console.log("financelog log error");
+    }
+    console.log("financelog logged successfully");
+  });
+}
+function FeeGenerateLog(data) {
+  let sqlQuery = `insert into feegeneraterecord (code,session,createdby,date) values
+     ('${data.code}','${data.session}','${data.createdby}','${date}')`;
 
   pool.query(sqlQuery, (error, results, fields) => {
     if (error) {
@@ -571,7 +571,7 @@ module.exports = {
     const data = req.body;
     console.log(data);
 
-    let sqlQuery = `update account set scholarship = '${data.amount}' where student_id ='${data.id}' `;
+    let sqlQuery = `update student set scholarship = '${data.amount}' where student_id ='${data.id}' `;
 
     pool.query(sqlQuery, (error, result) => {
       if (error) {
@@ -681,33 +681,72 @@ module.exports = {
       res.status(200).json({ success: 1, data: result });
     });
   },
-  getbulkbill: (req, res) => {
+
+  getbulkbill: async (req, res) => {
     const data = req.body
-    let sqlQuery = `select student.*,assignfeecartegory.* from student right join assignfeecartegory on student.cartegory = assignfeecartegory.scartegory where assignfeecartegory.scartegory = '${data.cart}' and assignfeecartegory.class = '${data.class}' `;
-    pool.query(sqlQuery, (error, result) => {
-      if (error) {
-        console.log(error)
-        console.log(
-          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch fee by id`
-        );
-        return res
-          .status(500)
-          .json({ success: 0, error: "internal server error", message: error });
+
+    let sqlQuery = `select student_id from student where class = '${data.class}'`;
+
+    const promise8 = await new Promise((resolve, reject) => {
+      pool.query(sqlQuery, (error, result) => {
+        if (error) {
+          console.log(error)
+          console.log(
+            `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch fee by id`
+          );
+          return res
+            .status(500)
+            .json({ success: 0, error: "internal server error", message: error });
+        }
+
+        if (result) {
+          console.log('student list retrieved');
+          resolve(result)
+        }
+      });
+    });
+    let fetchedStudent = await promise8;
+    let myArray = []
+    async function forEachAsync(fetchedStudent) {
+
+      for (const val of fetchedStudent) {
+
+        let sqlQuery1 = `select student.*,assignfeecartegory.* from student right join assignfeecartegory on student.cartegory = assignfeecartegory.scartegory  where student.student_id = '${val.student_id}' and assignfeecartegory.class = '${data.class}'`;
+        const promise9 = await new Promise((resolve, reject) => {
+          pool.query(sqlQuery1, (error, result) => {
+            if (error) {
+              console.log(error)
+              console.log(
+                `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch fee by id`
+              );
+              return res
+                .status(500)
+                .json({ success: 0, error: "internal server error", message: error });
+            }
+            resolve(result)
+              ;
+          });
+        });
+
+        myArray.push(promise9)
+
       }
 
-      if (!result) {
-        console.log(
-          `${req.method} ${req.originalUrl}, fetch fee by id: no record found`
-        );
-        return res.status(200).json({
-          success: 1,
-          data: [],
-        });
-      }
-      console.log(`${req.method} ${req.originalUrl}, fetch fee by id`);
-      res.status(200).json({ success: 1, data: result });
-    });
+
+
+
+    }
+
+    async function main(fetchedStudent) {
+      await forEachAsync(fetchedStudent);
+      res.status(200).json({ success: 1, data: myArray });
+
+    }
+    main(fetchedStudent)
+
   },
+
+
   getAssignRecordAction: (req, res) => {
     const id = req.body.id
     let sqlQuery = `select * from assignfeerecord order by id desc limit  100 `;
@@ -816,7 +855,7 @@ module.exports = {
       for (let i = 0; i < info.length; i++) {
         let sdtID = info[i].student_id;
 
-        let sqlQuery6 = `update account set accountbalance = '${data.amount}' where student_id = '${sdtID}'`;
+        let sqlQuery6 = `update student set accountbalance = '${data.amount}' where student_id = '${sdtID}'`;
 
         async function resetfeepayable(sqlQuery6) {
           const promise3 = await new Promise((resolve, reject) => {
@@ -854,7 +893,7 @@ module.exports = {
   resetallaccount: (req, res) => {
     let data = req.body;
     console.log(data);
-    let sqlQuery = `update account set accountbalance ='${data.amount}'`;
+    let sqlQuery = `update student set accountbalance ='${data.amount}'`;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(
@@ -1307,11 +1346,15 @@ module.exports = {
   },
   generatefeeallstudent: async (req, res) => {
     const data = req.body;
+    console.log(data.class);
+    let code = 0
 
-    // set fee payable to 0 balance
-    const promise5 = await new Promise((resolve, reject) => {
-      let sqlQuery = `update account set feepayable = 0`;
+
+    //get all student to be applied to
+    const promise8 = await new Promise((resolve, reject) => {
+      let sqlQuery = `select student_id from student where  student.isActive = 'true'; `;
       pool.query(sqlQuery, (error, result) => {
+        console.log(result)
         if (error) {
           return res.status(500).json({
             success: 0,
@@ -1319,68 +1362,94 @@ module.exports = {
             message: error,
           });
         }
-        resolve("true");
-      });
-    });
-
-    let reset = await promise5;
-    const promise2 = await new Promise((resolve, reject) => {
-      let sqlQuery = `select class, amount as amt , feename as name, scartegory as cart from assignfeecartegory order by id desc`;
-      pool.query(sqlQuery, (error, result) => {
-        // res.status(200).json({ success: 1, data: result });
-        if (result == []) {
-          resolve(false);
-
+        if (result.length == 0) {
           return res.status(200).json({
-            success: 0,
-            error: "No Assigned Fee cartegory Available",
+            success: 2,
+            data: [],
+            // error: "internal server error",
+            message: 'No Student In Class',
           });
         }
-        else {
-          resolve(result);
-
-        }
+        console.log(result);
+        resolve(result);
       });
-      console.log("Fees Cartegory fetched");
     });
+    let getstudent = promise8;
 
-    let fetchedFeecart = await promise2;
 
-    let assign = await AssignFeeByClass(fetchedFeecart);
-    console.log("assign is");
-    console.log(assign);
+    for (const stud of getstudent) {
+      console.log(stud);
 
-    async function generateFee() {
-      let sqlQuery1 = `select feepayable as val,student_id as stdid,scholarship, accountbalance as bal from account `;
-      const promise1 = await new Promise((resolve, reject) => {
-        pool.query(sqlQuery1, async (error, result) => {
+      const promise5 = await new Promise((resolve, reject) => {
+        let sqlQuery = `select * from student where student_id = '${stud.student_id}'`;
+        pool.query(sqlQuery, (error, result) => {
           if (error) {
-            console.log(
-              res
-                .status(500)
-                .json({ success: 1, message: "Internal server", error: error })
-            );
+            return res.status(500).json({
+              success: 0,
+              error: "internal server error",
+              message: error,
+            });
           }
-
+          console.log(result);
           resolve(result);
         });
       });
-      console.log(promise1);
+      let student = await promise5;
+      console.log(student);
 
-      let info = await promise1;
-      for (let i = 0; i < info.length; i++) {
-        let sdtID = info[i].stdid;
-        let scholarship = info[i].scholarship;
 
-        let value = info[i].val;
-        let bal = info[i].bal;
+      //check for assigned fee for chosen classes and get assigned fee
+      const promise3 = await new Promise((resolve, reject) => {
+        let sqlQuery = `select class, amount as amt , feename as name,scartegory as cart from assignfeecartegory where class = '${student[0].class}' and scartegory ='${student[0].cartegory}' `;
+        pool.query(sqlQuery, (error, result) => {
+          console.log(result)
+          console.log(sqlQuery)
 
-        let amount = Math.abs(eval(bal + value - scholarship));
-        console.log(value + bal + sdtID);
+          if (error) {
+            return res.status(500).json({
+              success: 0,
+              error: "internal server error",
+              message: error,
+            });
+          }
+          if (result.length == 0) {
+            return res.status(200).json({
+              success: 3,
+              data: [],
+              // error: "internal server error",
+              message: "No Assigned Fee For Student's Class",
+            });
+          }
+          console.log(result);
+          resolve(result);
+        });
+      });
+      let getassignedfee = promise3;
 
-        let sqlQuery6 = `update account set arrears = '${bal}', accountbalance ='${amount}', feegeneratedate = '${date}' where student_id = '${sdtID}'`;
+
+      //check preference and fee cart to set feepayable
+      let assign = await AssignFeeByStudent(getassignedfee, student);
+      console.log("assign is");
+      console.log(assign);
+
+      async function generateFee(id, info, assign) {
+
+
+        let scholarship = info[0].scholarship;
+        let value = assign;
+        let bal = info[0].accountbalance;
+
+
+        let amount = eval(
+          parseFloat(bal) + parseFloat(value) - parseFloat(scholarship)
+        );
+        console.log("amount");
+        console.log(amount);
+
+        let sqlQuery6 = `update student set arrears = '${bal}', accountbalance ='${amount}',feegeneratecode  ='${code}', feegeneratedate = '${date}',feepayable = '${value}' where student_id = '${id}'`;
 
         const promise2 = await new Promise((resolve, reject) => {
+          console.log(sqlQuery6)
           pool.query(sqlQuery6, async (error, result) => {
             if (error) {
               console.log(error);
@@ -1389,39 +1458,56 @@ module.exports = {
                 .json({ success: 1, message: "Internal server", error: error });
             }
             resolve(result);
+            ActivityregisterLog(
+              "Generate Fee",
+              data.createdby,
+              "none",
+              "Applied",
+              date,
+              "Generating fee for all Classes"
+            );
+            FeeGenerateLog(data)
+
           });
         });
-
-        if (i == info.length - 1) {
-          ActivityregisterLog(
-            "Generate Fee",
-            data.createdby,
-            "none",
-            "Applied",
-            date,
-            "Generating fee for all Classes"
-          );
-          res
-            .status(200)
-            .json({ success: 1, message: "Fees Generated Successfully" });
-        }
       }
+
+      //generate fee from values set
+      generateFee(student[0].student_id, student, assign);
+
     }
 
-    if (assign == true) {
-      generateFee();
-    } else {
-      console.log("reverse the assign process");
-    }
+    res
+      .status(200)
+      .json({ success: 1, message: "Fees Generated Successfully" });
+
+
   },
+
   generatefeebystudent: async (req, res) => {
     const data = req.body;
     console.log(data);
+    let code = hashgenerator(7)
+    //get student data
+    const promise5 = await new Promise((resolve, reject) => {
+      let sqlQuery = `select * from student where student_id = '${data.id}'`;
+      pool.query(sqlQuery, (error, result) => {
+        if (error) {
+          return res.status(500).json({
+            success: 0,
+            error: "internal server error",
+            message: error,
+          });
+        }
+        console.log(result);
+        resolve(result);
+      });
+    });
+    let student = await promise5;
 
-
-    //check for assigned fee for chosen classes
+    //check for assigned fee for chosen classes and get assigned fee
     const promise3 = await new Promise((resolve, reject) => {
-      let sqlQuery = `select amount from assignfeecartegory where class = '${data.class}' and scartegory = '${data.cartegory}'`;
+      let sqlQuery = `select class, amount as amt , feename as name,scartegory as cart from assignfeecartegory where class = '${data.class}' and scartegory ='${data.cartegory}' `;
       pool.query(sqlQuery, (error, result) => {
         console.log(result)
         console.log(sqlQuery)
@@ -1447,72 +1533,19 @@ module.exports = {
     });
     let getassignedfee = promise3;
 
-    //update fee payable
-    const promise2 = await new Promise((resolve, reject) => {
-      let sdtID = data.id;
 
-      let sqlQuery6 = `update account set feepayable = 0 where student_id = '${sdtID}'`;
-
-      pool.query(sqlQuery6, async (error, result) => {
-        if (error) {
-          console.log(error);
-          res.status(500).json({
-            success: 1,
-            message: "Internal server",
-            error: error,
-          });
-        }
-        console.log("done updataing feepayable");
-        return resolve(result);
-      });
-    });
-
-    let uodated = await promise2;
-
-    //select feepayable from db to be used for calculation
-    const promise7 = await new Promise((resolve, reject) => {
-      let sqlQuery = `select class, amount as amt , feename as name,scartegory as cart from assignfeecartegory where class = '${data.class}' and scartegory ='${data.cartegory}' `;
-      pool.query(sqlQuery, (error, result) => {
-        //  res.status(200).json({ success: 1, data: result });
-        resolve(result);
-      });
-      console.log("Fees Assign logged Successfully");
-    });
-    console.log(promise7[0].name);
-    let fetchedFeecart = promise7;
-    console.log(fetchedFeecart);
-
-
-    //assign fee to student
-    let assign = await AssignFeeByStudent(fetchedFeecart, data.id);
+    //check preference and fee cart to set feepayable
+    let assign = await AssignFeeByStudent(getassignedfee, student);
     console.log("assign is");
     console.log(assign);
 
-    async function generateFee(id) {
-      let sqlQuery1 = `select account.feepayable as val,account.student_id as stdid,account.scholarship, account.accountbalance as bal from account where student_id = '${id}'`;
-      const promise1 = await new Promise((resolve, reject) => {
-        pool.query(sqlQuery1, async (error, result) => {
-          if (error) {
-            console.log(
-              res
-                .status(500)
-                .json({ success: 1, message: "Internal server", error: error })
-            );
-          }
+    async function generateFee(id, info, assign) {
 
-          resolve(result);
-        });
-      });
-      console.log(promise1);
 
-      let info = await promise1;
-      let sdtID = info.stdid;
       let scholarship = info[0].scholarship;
+      let value = assign;
+      let bal = info[0].accountbalance;
 
-      let value = info[0].val;
-      let bal = info[0].bal;
-      console.log(value);
-      console.log(bal);
 
       let amount = eval(
         parseFloat(bal) + parseFloat(value) - parseFloat(scholarship)
@@ -1520,9 +1553,10 @@ module.exports = {
       console.log("amount");
       console.log(amount);
 
-      let sqlQuery6 = `update account set arrears = '${bal}', accountbalance ='${amount}', feegeneratedate = '${date}' where student_id = '${id}'`;
+      let sqlQuery6 = `update student set arrears = '${bal}', accountbalance ='${amount}',feegeneratecode  ='${code}', feegeneratedate = '${date}',feepayable = '${value}' where student_id = '${id}'`;
 
       const promise2 = await new Promise((resolve, reject) => {
+        console.log(sqlQuery6)
         pool.query(sqlQuery6, async (error, result) => {
           if (error) {
             console.log(error);
@@ -1539,6 +1573,7 @@ module.exports = {
             date,
             "Generating fee for all Classes"
           );
+          FeeGenerateLog(data)
           res
             .status(200)
             .json({ success: 1, message: "Fees Generated Successfully" });
@@ -1546,41 +1581,20 @@ module.exports = {
       });
     }
 
-    if (assign == true) {
-      generateFee(data.id);
-    } else {
-      console.log("reverse the assign process");
-    }
+    //generate fee from values set
+    generateFee(data.id, student, assign);
+
   },
+
+
+
+
+
   generatefeebyclass: async (req, res) => {
     const data = req.body;
     console.log(data.class);
+    let code = 0
 
-    //check for assigned fee for chosen classes
-    const promise3 = await new Promise((resolve, reject) => {
-      let sqlQuery = `select amount from assignfeecartegory where class in (${data.class})  `;
-      pool.query(sqlQuery, (error, result) => {
-        console.log(result)
-        if (error) {
-          return res.status(500).json({
-            success: 0,
-            error: "internal server error",
-            message: error,
-          });
-        }
-        if (result.length == 0) {
-          return res.status(200).json({
-            success: 3,
-            data: [],
-            // error: "internal server error",
-            message: 'No Assigned Fee For Class(es)',
-          });
-        }
-        console.log(result);
-        resolve(result);
-      });
-    });
-    let getassignedfee = promise3;
 
     //get all student to be applied to
     const promise8 = await new Promise((resolve, reject) => {
@@ -1608,100 +1622,80 @@ module.exports = {
     });
     let getstudent = promise8;
 
-    //reset fee payable to 0
-    const promise2 = await new Promise((resolve, reject) => {
-      let info = getstudent;
-      for (let i = 0; i < info.length; i++) {
-        let sdtID = info[i].student_id;
 
-        let sqlQuery6 = `update account set feepayable = 0 where student_id = '${sdtID}'`;
+    for (const stud of getstudent) {
+      console.log(stud);
 
-        async function resetfeepayable(sqlQuery6) {
-          const promise3 = await new Promise((resolve, reject) => {
-            pool.query(sqlQuery6, async (error, result) => {
-              if (error) {
-                console.log(error);
-                res.status(500).json({
-                  success: 1,
-                  message: "Internal server",
-                  error: error,
-                });
-              }
-              return resolve(result);
-            });
-          });
-          return promise3;
-        }
-
-        let gg = resetfeepayable(sqlQuery6);
-
-        if (i == info.length - 1) {
-          resolve(gg);
-          console.log("done updataing feepayable");
-        }
-      }
-    });
-
-    let arrearsduplicate = promise2;
-
-    //fetch assigned fee cartegory
-    const promise7 = await new Promise((resolve, reject) => {
-      let sqlQuery = `select class, amount as amt , feename as name ,scartegory as cart from assignfeecartegory where class in (${data.class})  order by id desc`;
-      pool.query(sqlQuery, (error, result) => {
-        //  res.status(200).json({ success: 1, data: result });
-        if (!result) {
-          console.log(error)
-          return res
-            .status(500)
-            .json({ success: 1, message: "Internal server", error: error })
-            ;
-
-        }
-
-        resolve(result);
-
-      });
-      console.log("Fees Assign logged Successfully");
-    });
-    let fetchedFeecart = promise7;
-    console.log(fetchedFeecart);
-
-    //assign fee to students
-    let assign = await AssignFeeByClass(fetchedFeecart);
-    console.log("assign is");
-    console.log(assign);
-
-    async function generateFee() {
-      let sqlQuery1 = `select account.feepayable as val,account.student_id as stdid,account.scholarship, account.accountbalance as bal from account left join student on account.student_id = student.student_id where student.class in (${data.class}) and student.isActive = 'true'`;
-      const promise1 = await new Promise((resolve, reject) => {
-        pool.query(sqlQuery1, async (error, result) => {
+      const promise5 = await new Promise((resolve, reject) => {
+        let sqlQuery = `select * from student where student_id = '${stud.student_id}'`;
+        pool.query(sqlQuery, (error, result) => {
           if (error) {
-            console.log(
-              res
-                .status(500)
-                .json({ success: 1, message: "Internal server", error: error })
-            );
+            return res.status(500).json({
+              success: 0,
+              error: "internal server error",
+              message: error,
+            });
           }
-
+          console.log(result);
           resolve(result);
         });
       });
-      //console.log(promise1);
+      let student = await promise5;
+      console.log(student);
 
-      let info = await promise1;
-      for (let i = 0; i < info.length; i++) {
-        let sdtID = info[i].stdid;
-        let scholarship = info[i].scholarship;
 
-        let value = info[i].val;
-        let bal = info[i].bal;
+      //check for assigned fee for chosen classes and get assigned fee
+      const promise3 = await new Promise((resolve, reject) => {
+        let sqlQuery = `select class, amount as amt , feename as name,scartegory as cart from assignfeecartegory where class = '${student[0].class}' and scartegory ='${student[0].cartegory}' `;
+        pool.query(sqlQuery, (error, result) => {
+          console.log(result)
+          console.log(sqlQuery)
 
-        let amount = eval(bal + value - scholarship);
-        console.log(value + bal + sdtID);
+          if (error) {
+            return res.status(500).json({
+              success: 0,
+              error: "internal server error",
+              message: error,
+            });
+          }
+          if (result.length == 0) {
+            return res.status(200).json({
+              success: 3,
+              data: [],
+              // error: "internal server error",
+              message: "No Assigned Fee For Student's Class",
+            });
+          }
+          console.log(result);
+          resolve(result);
+        });
+      });
+      let getassignedfee = promise3;
 
-        let sqlQuery6 = `update account set arrears = '${bal}', accountbalance ='${amount}', feegeneratedate = '${date}' where student_id = '${sdtID}'`;
+
+      //check preference and fee cart to set feepayable
+      let assign = await AssignFeeByStudent(getassignedfee, student);
+      console.log("assign is");
+      console.log(assign);
+
+      async function generateFee(id, info, assign) {
+
+
+        let scholarship = info[0].scholarship;
+        let value = assign;
+        let bal = info[0].accountbalance;
+
+
+        let amount = eval(
+          parseFloat(bal) + parseFloat(value) - parseFloat(scholarship)
+        );
+        console.log("amount");
+        console.log(amount);
+
+        let sqlQuery6 = `update student set arrears = '${bal}', accountbalance ='${amount}',feegeneratecode  ='${code}', feegeneratedate = '${date}',feepayable = '${value}' where student_id = '${id}'`;
 
         const promise2 = await new Promise((resolve, reject) => {
+          console.log(sqlQuery6)
           pool.query(sqlQuery6, async (error, result) => {
             if (error) {
               console.log(error);
@@ -1710,32 +1704,28 @@ module.exports = {
                 .json({ success: 1, message: "Internal server", error: error });
             }
             resolve(result);
+            ActivityregisterLog(
+              "Generate Fee",
+              data.createdby,
+              "none",
+              "Applied",
+              date,
+              "Generating fee for all Classes"
+            );
+            FeeGenerateLog(data)
+
           });
         });
-
-        if (i == info.length - 1) {
-          ActivityregisterLog(
-            "Generate Fee",
-            data.createdby,
-            "none",
-            "Applied",
-            date,
-            "Generating fee for class/es"
-          );
-          res
-            .status(200)
-            .json({ success: 1, message: "Fees Generated Successfully" });
-        }
       }
+
+      //generate fee from values set
+      generateFee(student[0].student_id, student, assign);
+
     }
 
-    //generate fee after successfull asssign
-    if (assign == true) {
-      generateFee();
-    } else {
-      console.log("Failed assigning to student");
-      console.log("reverse the assign process");
-    }
+    res
+      .status(200)
+      .json({ success: 1, message: "Fees Generated Successfully" });
   },
 
 
@@ -1783,7 +1773,7 @@ module.exports = {
     const data = req.body;
     console.log(data);
     const promise1 = await new Promise((resolve, reject) => {
-      let sqlQuery = `update account set accountbalance ='${data.balanceafterpayment}' where student_id ='${data.id}' `;
+      let sqlQuery = `update student set accountbalance ='${data.balanceafterpayment}' where student_id ='${data.id}' `;
       pool.query(sqlQuery, (error, result) => {
         if (error) {
           console.log(
@@ -1832,7 +1822,7 @@ module.exports = {
           console.log(data.infotype);
 
           if (data.infotype == "All Sections") {
-            let sqlQuery = `select student.userId,student.student_id,student.firstName,student.otherName, student.lastName,student.gender, student.class,student.section,account.* from student left join account on student.student_id=account.student_id where student.class = '${data.class}' `;
+            let sqlQuery = `select * from student  where student.class = '${data.class}' `;
             pool.query(sqlQuery, (error, result) => {
               if (error) {
                 return res.status(500).json({
@@ -1853,7 +1843,7 @@ module.exports = {
               });
             });
           } else {
-            let sqlQuery = `select student.userId,student.student_id,student.firstName,student.otherName, student.lastName,student.gender, student.class,student.section,account.accountbalance from student left join account on student.student_id=account.student_id where student.class = '${data.class}' and student.section = '${data.section}'`;
+            let sqlQuery = `select * from student  where student.class = '${data.class}' and student.section = '${data.section}'`;
             pool.query(sqlQuery, (error, result) => {
               if (error) {
                 return res.status(500).json({
@@ -1936,7 +1926,7 @@ module.exports = {
     let data = req.body;
     console.log(data.pref);
 
-    let sqlQuery = `update account set preference ='${data.pref}' where student_id = '${data.id}'  `;
+    let sqlQuery = `update student set preference ='${data.pref}' where student_id = '${data.id}'  `;
     pool.query(sqlQuery, (error, results, fields) => {
       if (error) {
         console.log(error);
@@ -1956,7 +1946,7 @@ module.exports = {
     date = date.toLocaleDateString("en-CA");
     let data = req.body;
     console.log(data);
-    let sqlQuery = `update account set accountbalance ='${data.reverseamount}' where student_id ='${data.id}' `;
+    let sqlQuery = `update student set accountbalance ='${data.reverseamount}' where student_id ='${data.id}' `;
 
     pool.query(sqlQuery, (error, result) => {
       if (error) {
@@ -2024,7 +2014,7 @@ module.exports = {
     let date = new Date();
     date = date.toLocaleDateString("en-CA");
     let data = req.body;
-    let sqlQuery = `update account  set accountbalance ='${data.amount}' where student_id='${data.id}'`;
+    let sqlQuery = `update student  set accountbalance ='${data.amount}' where student_id='${data.id}'`;
 
     pool.query(sqlQuery, (error, result) => {
       if (error) {
