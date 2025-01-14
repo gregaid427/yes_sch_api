@@ -338,7 +338,76 @@ async function getfee(custom) {
 
 }
 
+//function to check
+async function generatefeecartchecker(classname) {
+  let myArray = []
 
+  const promise2 = await new Promise((resolve, reject) => {
+   
+      let sqlQuery = `SELECT distinct(scartegory) as feecount FROM assignfeecartegory WHERE class = ${classname} `
+
+      try {
+        pool.query(sqlQuery, (error, results, fields) => {
+          if (error) {
+            console.log(error);
+            resolve('false')
+
+            return console.log("assignfeecartegory4 log error --new fee cart");
+          }
+           resolve(results);
+        
+        });
+
+      } catch (error) {
+      }
+      ;
+    });
+    const promise1 = await new Promise((resolve, reject) => {
+   
+      let sqlQuery = `SELECT distinct(cartegory) as classcount  FROM student WHERE class = ${classname} `
+      try {
+        pool.query(sqlQuery, (error, results, fields) => {
+          console.log(sqlQuery)
+
+          if (error) {
+            console.log(error);
+            resolve('false')
+
+            return console.log();
+          }
+           resolve(results);
+        
+        });
+
+      } catch (error) {
+      }
+      ;
+    });
+  
+    for(const count of promise1){
+      if(promise2.includes(count.classcount)){
+        console.log('exist')
+      }
+      else{
+        console.log(' not exist')
+        myArray.push(count.classcount)
+  
+      //  return res.status(500)
+      //   .json({ success: 0, error: "internal server error", message: error });
+      }
+    }
+  
+    console.log( myArray)
+
+return myArray
+
+    }
+   
+  
+
+
+ // 
+//SELECT count(distinct(cartegory)) as classcount,distinct(cartegory) as classcart FROM `student` WHERE class = 'JHS 1'; 
 
 async function CreateAssignFeeClass(data) {
 
@@ -1136,7 +1205,51 @@ module.exports = {
       res.status(200).json({ success: 1, data: result });
     });
   },
+  
+  paymentWithscholarship: async(req, res) => {
+    let id = req.body.id
+    // const promise1 = await new Promise((resolve, reject) => {
 
+  //   let sqlQuery = `select * from feepaymentrecords where student_id='${id}' limit 15 `;
+  //   pool.query(sqlQuery, (error, result) => {
+  //     if (error) {
+  //       console.log(
+  //         `${req.method} ${req.originalUrl}, 'server error', fetch all fee`
+  //       );
+
+  //       return res
+  //         .status(500)
+  //         .json({ success: 0, error: "internal server error", message: error });
+  //     }
+
+  //     console.log(`${req.method} ${req.originalUrl},'success', fetch all fee`);
+  //     resolve(result)
+  //    // res.status(200).json({ success: 1, data: result });
+  //   });
+  // });
+
+  // let feedata = await promise1
+
+    let sqlQuery1 = `select * from scholarshipenroll where student_id='${id}' `;
+    pool.query(sqlQuery1, (error, result) => {
+      if (error) {
+        console.log(
+          `${req.method} ${req.originalUrl}, 'server error', fetch all fee`
+        );
+
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error", message: error });
+      }
+
+      console.log(`${req.method} ${req.originalUrl},'success', fetch all fee`);
+
+      // res.status(200).json({ success: 1, scholarship: result , feedata:feedata });
+      res.status(200).json({ success: 1, scholarship: result });
+
+    });
+
+  },
   getPaymentRecords: (req, res) => {
     let sqlQuery = `select feepaymentrecords.*, student.firstName, student.otherName, student.lastName ,student.class from feepaymentrecords left join student on feepaymentrecords.student_id = student.student_id order by id desc `;
     pool.query(sqlQuery, (error, result) => {
@@ -1348,8 +1461,7 @@ module.exports = {
     const data = req.body;
     console.log(data.class);
     let code = 0
-
-
+  
     //get all student to be applied to
     const promise8 = await new Promise((resolve, reject) => {
       let sqlQuery = `select student_id from student where  student.isActive = 'true'; `;
@@ -1595,6 +1707,9 @@ module.exports = {
     console.log(data.class);
     let code = 0
 
+    let bb = await generatefeecartchecker(data.class)
+
+    console.log(bb)
 
     //get all student to be applied to
     const promise8 = await new Promise((resolve, reject) => {
@@ -1616,7 +1731,6 @@ module.exports = {
             message: 'No Student In Class',
           });
         }
-        console.log(result);
         resolve(result);
       });
     });
@@ -1664,6 +1778,7 @@ module.exports = {
               data: [],
               // error: "internal server error",
               message: "No Assigned Fee For Student's Class",
+              val : bb
             });
           }
           console.log(result);
