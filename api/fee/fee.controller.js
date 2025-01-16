@@ -343,70 +343,69 @@ async function generatefeecartchecker(classname) {
   let myArray = []
 
   const promise2 = await new Promise((resolve, reject) => {
-   
-      let sqlQuery = `SELECT distinct(scartegory) as feecount FROM assignfeecartegory WHERE class = ${classname} `
 
-      try {
-        pool.query(sqlQuery, (error, results, fields) => {
-          if (error) {
-            console.log(error);
-            resolve('false')
+    let sqlQuery = `SELECT distinct(scartegory) as feecount FROM assignfeecartegory WHERE class = '${classname}' `
 
-            return console.log("assignfeecartegory4 log error --new fee cart");
-          }
-           resolve(results);
-        
-        });
+    try {
+      pool.query(sqlQuery, (error, results, fields) => {
+        if (error) {
+          console.log(error);
+          resolve('false')
 
-      } catch (error) {
-      }
-      ;
-    });
-    const promise1 = await new Promise((resolve, reject) => {
-   
-      let sqlQuery = `SELECT distinct(cartegory) as classcount  FROM student WHERE class = ${classname} `
-      try {
-        pool.query(sqlQuery, (error, results, fields) => {
-          console.log(sqlQuery)
+          return console.log("assignfeecartegory4 log error --new fee cart");
+        }
+        resolve(results);
 
-          if (error) {
-            console.log(error);
-            resolve('false')
+      });
 
-            return console.log();
-          }
-           resolve(results);
-        
-        });
+    } catch (error) {
+    }
+    ;
+  });
+  const promise1 = await new Promise((resolve, reject) => {
 
-      } catch (error) {
-      }
-      ;
-    });
-  
-    for(const count of promise1){
-      if(promise2.includes(count.classcount)){
-        console.log('exist')
-      }
-      else{
-        console.log(' not exist')
-        myArray.push(count.classcount)
-  
+    let sqlQuery = `SELECT distinct(cartegory) as classcount  FROM student WHERE class = '${classname}' `
+    try {
+      pool.query(sqlQuery, (error, results, fields) => {
+        console.log(sqlQuery)
+
+        if (error) {
+          console.log(error);
+          resolve('false')
+
+          return console.log();
+        }
+        resolve(results);
+
+      });
+
+    } catch (error) {
+    }
+    ;
+  });
+ 
+
+  for (const count of promise1) {
+    if (promise2.some(e => e.feecount === count.classcount)) {
+    }
+    else {
+      myArray.push(count.classcount)
+
       //  return res.status(500)
       //   .json({ success: 0, error: "internal server error", message: error });
-      }
     }
-  
-    console.log( myArray)
+  }
 
-return myArray
+  console.log(myArray)
 
-    }
-   
-  
+  return myArray
+
+}
 
 
- // 
+
+
+// 
 //SELECT count(distinct(cartegory)) as classcount,distinct(cartegory) as classcart FROM `student` WHERE class = 'JHS 1'; 
 
 async function CreateAssignFeeClass(data) {
@@ -447,8 +446,8 @@ async function CreateAssignFeeClass(data) {
         let date = new Date();
         date = date.toLocaleDateString("en-CA");
         console.log(date);
-        let sqlQuery = `insert into assignfeecartegory (class,scartegory,feename,amount,createdat,createdby,total,cartgroupid) values
-     ('${data.class}','${data.scartegory}','${name}','${amt}','${date}','${data.createdby}','${data.total}','${cartid}')`;
+        let sqlQuery = `insert into assignfeecartegory (class,scartegory,feename,amount,createdat,createdby,total) values
+     ('${data.class}','${data.scartegory}','${name}','${amt}','${date}','${data.createdby}','${data.total}')`;
 
         try {
           pool.query(sqlQuery, (error, results, fields) => {
@@ -1205,30 +1204,30 @@ module.exports = {
       res.status(200).json({ success: 1, data: result });
     });
   },
-  
-  paymentWithscholarship: async(req, res) => {
+
+  paymentWithscholarship: async (req, res) => {
     let id = req.body.id
     // const promise1 = await new Promise((resolve, reject) => {
 
-  //   let sqlQuery = `select * from feepaymentrecords where student_id='${id}' limit 15 `;
-  //   pool.query(sqlQuery, (error, result) => {
-  //     if (error) {
-  //       console.log(
-  //         `${req.method} ${req.originalUrl}, 'server error', fetch all fee`
-  //       );
+    //   let sqlQuery = `select * from feepaymentrecords where student_id='${id}' limit 15 `;
+    //   pool.query(sqlQuery, (error, result) => {
+    //     if (error) {
+    //       console.log(
+    //         `${req.method} ${req.originalUrl}, 'server error', fetch all fee`
+    //       );
 
-  //       return res
-  //         .status(500)
-  //         .json({ success: 0, error: "internal server error", message: error });
-  //     }
+    //       return res
+    //         .status(500)
+    //         .json({ success: 0, error: "internal server error", message: error });
+    //     }
 
-  //     console.log(`${req.method} ${req.originalUrl},'success', fetch all fee`);
-  //     resolve(result)
-  //    // res.status(200).json({ success: 1, data: result });
-  //   });
-  // });
+    //     console.log(`${req.method} ${req.originalUrl},'success', fetch all fee`);
+    //     resolve(result)
+    //    // res.status(200).json({ success: 1, data: result });
+    //   });
+    // });
 
-  // let feedata = await promise1
+    // let feedata = await promise1
 
     let sqlQuery1 = `select * from scholarshipenroll where student_id='${id}' `;
     pool.query(sqlQuery1, (error, result) => {
@@ -1461,7 +1460,54 @@ module.exports = {
     const data = req.body;
     console.log(data.class);
     let code = 0
+
+      //get all distinct classnames 
+      const promise4 = await new Promise((resolve, reject) => {
+        let sqlQuery = `select distinct(class.title) as class from class `;
+        pool.query(sqlQuery, (error, result) => {
+          console.log(result)
+          if (error) {
+            return res.status(500).json({
+              success: 0,
+              error: "internal server error",
+              message: error,
+            });
+          }
+          if (result.length == 0) {
+            return res.status(200).json({
+              success: 2,
+              data: [],
+              // error: "internal server error",
+              message: 'No Classes Available',
+            });
+          }
+          console.log(result);
+          resolve(result);
+        });
+      });
+
+      let clazz = await promise4
+      async function checkallclasscart(classes) {
+        let final = []
+        console.log(classes)
+        for (const clazz of classes) {
   
+          let bb = await generatefeecartchecker(clazz.class)
+  
+          if (bb.length != 0) {
+            final.push({ class: clazz.class, cart: bb })
+          }
+  
+        };
+        return final
+      }
+  let vv = await checkallclasscart(clazz)
+  
+  
+  //break from here if unassigned fees caugthby abouve function
+   if (vv.length != 0) return res.status(200).json({ success: 2, message: "Unassigned Fees Detected" ,data : vv });
+
+
     //get all student to be applied to
     const promise8 = await new Promise((resolve, reject) => {
       let sqlQuery = `select student_id from student where  student.isActive = 'true'; `;
@@ -1591,7 +1637,7 @@ module.exports = {
 
     res
       .status(200)
-      .json({ success: 1, message: "Fees Generated Successfully" });
+      .json({ success: 1, message: "Fees Generated Successfully",data: clazz });
 
 
   },
@@ -1633,10 +1679,8 @@ module.exports = {
         }
         if (result.length == 0) {
           return res.status(200).json({
-            success: 3,
-            data: [],
-            // error: "internal server error",
-            message: "No Assigned Fee For Student's Class",
+            success: 2, message: "Unassigned Fees Detected" ,data : [{class:data.class, cart: data.cartegory}]
+          
           });
         }
         console.log(result);
@@ -1688,7 +1732,7 @@ module.exports = {
           FeeGenerateLog(data)
           res
             .status(200)
-            .json({ success: 1, message: "Fees Generated Successfully" });
+            .json({ success: 7, message: "Fees Generated Successfully" });
         });
       });
     }
@@ -1706,16 +1750,38 @@ module.exports = {
     const data = req.body;
     console.log(data.class);
     let code = 0
+    // let bb = await generatefeecartchecker(data.class)
 
-    let bb = await generatefeecartchecker(data.class)
+    async function checkallclasscart(classes) {
+      let final = []
+      console.log(classes)
+      for (const clazz of classes) {
 
-    console.log(bb)
+        let bb = await generatefeecartchecker(clazz)
+
+        if (bb.length != 0) {
+          final.push({ class: clazz, cart: bb })
+        }
+
+      };
+      return final
+    }
+let vv = await checkallclasscart(data.clazz)
+
+
+//break from here if unassigned fees caugthby abouve function
+ if (vv.length != 0) return res.status(200).json({ success: 2, message: "Unassigned Fees Detected" ,data : vv });
+
+ 
+
 
     //get all student to be applied to
     const promise8 = await new Promise((resolve, reject) => {
       let sqlQuery = `select student_id from student where class in (${data.class}) and student.isActive = 'true'; `;
+
       pool.query(sqlQuery, (error, result) => {
         console.log(result)
+      
         if (error) {
           return res.status(500).json({
             success: 0,
@@ -1723,14 +1789,14 @@ module.exports = {
             message: error,
           });
         }
-        if (result.length == 0) {
-          return res.status(200).json({
-            success: 2,
-            data: [],
-            // error: "internal server error",
-            message: 'No Student In Class',
-          });
-        }
+        // if (result.length == 0) {
+        //   return res.status(200).json({
+        //     success: 2,
+        //     data: [],
+        //     // error: "internal server error",
+        //     message: 'No Student In Class',
+        //   });
+        // }
         resolve(result);
       });
     });
@@ -1772,15 +1838,15 @@ module.exports = {
               message: error,
             });
           }
-          if (result.length == 0) {
-            return res.status(200).json({
-              success: 3,
-              data: [],
-              // error: "internal server error",
-              message: "No Assigned Fee For Student's Class",
-              val : bb
-            });
-          }
+          // if (result.length == 0) {
+          //   return res.status(200).json({
+          //     success: 3,
+          //     data: [],
+          //     // error: "internal server error",
+          //     message: "No Assigned Fee For Student's Class",
+          //     val: vv
+          //   });
+          // }
           console.log(result);
           resolve(result);
         });
@@ -1840,7 +1906,7 @@ module.exports = {
 
     res
       .status(200)
-      .json({ success: 1, message: "Fees Generated Successfully" });
+      .json({ success: 1, message: "Fees Generated Successfully" ,data: data.clazz});
   },
 
 
