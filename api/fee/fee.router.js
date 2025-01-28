@@ -44,7 +44,9 @@ const {
   getAssignRecordAction,
   paymentWithscholarship,
   totalfee,
-  getbulkbill
+  getbulkbill,
+  closeaccount,
+  feespaidsession
 } = require("./fee.controller");
 
 router.get("/", getAllfee);
@@ -85,6 +87,9 @@ router.get("/getallassignedfeerecord", getallassignedfeerecord);
 router.post("/cartitemdel", cartitemdel);
 router.post("/paymentscholarshiprecords", paymentWithscholarship);
 
+
+router.post("/feespaidsession",  feespaidsession);
+router.post("/closeaccount",  closeaccount);
 
 
 router.post("/getsinglebill", getsinglebill);

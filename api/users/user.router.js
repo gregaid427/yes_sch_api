@@ -54,6 +54,7 @@ router.post("/userdata",  getuserdata);
 router.get("/userbyrole",  getUserByUserIdRole);
 
 
+
 router.post("/userid",  getUserByUserId);
 router.get("/pin/:userId",  getOTPpin);
 

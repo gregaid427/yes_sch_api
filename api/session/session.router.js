@@ -19,7 +19,7 @@ router.get("/",  getAllsession);
 
 router.get("/:id", getsessionById );
 router.patch("/",  updatesession);
-router.delete("/single/:id",  deleteSinglesession);
+router.post("/single",  deleteSinglesession);
 
 router.delete("/",  deleteAllsession);
 
