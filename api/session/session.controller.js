@@ -34,21 +34,21 @@ module.exports = {
 
         if (result.affectedRows == 1) {
           let sqlQuery1 = `CREATE TABLE ${code}  (
-       id int(11) NOT NULL,
        student_id varchar(40) DEFAULT NULL,
        amountpaid varchar(10) DEFAULT '0',
-       stdname varchar(100) DEFAULT NULL,
+       firstName varchar(50) DEFAULT NULL,
+       lastName varchar(50) DEFAULT NULL,
+       otherName varchar(50) DEFAULT NULL,
        class varchar(50) DEFAULT NULL,
        arrears varchar(20) DEFAULT NULL,
        session varchar(50) DEFAULT NULL,
        activeaccountid varchar(20) DEFAULT '0',
        feepayable varchar(10) DEFAULT '0',
-       preference varchar(10) DEFAULT '0',
+       preference varchar(80) DEFAULT '0',
        scholarship varchar(10) DEFAULT '0',
        accountbalance varchar(10) DEFAULT '0',
        date varchar(50) DEFAULT NULL,
-       createdby varchar(10) DEFAULT '0',
-       PRIMARY KEY (id)
+       createdby varchar(10) DEFAULT '0'
        )`;
           pool.query(sqlQuery1, (error, result) => {
             // res.status(200).json({ success: 1, data: result });

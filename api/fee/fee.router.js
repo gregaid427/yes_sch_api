@@ -46,7 +46,9 @@ const {
   totalfee,
   getbulkbill,
   closeaccount,
-  feespaidsession
+  feespaidsession,
+  sessionacctreport,
+  sessionaccountrecords
 } = require("./fee.controller");
 
 router.get("/", getAllfee);
@@ -59,6 +61,7 @@ router.post("/updatescholarship", updatescholarship);
 
 router.post("/enrollscholarship", enrollScholarship);
 router.post("/revokescholarship", revokeScholarship);
+router.post("/sessionacctreport", sessionacctreport);
 
 
 router.post("/getstudentrecord", getstudentrecord);
@@ -90,7 +93,7 @@ router.post("/paymentscholarshiprecords", paymentWithscholarship);
 
 router.post("/feespaidsession",  feespaidsession);
 router.post("/closeaccount",  closeaccount);
-
+router.post("/sessionaccountrecords",  sessionaccountrecords);
 
 router.post("/getsinglebill", getsinglebill);
 router.post("/getbulkbill", getbulkbill);

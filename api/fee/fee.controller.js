@@ -927,7 +927,8 @@ module.exports = {
       });
     });
     let val1 = await promise2
-    console.log('222222222222222222')
+
+
 
 
     //get old session accountid 
@@ -952,15 +953,10 @@ module.exports = {
     console.log(oldsessionid)
 
 
-
-    console.log('oldsessionid')
-
-    //duplicate records into custom table
-    let sqlQuery3 = `insert into   ${oldsessionid[0].sessionaccountid} (student_id,firstName,lastName,otherName,class,amountpaid,arrears,session,feepayable,preference,scholarship,accountbalance,date,createdby) select 
-     student_id,firstName,lastName,otherName,class,amountpaid,arrears,'${data.oldsession}',feepayable,preference,scholarship,accountbalance,'${date}','${data.createdby}' from student `;
-
-    const promise = await new Promise((resolve, reject) => {
-      pool.query(sqlQuery3, (error, result) => {
+    //get old session accountid 
+    let sqlQuery19 = `select sessionaccountid from session where sessionname ='${data.oldsession}'`;
+    const promise9 = await new Promise((resolve, reject) => {
+      pool.query(sqlQuery19, (error, result) => {
         if (error) {
           console.log(error)
           console.log(
@@ -970,21 +966,151 @@ module.exports = {
             .status(500)
             .json({ success: 0, error: "internal server error", message: error });
         }
+        console.log(`${req.method} ${req.originalUrl}, fetch fee by id`);
+        resolve(result)
+      });
+    });
 
-        if (!result) {
+
+    //check if dtable exist for recordinding session info
+    let sqlQuery22 = `SELECT * 
+FROM information_schema.tables
+WHERE table_schema = 'yes_school_db' 
+    AND table_name = '${oldsessionid[0].sessionaccountid}'
+LIMIT 1;`;
+
+    const promise22 = await new Promise((resolve, reject) => {
+      pool.query(sqlQuery22, async (error, result) => {
+
+        if (error) {
+          console.log(error)
           console.log(
-            `${req.method} ${req.originalUrl}, fetch fee by id: no record found`
+            `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch fee by id`
           );
-          return res.status(200).json({
-            success: 1,
-            data: [],
+          return res
+            .status(500)
+            .json({ success: 0, error: "internal server error", message: error });
+        }
+        console.log(result)
+
+        // if table doesnt exist create it
+        if (result.length == 0) {
+          console.log('table doesnt exist')
+
+          let sqlQuery1 = `CREATE TABLE ${oldsessionid[0].sessionaccountid}  (
+       student_id varchar(40) DEFAULT NULL,
+       amountpaid varchar(10) DEFAULT '0',
+       firstName varchar(50) DEFAULT NULL,
+       lastName varchar(50) DEFAULT NULL,
+       otherName varchar(50) DEFAULT NULL,
+       class varchar(50) DEFAULT NULL,
+       arrears varchar(20) DEFAULT NULL,
+       session varchar(50) DEFAULT NULL,
+       activeaccountid varchar(20) DEFAULT '0',
+       feepayable varchar(10) DEFAULT '0',
+       preference varchar(80) DEFAULT '0',
+       scholarship varchar(10) DEFAULT '0',
+       accountbalance varchar(10) DEFAULT '0',
+       date varchar(50) DEFAULT NULL,
+       createdby varchar(10) DEFAULT '0'
+       )`;
+          pool.query(sqlQuery1, async (error, result) => {
+            // res.status(200).json({ success: 1, data: result });
+            if (error) {
+              console.log(error)
+            } else {
+              console.log('table created')
+
+              //duplicate records into custom table
+              let sqlQuery3 = `insert into   ${oldsessionid[0].sessionaccountid} (student_id,firstName,lastName,otherName,class,amountpaid,arrears,session,feepayable,preference,scholarship,accountbalance,date,createdby) select 
+              student_id,firstName,lastName,otherName,class,amountpaid,arrears,'${data.oldsession}',feepayable,preference,scholarship,accountbalance,'${date}','${data.createdby}' from student `;
+              console.log(sqlQuery3)
+              const promise = await new Promise((resolve, reject) => {
+                pool.query(sqlQuery3, async (error, result) => {
+                  if (error) {
+                    console.log(error)
+                    console.log(
+                      `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch fee by id`
+                    );
+                    return res
+                      .status(500)
+                      .json({ success: 0, error: "internal server error", message: error });
+                  }
+
+                  if (!result) {
+                    console.log(
+                      `${req.method} ${req.originalUrl}, fetch fee by id: no record found`
+                    );
+                    return res.status(200).json({
+                      success: 1,
+                      data: [],
+                    });
+                  }
+                  else {
+                    // reset amount paid  to 0 for all student in student table 
+                    let sqlQuery6 = `update student set  amountpaid=0.00`;
+
+                    pool.query(sqlQuery6, (error, result) => {
+                      if (error) {
+                        console.log(error)
+                        console.log(
+                          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch fee by id`
+                        );
+                        return res
+                          .status(500)
+                          .json({ success: 0, error: "internal server error", message: error });
+                      }
+
+                      if (!result) {
+                        console.log(
+                          `${req.method} ${req.originalUrl}, fetch fee by id: no record found`
+                        );
+                        return res.status(200).json({
+                          success: 1,
+                          data: [],
+                        });
+                      }
+
+                    });
+
+
+                    //record in account closure
+                    let sqlQuery4 = `insert into accountclosure (createdby,createdat,oldsession,newsession) values
+                      ('${data.createdby}','${date}','${data.oldsession}','${data.newsession}')`;
+                    const promise = await new Promise((resolve, reject) => {
+
+                      pool.query(sqlQuery4, (error, result) => {
+
+                        return res.status(200).json({
+                          success: 1,
+                          data: [],
+                        });
+                      });
+                    });
+                    console.log('account closure recorded')
+
+
+                  }
+
+                });
+              });
+
+
+            }
           });
         }
-        else {
-          // reset amount paid  to 0 for all student in student table 
-          let sqlQuery6 = `update student set  amountpaid=0.00`;
 
-            pool.query(sqlQuery6, (error, result) => {
+
+        else {
+
+          console.log('table created')
+
+          //duplicate records into custom table
+          let sqlQuery3 = `insert into   ${oldsessionid[0].sessionaccountid} (student_id,firstName,lastName,otherName,class,amountpaid,arrears,session,feepayable,preference,scholarship,accountbalance,date,createdby) select 
+          student_id,firstName,lastName,otherName,class,amountpaid,arrears,'${data.oldsession}',feepayable,preference,scholarship,accountbalance,'${date}','${data.createdby}' from student `;
+          console.log(sqlQuery3)
+          const promise = await new Promise((resolve, reject) => {
+            pool.query(sqlQuery3, async (error, result) => {
               if (error) {
                 console.log(error)
                 console.log(
@@ -999,22 +1125,70 @@ module.exports = {
                 console.log(
                   `${req.method} ${req.originalUrl}, fetch fee by id: no record found`
                 );
+
                 return res.status(200).json({
                   success: 1,
                   data: [],
                 });
               }
+              else {
+                console.log(' records duplicated in session table')
+
+                // reset amount paid  to 0 for all student in student table 
+                let sqlQuery6 = `update student set  amountpaid=0.00`;
+
+                pool.query(sqlQuery6, (error, result) => {
+                  if (error) {
+                    console.log(error)
+                    console.log(
+                      `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch fee by id`
+                    );
+                    return res
+                      .status(500)
+                      .json({ success: 0, error: "internal server error", message: error });
+                  }
+
+                  if (!result) {
+                    console.log(
+                      `${req.method} ${req.originalUrl}, fetch fee by id: no record found`
+                    );
+                    return res.status(200).json({
+                      success: 1,
+                      data: [],
+                    });
+                  }
+                  console.log(' amountpaid updated')
+
+                });
+
+                //record in account closure
+                let sqlQuery4 = `insert into accountclosure (createdby,createdat,oldsession,newsession) values
+          ('${data.createdby}','${date}','${data.oldsession}','${data.newsession}')`;
+                const promise = await new Promise((resolve, reject) => {
+
+                  pool.query(sqlQuery4, (error, result) => {
+
+                    return res.status(200).json({
+                      success: 1,
+                      data: [],
+                    });
+                  });
+                });
+
+                console.log('account closure recorded')
+
+              }
 
             });
-
-          return res.status(200).json({
-            success: 1,
-            data: [],
           });
-        }
 
+        }
       });
     });
+
+
+
+
 
 
 
@@ -1049,9 +1223,9 @@ module.exports = {
   },
   feespaidsession: async (req, res) => {
     const data = req.body
-    let sqlQuery = `select * from student where class = '${data.class}' `;
+    let sqlQuery = `select sessionaccountid from session where sessionname = '${data.session}' `;
     const promise8 = await new Promise((resolve, reject) => {
-
+      console.log(sqlQuery)
       pool.query(sqlQuery, (error, result) => {
         if (error) {
           console.log(
@@ -1075,12 +1249,96 @@ module.exports = {
       });
     });
 
-    let students = promise8
-    let gold = []
+    let students = await promise8
+    console.log(students)
+    let db = students[0].sessionaccountid
+    let sqlQuery5 = `select * from  ${db} where class = '${data.class}' `;
+    console.log(sqlQuery5)
+    const promise1 = await new Promise((resolve, reject) => {
+      pool.query(sqlQuery5, (error, result) => {
+        if (error) {
+          console.log(
+            `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch fee by id`
+          );
+          return res
+            .status(500)
+            .json({ success: 0, error: "internal server error", message: error });
+        }
 
-    for (const element of students) {
-      // console.log(element)
-      let sqlQuery1 = `select sum(amountpaid) as paid from feepaymentrecords where student_id = '${element.student_id}' and session = '${data.session}'`;
+        if (!result) {
+          console.log(
+            `${req.method} ${req.originalUrl}, fetch fee by id: no record found`
+          );
+          return res.status(200).json({
+            success: 1,
+            data: [],
+          });
+        }
+        res.status(200).json({ success: 1, data: result });
+        resolve(result)
+      });
+    });
+
+
+  },
+  sessionacctreport: async (req, res) => {
+    const data = req.body
+
+    let sqlQuery3 = `select sessionaccountid  from session where sessionname='${data.id}'`;
+    const promise3 = await new Promise((resolve, reject) => {
+
+      pool.query(sqlQuery3, async (error, result) => {
+        if (error) {
+          console.log(
+            `${req.method} ${req.originalUrl}, 'server error', fetch accountid error`
+          );
+
+          return res
+            .status(500)
+            .json({ success: 0, error: "internal server error", message: error });
+        }
+
+        // console.log(result)
+        resolve(result)
+      })
+      return resolve
+
+    });
+    let acctid = promise3
+    console.log(acctid)
+
+
+
+    let sqlQuery1 = `select distinct(class.title) as title,id from class order by class.title asc`;
+    const promise1 = await new Promise((resolve, reject) => {
+
+      pool.query(sqlQuery1, async (error, result) => {
+        if (error) {
+          console.log(
+            `${req.method} ${req.originalUrl}, 'server error', fetch all fee`
+          );
+
+          return res
+            .status(500)
+            .json({ success: 0, error: "internal server error", message: error });
+        }
+
+        // console.log(result)
+        resolve(result)
+      })
+      return resolve
+
+    });
+
+    let clazz = promise1
+    console.log(clazz)
+
+    let subdata = []
+
+    for (const element of clazz) {
+
+      console.log(element)
+      let sqlQuery1 = `select sum(amountpaid) as paid, sum(arrears) as arrears, sum(accountbalance) as balance from ${acctid[0].sessionaccountid} where class = '${element.title}'`;
       const promise2 = await new Promise((resolve, reject) => {
 
         pool.query(sqlQuery1, (error, result) => {
@@ -1094,60 +1352,153 @@ module.exports = {
               .json({ success: 0, error: "internal server error", message: error });
           }
 
-          if (!result) {
-            gold.push({
 
-              student_id: element.student_id,
-              firstName: element.firstName,
-              lastName: element.lastName,
-              otherName: element.otherName,
-              'class': element.class,
-              cartegory: element.cartegory,
-              section: element.section,
-              amountpaid: element.amountpaid,
+          let subresult = {
+            paid: result[0].paid == null ? 0 : result[0].paid,
+            arrears: result[0].arrears == null ? 0 : result[0].arrears,
+            balance: result[0].balance == null ? 0 : result[0].balance,
+            class: element.title,
+            class: element.title,
 
-              accountbalance: element.accountbalance,
-
-              feepayable: element.feepayable,
-              scholarship: element.scholarship,
-              arrears: element.arrears,
-              preference: element.preference,
-              feegeneratedate: element.feegeneratedate,
-              feegeneratecode: element.feegeneratecode,
-              feepaid: 0
-            })
+            classid: element.id
           }
-          else {
-            gold.push({
+          subdata.push(subresult)
+          console.log(subresult)
 
-              student_id: element.student_id,
-              firstName: element.firstName,
-              lastName: element.lastName,
-              otherName: element.otherName,
-              'class': element.class,
-              cartegory: element.cartegory,
-              section: element.section,
-              amountpaid: element.amountpaid,
 
-              accountbalance: element.accountbalance,
-
-              feepayable: element.feepayable,
-              scholarship: element.scholarship,
-              arrears: element.arrears,
-              preference: element.preference,
-              feegeneratedate: element.feegeneratedate,
-              feegeneratecode: element.feegeneratecode,
-              feepaid: result[0].paid
-            })
-          }
           resolve(result)
         });
       });
 
-    };
-    res.status(200).json({ success: 1, data: gold });
+      // console.log(element)
 
-    console.log(gold)
+      // setTimeout(() => {
+      //   res.status(200).json({ success: 1, data: arr });
+      // }, 3000);
+
+    }
+
+    console.log('subdataaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+    console.log(subdata)
+    let sqlQuery6 = `select sum(amountpaid) as paid, sum(arrears) as arrears, sum(accountbalance) as balance, createdby,date from ${acctid[0].sessionaccountid}`;
+
+    const promise6 = await new Promise((resolve, reject) => {
+
+      pool.query(sqlQuery6, (error, result) => {
+        console.log(result)
+        if (error) {
+          console.log(
+            `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch fee by id`
+          );
+          return res
+            .status(500)
+            .json({ success: 0, error: "internal server error", message: error });
+        }
+        resolve(result)
+      });
+    });
+    let subdata1 = promise6
+    console.log(subdata1)
+
+    // let sqlQuery = `select * from student where class = '${data.class}' `;
+    // const promise8 = await new Promise((resolve, reject) => {
+
+    //   pool.query(sqlQuery, (error, result) => {
+    //     if (error) {
+    //       console.log(
+    //         `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch fee by id`
+    //       );
+    //       return res
+    //         .status(500)
+    //         .json({ success: 0, error: "internal server error", message: error });
+    //     }
+
+    //     if (!result) {
+    //       console.log(
+    //         `${req.method} ${req.originalUrl}, fetch fee by id: no record found`
+    //       );
+    //       return res.status(200).json({
+    //         success: 1,
+    //         data: [],
+    //       });
+    //     }
+    //     resolve(result)
+    //   });
+    // });
+
+    // let students = promise8
+    // let gold = []
+
+    // for (const element of students) {
+    //   // console.log(element)
+    //   let sqlQuery1 = `select sum(amountpaid) as paid from feepaymentrecords where student_id = '${element.student_id}' and session = '${data.session}'`;
+    //   const promise2 = await new Promise((resolve, reject) => {
+
+    //     pool.query(sqlQuery1, (error, result) => {
+    //       console.log(result)
+    //       if (error) {
+    //         console.log(
+    //           `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch fee by id`
+    //         );
+    //         return res
+    //           .status(500)
+    //           .json({ success: 0, error: "internal server error", message: error });
+    //       }
+
+    //       if (!result) {
+    //         gold.push({
+
+    //           student_id: element.student_id,
+    //           firstName: element.firstName,
+    //           lastName: element.lastName,
+    //           otherName: element.otherName,
+    //           'class': element.class,
+    //           cartegory: element.cartegory,
+    //           section: element.section,
+    //           amountpaid: element.amountpaid,
+
+    //           accountbalance: element.accountbalance,
+
+    //           feepayable: element.feepayable,
+    //           scholarship: element.scholarship,
+    //           arrears: element.arrears,
+    //           preference: element.preference,
+    //           feegeneratedate: element.feegeneratedate,
+    //           feegeneratecode: element.feegeneratecode,
+    //           feepaid: 0
+    //         })
+    //       }
+    //       else {
+    //         gold.push({
+
+    //           student_id: element.student_id,
+    //           firstName: element.firstName,
+    //           lastName: element.lastName,
+    //           otherName: element.otherName,
+    //           'class': element.class,
+    //           cartegory: element.cartegory,
+    //           section: element.section,
+    //           amountpaid: element.amountpaid,
+
+    //           accountbalance: element.accountbalance,
+
+    //           feepayable: element.feepayable,
+    //           scholarship: element.scholarship,
+    //           arrears: element.arrears,
+    //           preference: element.preference,
+    //           feegeneratedate: element.feegeneratedate,
+    //           feegeneratecode: element.feegeneratecode,
+    //           feepaid: result[0].paid
+    //         })
+    //       }
+    //       resolve(result)
+    //     });
+    //   });
+
+    // };
+    res.status(200).json({ success: 1, data: subdata, info: subdata1, data1: data.id });
+
+    //  console.log(gold)
   },
   sessionaccountrecords: async (req, res) => {
     const data = req.body
