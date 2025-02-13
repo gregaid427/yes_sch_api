@@ -114,15 +114,15 @@ async function AssignFeeByClass(data) {
 
     }
     // if (i == feedata.length - 1) {
-    ActivityregisterLog(
-      "Assign Fee",
-      data.createdby,
-      "none",
-      "Applied",
-      date,
-      `Assign fee for ${data.class}`,
-      'set'
-    );
+    // ActivityregisterLog(
+    //   "Assign Fee",
+    //   data.createdby,
+    //   "none",
+    //   "Applied",
+    //   date,
+    //   `Assign fee for ${data.class}`,
+    //   'set'
+    // );
 
     setTimeout(() => {
       resolve2(true);
@@ -322,6 +322,8 @@ async function AssignFeeByStudent(feedata, stud) {
 
   );
 }
+
+
 
 async function RecordAssignFee(data) {
   let sqlQuery = `insert into assignfeerecord (class,total,cartegory,createdat,status,createdby) values
@@ -538,7 +540,7 @@ async function CreateAssignFeeClass(data) {
 
 
 function ActivityregisterLog(activity, user, amount, status, date, description) {
-  let sqlQuery = `insert into financelog (activity,user,amount,createdAt,status,description) values
+  let sqlQuery = `insert into financelog (activity,createdby,amount,createdAt,status,description) values
      ('${activity}','${user}','${amount}','${date}','applied','${description}')`;
 
   pool.query(sqlQuery, (error, results, fields) => {
@@ -549,9 +551,9 @@ function ActivityregisterLog(activity, user, amount, status, date, description) 
     console.log("financelog logged successfully");
   });
 }
-function FeeGenerateLog(data) {
-  let sqlQuery = `insert into feegeneraterecord (code,session,createdby,date) values
-     ('${data.code}','${data.session}','${data.createdby}','${date}')`;
+function FeeGenerateLog(data,entity,description) {
+  let sqlQuery = `insert into feegeneraterecord (code,session,createdby,date,entity,description) values
+     ('${data.code}','${data.session}','${data.createdby}','${date}','${entity}','${description}')`;
 
   pool.query(sqlQuery, (error, results, fields) => {
     if (error) {
@@ -559,6 +561,18 @@ function FeeGenerateLog(data) {
       return console.log("financelog log error");
     }
     console.log("financelog logged successfully");
+  });
+}
+function AssignFeeLog(createdby,entity) {
+  let sqlQuery = `insert into assignfeelog (createdby,createdat,entity) values
+     ('${createdby}','${date}','${entity}')`;
+
+  pool.query(sqlQuery, (error, results, fields) => {
+    if (error) {
+      console.log(error);
+      return console.log("Assign log error");
+    }
+    console.log("Assign fee logged successfully");
   });
 }
 async function getfeepayable(stdid, callBack) {
@@ -874,11 +888,11 @@ module.exports = {
     console.log(data)
 
     let code = "session_" + createHash(9);
-    // if(data.active == true){
-    let sqlQuery1 = `update session set active ='false'`;
-    let sqlQuery2 = `select count(id) from session'`;
+    // // if(data.active == true){
+    // let sqlQuery1 = `update session set active ='false'`;
+    // let sqlQuery2 = `select count(id) from session'`;
 
-    let query = data.active == true ? sqlQuery1 : sqlQuery2;
+    // let query = data.active == true ? sqlQuery1 : sqlQuery2;
     let sqlQuery10 = `select sessionaccountid from session where sessionname ='${data.newsession}'`;
 
     //get new session accountid 
@@ -901,9 +915,9 @@ module.exports = {
     let val = await promise1
     console.log(val)
     console.log('llllllllllllllllllll')
-
+    
     //update activeaccount session id
-    let sqlQuery = `update session set activeaccountid =  '${val[0].sessionaccountid}'`;
+    let sqlQuery = `update session set activeaccountid =  '${val[0].sessionaccountid}',activesessionname = '${data.newsession}'`;
     const promise2 = await new Promise((resolve, reject) => {
 
       pool.query(sqlQuery, (error, result) => {
@@ -953,23 +967,23 @@ module.exports = {
     console.log(oldsessionid)
 
 
-    //get old session accountid 
-    let sqlQuery19 = `select sessionaccountid from session where sessionname ='${data.oldsession}'`;
-    const promise9 = await new Promise((resolve, reject) => {
-      pool.query(sqlQuery19, (error, result) => {
-        if (error) {
-          console.log(error)
-          console.log(
-            `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch fee by id`
-          );
-          return res
-            .status(500)
-            .json({ success: 0, error: "internal server error", message: error });
-        }
-        console.log(`${req.method} ${req.originalUrl}, fetch fee by id`);
-        resolve(result)
-      });
-    });
+    // //get old session accountid 
+    // let sqlQuery19 = `select sessionaccountid from session where sessionname ='${data.oldsession}'`;
+    // const promise9 = await new Promise((resolve, reject) => {
+    //   pool.query(sqlQuery19, (error, result) => {
+    //     if (error) {
+    //       console.log(error)
+    //       console.log(
+    //         `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch fee by id`
+    //       );
+    //       return res
+    //         .status(500)
+    //         .json({ success: 0, error: "internal server error", message: error });
+    //     }
+    //     console.log(`${req.method} ${req.originalUrl}, fetch fee by id`);
+    //     resolve(result)
+    //   });
+    // });
 
 
     //check if dtable exist for recordinding session info
@@ -1075,11 +1089,16 @@ LIMIT 1;`;
 
 
                     //record in account closure
-                    let sqlQuery4 = `insert into accountclosure (createdby,createdat,oldsession,newsession) values
-                      ('${data.createdby}','${date}','${data.oldsession}','${data.newsession}')`;
+                    let sqlQuery4 = `insert into accountclosure (createdby,createdat,oldsession,newsession,activeaccountid) values
+                      ('${data.createdby}','${date}','${data.oldsession}','${data.newsession}','${oldsessionid[0].sessionaccountid}')`;
                     const promise = await new Promise((resolve, reject) => {
 
                       pool.query(sqlQuery4, (error, result) => {
+                        if(error){
+                          console.log('account closure recorded')
+                          console.log(error)
+
+                        }
 
                         return res.status(200).json({
                           success: 1,
@@ -1162,12 +1181,16 @@ LIMIT 1;`;
                 });
 
                 //record in account closure
-                let sqlQuery4 = `insert into accountclosure (createdby,createdat,oldsession,newsession) values
-          ('${data.createdby}','${date}','${data.oldsession}','${data.newsession}')`;
+                let sqlQuery4 = `insert into accountclosure (createdby,createdat,oldsession,newsession,activeaccountid) values
+                      ('${data.createdby}','${date}','${data.oldsession}','${data.newsession}','${oldsessionid[0].sessionaccountid}')`;
                 const promise = await new Promise((resolve, reject) => {
 
                   pool.query(sqlQuery4, (error, result) => {
+                    if(error){
+                      console.log('account closure recorded')
+                      console.log(error)
 
+                    }
                     return res.status(200).json({
                       success: 1,
                       data: [],
@@ -1193,6 +1216,33 @@ LIMIT 1;`;
 
 
 
+  },
+  getAllassignlog: (req, res) => {
+    const id = req.body.id
+    let sqlQuery = `select * from assignfeelog order by id desc limit  30 `;
+    pool.query(sqlQuery, (error, result) => {
+      if (error) {
+        console.log(error)
+        console.log(
+          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch fee by id`
+        );
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error", message: error });
+      }
+
+      if (!result) {
+        console.log(
+          `${req.method} ${req.originalUrl}, fetch fee by id: no record found`
+        );
+        return res.status(200).json({
+          success: 1,
+          data: [],
+        });
+      }
+      console.log(`${req.method} ${req.originalUrl}, fetch fee by id`);
+      res.status(200).json({ success: 1, data: result });
+    });
   },
   getAssignRecordAction: (req, res) => {
     const id = req.body.id
@@ -1283,6 +1333,7 @@ LIMIT 1;`;
   },
   sessionacctreport: async (req, res) => {
     const data = req.body
+    console.log(data)
 
     let sqlQuery3 = `select sessionaccountid  from session where sessionname='${data.id}'`;
     const promise3 = await new Promise((resolve, reject) => {
@@ -1628,7 +1679,38 @@ LIMIT 1;`;
       res.status(200).json({ success: 1, data: result });
     });
   },
-
+  generatefeerecord: (req, res) => {
+    const id = parseInt(req.params.fee_id);
+    let sqlQuery = `SELECT * FROM feegeneraterecord order by id desc limit 50 `;
+    pool.query(sqlQuery, (error, result) => {
+      if (error) {
+        console.log(
+          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch fee by id`
+        );
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error", message: error });
+      }
+      console.log(`${req.method} ${req.originalUrl}, fetch fee by id`);
+      res.status(200).json({ success: 1, data: result });
+    });
+  },
+  fetchaccountclosure: (req, res) => {
+    const id = parseInt(req.params.fee_id);
+    let sqlQuery = `SELECT * FROM accountclosure  order by id desc limit 50`;
+    pool.query(sqlQuery, (error, result) => {
+      if (error) {
+        console.log(
+          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch fee by id`
+        );
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error", message: error });
+      }
+      console.log(`${req.method} ${req.originalUrl}, fetch fee by id`);
+      res.status(200).json({ success: 1, data: result });
+    });
+  },
   getfeeById: (req, res) => {
     const id = parseInt(req.params.fee_id);
     let sqlQuery = `select * from fee where fee_id = ${id}`;
@@ -2027,6 +2109,24 @@ LIMIT 1;`;
       res.status(200).json({ success: 1, data: result });
     });
   },
+  currentopenedaccount: (req, res) => {
+    let sqlQuery = `select * from accountclosure order by id desc limit 1`;
+    pool.query(sqlQuery, (error, result) => {
+      if (error) {
+        console.log(
+          `${req.method} ${req.originalUrl}, 'server error',fetch Current Account details`
+        );
+
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error", message: error });
+      }
+
+      console.log(`${req.method} ${req.originalUrl},'success', fetch Current Account details`);
+
+      res.status(200).json({ success: 1, data: result });
+    });
+  },
   getScholarship: (req, res) => {
     let sqlQuery = `select * from scholarshiplist`;
     pool.query(sqlQuery, (error, result) => {
@@ -2218,7 +2318,7 @@ LIMIT 1;`;
   },
   generatefeeallstudent: async (req, res) => {
     const data = req.body;
-    console.log(data.class);
+    console.log(data);
     let code = 0
 
     //get all distinct classnames 
@@ -2364,7 +2464,7 @@ LIMIT 1;`;
         console.log("amount");
         console.log(amount);
 
-        let sqlQuery6 = `update student set arrears = '${bal}', accountbalance ='${amount}',feegeneratecode  ='${code}', feegeneratedate = '${date}',feepayable = '${value}' where student_id = '${id}'`;
+        let sqlQuery6 = `update student set arrears = '${bal}', accountbalance ='${amount}',feegeneratecode  ='${code}', feegeneratedate = '${date}', feegenerateforsession = '${data.session}',feepayable = '${value}' where student_id = '${id}'`;
 
         const promise2 = await new Promise((resolve, reject) => {
           console.log(sqlQuery6)
@@ -2376,15 +2476,8 @@ LIMIT 1;`;
                 .json({ success: 1, message: "Internal server", error: error });
             }
             resolve(result);
-            ActivityregisterLog(
-              "Generate Fee",
-              data.createdby,
-              "none",
-              "Applied",
-              date,
-              "Generating fee for all Classes"
-            );
-            FeeGenerateLog(data)
+          
+           
 
           });
         });
@@ -2394,26 +2487,27 @@ LIMIT 1;`;
       generateFee(student[0].student_id, student, assign);
 
     }
-
+    //register in log
+    FeeGenerateLog(data,'All Students','All Classes')
     //  backup account data
-    const promise5 = await new Promise((resolve, reject) => {
-      let sqlQuery = `SHOW TABLES LIKE '${data.prev}'`;
-      pool.query(sqlQuery, (error, result) => {
-        if (error) {
-          return res.status(500).json({
-            success: 0,
-            error: "internal server error",
-            message: error,
-          });
-        }
-        if (!result) {
+    // const promise5 = await new Promise((resolve, reject) => {
+    //   let sqlQuery = `SHOW TABLES LIKE '${data.prev}'`;
+    //   pool.query(sqlQuery, (error, result) => {
+    //     if (error) {
+    //       return res.status(500).json({
+    //         success: 0,
+    //         error: "internal server error",
+    //         message: error,
+    //       });
+    //     }
+    //     if (!result) {
 
-        } else {
+    //     } else {
 
-        }
+    //     }
 
-      });
-    });
+    //   });
+    // });
 
     res
       .status(200)
@@ -2489,7 +2583,7 @@ LIMIT 1;`;
       console.log("amount");
       console.log(amount);
 
-      let sqlQuery6 = `update student set arrears = '${bal}', accountbalance ='${amount}',feegeneratecode  ='${code}', feegeneratedate = '${date}',feepayable = '${value}' where student_id = '${id}'`;
+      let sqlQuery6 = `update student set arrears = '${bal}', accountbalance ='${amount}',feegeneratecode  ='${code}', feegeneratedate = '${date}', feegenerateforsession = '${data.session}',feepayable = '${value}' where student_id = '${id}'`;
 
       const promise2 = await new Promise((resolve, reject) => {
         console.log(sqlQuery6)
@@ -2501,15 +2595,15 @@ LIMIT 1;`;
               .json({ success: 1, message: "Internal server", error: error });
           }
           resolve(result);
-          ActivityregisterLog(
-            "Generate Fee",
-            data.createdby,
-            "none",
-            "Applied",
-            date,
-            "Generating fee for all Classes"
-          );
-          FeeGenerateLog(data)
+          // ActivityregisterLog(
+          //   "Generate Fee",
+          //   data.createdby,
+          //   "none",
+          //   "Applied",
+          //   date,
+          //   "Generating fee for all Classes"
+          // );
+          FeeGenerateLog(data,'Single Student',id)
           res
             .status(200)
             .json({ success: 7, message: "Fees Generated Successfully" });
@@ -2653,7 +2747,7 @@ LIMIT 1;`;
         console.log("amount");
         console.log(amount);
 
-        let sqlQuery6 = `update student set arrears = '${bal}', accountbalance ='${amount}',feegeneratecode  ='${code}', feegeneratedate = '${date}',feepayable = '${value}' where student_id = '${id}'`;
+        let sqlQuery6 = `update student set arrears = '${bal}', accountbalance ='${amount}',feegeneratecode  ='${code}', feegeneratedate = '${date}', feegenerateforsession = '${data.session}',feepayable = '${value}' where student_id = '${id}'`;
 
         const promise2 = await new Promise((resolve, reject) => {
           console.log(sqlQuery6)
@@ -2665,15 +2759,15 @@ LIMIT 1;`;
                 .json({ success: 1, message: "Internal server", error: error });
             }
             resolve(result);
-            ActivityregisterLog(
-              "Generate Fee",
-              data.createdby,
-              "none",
-              "Applied",
-              date,
-              "Generating fee for all Classes"
-            );
-            FeeGenerateLog(data)
+            // ActivityregisterLog(
+            //   "Generate Fee",
+            //   data.createdby,
+            //   "none",
+            //   "Applied",
+            //   date,
+            //   "Generating fee for all Classes"
+            // );
+          
 
           });
         });
@@ -2683,7 +2777,8 @@ LIMIT 1;`;
       generateFee(student[0].student_id, student, assign);
 
     }
-
+    let val = data.clazz
+    FeeGenerateLog(data,'Class(es)',val)
     res
       .status(200)
       .json({ success: 1, message: "Fees Generated Successfully", data: data.clazz });
@@ -2705,14 +2800,14 @@ LIMIT 1;`;
         //create assign fee in assignfeerecord teable
         let createAssignFee = await CreateAssignFeeClass(data);
 
-        ActivityregisterLog(
-          "Assign Fee",
-          data.createdby,
-          "none",
-          "Assign",
-          date,
-          `Assign fee for ${val}`
-        );
+        // ActivityregisterLog(
+        //   "Assign Fee",
+        //   data.createdby,
+        //   "none",
+        //   "Assign",
+        //   date,
+        //   `Assign fee for ${val}`
+        // );
       }
     }
 
@@ -2724,6 +2819,7 @@ LIMIT 1;`;
       pool.query(sqlQuery, (error, result) => {
         res.status(200).json({ success: 1, data: result });
       });
+      AssignFeeLog(data.createdby,data.class)
       console.log("Fees Assign logged Successfully");
     }
 
