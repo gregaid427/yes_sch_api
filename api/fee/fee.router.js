@@ -52,6 +52,7 @@ const {
   currentopenedaccount,
   getAllassignlog,
   generatefeerecord,
+  getstudentsessionrecord,
   sessionaccountrecords
 } = require("./fee.controller");
 
@@ -70,6 +71,8 @@ router.get("/fetchaccountclosure", fetchaccountclosure);
 
 
 router.post("/getstudentrecord", getstudentrecord);
+router.post("/getstudentsessionrecord", getstudentsessionrecord);
+
 
 router.get("/currentopenedaccount", currentopenedaccount);
 router.get("/scholarship", getScholarship);

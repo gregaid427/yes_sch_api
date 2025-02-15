@@ -54,7 +54,7 @@ module.exports = {
             // res.status(200).json({ success: 1, data: result });
           });
 
-          let sqlQuery = `select * from session`;
+          let sqlQuery = `select * from session order by id desc limit 50`;
           pool.query(sqlQuery, (error, result) => {
             res.status(200).json({ success: 1, data: result });
           });
@@ -90,7 +90,7 @@ module.exports = {
   },
 
   getAllsession: (req, res) => {
-    let sqlQuery = `select * from session`;
+    let sqlQuery = `select * from session order by id desc limit 50`;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
@@ -261,7 +261,7 @@ module.exports = {
         });
 
         // logger.info(`${req.method} ${req.originalUrl}, delete session  by id`);
-        let sqlQuery = `select * from session`;
+        let sqlQuery = `select * from session order by id desc limit 50`;
         pool.query(sqlQuery, (error, result) => {
           res.status(200).json({ success: 1, data: result });
         });

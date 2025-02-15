@@ -551,7 +551,7 @@ function ActivityregisterLog(activity, user, amount, status, date, description) 
     console.log("financelog logged successfully");
   });
 }
-function FeeGenerateLog(data,entity,description) {
+function FeeGenerateLog(data, entity, description) {
   let sqlQuery = `insert into feegeneraterecord (code,session,createdby,date,entity,description) values
      ('${data.code}','${data.session}','${data.createdby}','${date}','${entity}','${description}')`;
 
@@ -563,7 +563,7 @@ function FeeGenerateLog(data,entity,description) {
     console.log("financelog logged successfully");
   });
 }
-function AssignFeeLog(createdby,entity) {
+function AssignFeeLog(createdby, entity) {
   let sqlQuery = `insert into assignfeelog (createdby,createdat,entity) values
      ('${createdby}','${date}','${entity}')`;
 
@@ -887,6 +887,29 @@ module.exports = {
     const data = req.body
     console.log(data)
 
+
+     // let query = data.active == true ? sqlQuery1 : sqlQuery2;
+     let sqlQuery15 = `select oldsession from accountclosure where oldsession ='${data.oldsession}'`;
+
+     //get new session accountid 
+     const promise15 = await new Promise((resolve, reject) => {
+       pool.query(sqlQuery15, (error, result) => {
+         if (error) {
+           console.log(error)
+           console.log(
+             `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch fee by id`
+           );
+           return res
+             .status(500)
+             .json({ success: 0, error: "internal server error", message: error });
+         }
+         console.log(`${req.method} ${req.originalUrl}, fetch fee by id`);
+         resolve(result)
+       });
+     });
+console.log(promise15)
+    if (promise15.length != 0) return res.status(200).json({ success: 2, Message: "Account Already Closed For Session", });
+
     let code = "session_" + createHash(9);
     // // if(data.active == true){
     // let sqlQuery1 = `update session set active ='false'`;
@@ -915,7 +938,7 @@ module.exports = {
     let val = await promise1
     console.log(val)
     console.log('llllllllllllllllllll')
-    
+
     //update activeaccount session id
     let sqlQuery = `update session set activeaccountid =  '${val[0].sessionaccountid}',activesessionname = '${data.newsession}'`;
     const promise2 = await new Promise((resolve, reject) => {
@@ -1094,7 +1117,7 @@ LIMIT 1;`;
                     const promise = await new Promise((resolve, reject) => {
 
                       pool.query(sqlQuery4, (error, result) => {
-                        if(error){
+                        if (error) {
                           console.log('account closure recorded')
                           console.log(error)
 
@@ -1186,7 +1209,7 @@ LIMIT 1;`;
                 const promise = await new Promise((resolve, reject) => {
 
                   pool.query(sqlQuery4, (error, result) => {
-                    if(error){
+                    if (error) {
                       console.log('account closure recorded')
                       console.log(error)
 
@@ -1652,6 +1675,56 @@ LIMIT 1;`;
     res.status(200).json({ success: 1, data: gold });
 
     console.log(gold)
+  },
+  getstudentsessionrecord: async (req, res) => {
+    const data = req.body
+
+
+    let sqlQuery3 = `select sessionaccountid  from session where sessionname='${data.session}'`;
+    const promise3 = await new Promise((resolve, reject) => {
+
+      pool.query(sqlQuery3, async (error, result) => {
+        if (error) {
+          console.log(
+            `${req.method} ${req.originalUrl}, 'server error', fetch accountid error`
+          );
+
+          return res
+            .status(500)
+            .json({ success: 0, error: "internal server error", message: error });
+        }
+
+        // console.log(result)
+        resolve(result)
+      })
+      return resolve
+
+    });
+    let acctid = promise3[0].sessionaccountid
+    console.log()
+    let sqlQuery = `select * from feepaymentrecords  where student_id = '${data.id}' and activeaccountid =  '${acctid}'  order by date desc limit  10`;
+    pool.query(sqlQuery, (error, result) => {
+      if (error) {
+        console.log(
+          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch fee by id`
+        );
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error", message: error });
+      }
+
+      if (!result) {
+        console.log(
+          `${req.method} ${req.originalUrl}, fetch fee by id: no record found`
+        );
+        return res.status(200).json({
+          success: 1,
+          data: [],
+        });
+      }
+      console.log(`${req.method} ${req.originalUrl}, fetch fee by id`);
+      res.status(200).json({ success: 1, data: result });
+    });
   },
   getstudentrecord: (req, res) => {
     const id = req.body.id
@@ -2476,8 +2549,8 @@ LIMIT 1;`;
                 .json({ success: 1, message: "Internal server", error: error });
             }
             resolve(result);
-          
-           
+
+
 
           });
         });
@@ -2488,7 +2561,7 @@ LIMIT 1;`;
 
     }
     //register in log
-    FeeGenerateLog(data,'All Students','All Classes')
+    FeeGenerateLog(data, 'All Students', 'All Classes')
     //  backup account data
     // const promise5 = await new Promise((resolve, reject) => {
     //   let sqlQuery = `SHOW TABLES LIKE '${data.prev}'`;
@@ -2603,7 +2676,7 @@ LIMIT 1;`;
           //   date,
           //   "Generating fee for all Classes"
           // );
-          FeeGenerateLog(data,'Single Student',id)
+          FeeGenerateLog(data, 'Single Student', id)
           res
             .status(200)
             .json({ success: 7, message: "Fees Generated Successfully" });
@@ -2767,7 +2840,7 @@ LIMIT 1;`;
             //   date,
             //   "Generating fee for all Classes"
             // );
-          
+
 
           });
         });
@@ -2778,7 +2851,7 @@ LIMIT 1;`;
 
     }
     let val = data.clazz
-    FeeGenerateLog(data,'Class(es)',val)
+    FeeGenerateLog(data, 'Class(es)', val)
     res
       .status(200)
       .json({ success: 1, message: "Fees Generated Successfully", data: data.clazz });
@@ -2819,7 +2892,7 @@ LIMIT 1;`;
       pool.query(sqlQuery, (error, result) => {
         res.status(200).json({ success: 1, data: result });
       });
-      AssignFeeLog(data.createdby,data.class)
+      AssignFeeLog(data.createdby, data.class)
       console.log("Fees Assign logged Successfully");
     }
 
@@ -3123,7 +3196,7 @@ LIMIT 1;`;
   },
   deleteSinglefee: (req, res) => {
     const id = req.params.id;
-    let sqlQuery = `delete from fee where id = ${id}`;
+    let sqlQuery = `delete from fee where id = '${id}'`;
     // let sqlQuery = `delete from fee`;
 
     pool.query(sqlQuery, (error, result) => {
@@ -3145,14 +3218,11 @@ LIMIT 1;`;
           error: "delete fee by id: no fee record found",
         });
       }
-      if (result.affectedRows == 1) {
         if (result.affectedRows == 1) {
-          let sqlQuery = `select * from fee  where isActive = 'true'`;
-          pool.query(sqlQuery, (error, result) => {
-            res.status(200).json({ success: 1, data: result });
-          });
+          
+            res.status(200).json({ success: 1 });
         }
-      }
+      
     });
   },
 
@@ -3274,7 +3344,7 @@ LIMIT 1;`;
           .json({ success: 0, error: "internal server error", message: error });
       }
 
-      if (result.affectedRows != 1) {
+      if (result.affectedRows == 0) {
         console.log(
           `${req.method} ${req.originalUrl}, delete fee Cartegory by  id: no fee Cartegory record found`
         );
@@ -3284,11 +3354,9 @@ LIMIT 1;`;
           message: error,
         });
       }
-      if (result.affectedRows == 1) {
-        let sqlQuery = `select * from feesgroup `;
-        pool.query(sqlQuery, (error, result) => {
+      if (result.affectedRows ) {
+       
           res.status(200).json({ success: 1, data: result });
-        });
       }
     });
   },
