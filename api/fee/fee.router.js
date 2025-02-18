@@ -53,7 +53,10 @@ const {
   getAllassignlog,
   generatefeerecord,
   getstudentsessionrecord,
-  sessionaccountrecords
+  clearlog,
+  getclearlog,
+  sessionaccountrecords,
+  fetchaccountUpdate
 } = require("./fee.controller");
 
 router.get("/", getAllfee);
@@ -78,6 +81,10 @@ router.get("/currentopenedaccount", currentopenedaccount);
 router.get("/scholarship", getScholarship);
 
 router.get("/paymentrecords", getPaymentRecords);
+router.post("/clearlog", clearlog);
+router.get("/clearlog", getclearlog);
+
+
 
 router.post("/reversefee", reversefeepayment);
 
@@ -104,13 +111,14 @@ router.post("/cartitemdel", cartitemdel);
 router.post("/paymentscholarshiprecords", paymentWithscholarship);
 
 
-router.post("/feespaidsession",  feespaidsession);
-router.post("/closeaccount",  closeaccount);
-router.post("/sessionaccountrecords",  sessionaccountrecords);
+router.post("/feespaidsession", feespaidsession);
+router.post("/closeaccount", closeaccount);
+router.post("/sessionaccountrecords", sessionaccountrecords);
+router.post("/fetchaccountUpdate", fetchaccountUpdate);
+
 
 router.post("/getsinglebill", getsinglebill);
 router.post("/getbulkbill", getbulkbill);
-
 
 
 router.get("/feerecordgroup", getfeerecordgroup);

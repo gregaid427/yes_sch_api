@@ -563,6 +563,19 @@ function FeeGenerateLog(data, entity, description) {
     console.log("financelog logged successfully");
   });
 }
+
+function UpdateAccountLog(data) {
+  let sqlQuery = `insert into accountupdatelog (createdby,createdat,balance,activity,arrears) values
+     ('${data.createdby}','${date}','${data.balance}','${data.activity}','${data.arrears}')`;
+
+  pool.query(sqlQuery, (error, results, fields) => {
+    if (error) {
+      console.log(error);
+      return console.log("Update log error");
+    }
+    console.log("update  logged successfully");
+  });
+}
 function AssignFeeLog(createdby, entity) {
   let sqlQuery = `insert into assignfeelog (createdby,createdat,entity) values
      ('${createdby}','${date}','${entity}')`;
@@ -708,8 +721,25 @@ module.exports = {
     const data = req.body;
     console.log(data);
 
-    let sqlQuery = `update student set scholarship = '${data.amount}' where student_id ='${data.id}' `;
+    //delete existing scholardhip for studrnt before inserting 
+    const promise8 = await new Promise((resolve, reject) => {
 
+      let sqlQuery3 = `delete from scholarshipenroll where student_id ='${data.id}' `;
+
+      pool.query(sqlQuery3, (error, result) => {
+        if (error) {
+          console.log(
+            `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, create enroll scholarship`
+          );
+
+        }
+        resolve(result)
+
+      });
+    });
+    let bb = promise8
+
+    let sqlQuery = `update student set scholarship = '${data.amount}', accountbalance = '${data.accountbalance}' where student_id ='${data.id}' `;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(
@@ -888,26 +918,26 @@ module.exports = {
     console.log(data)
 
 
-     // let query = data.active == true ? sqlQuery1 : sqlQuery2;
-     let sqlQuery15 = `select oldsession from accountclosure where oldsession ='${data.oldsession}'`;
+    // let query = data.active == true ? sqlQuery1 : sqlQuery2;
+    let sqlQuery15 = `select oldsession from accountclosure where oldsession ='${data.oldsession}'`;
 
-     //get new session accountid 
-     const promise15 = await new Promise((resolve, reject) => {
-       pool.query(sqlQuery15, (error, result) => {
-         if (error) {
-           console.log(error)
-           console.log(
-             `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch fee by id`
-           );
-           return res
-             .status(500)
-             .json({ success: 0, error: "internal server error", message: error });
-         }
-         console.log(`${req.method} ${req.originalUrl}, fetch fee by id`);
-         resolve(result)
-       });
-     });
-console.log(promise15)
+    //get new session accountid 
+    const promise15 = await new Promise((resolve, reject) => {
+      pool.query(sqlQuery15, (error, result) => {
+        if (error) {
+          console.log(error)
+          console.log(
+            `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch fee by id`
+          );
+          return res
+            .status(500)
+            .json({ success: 0, error: "internal server error", message: error });
+        }
+        console.log(`${req.method} ${req.originalUrl}, fetch fee by id`);
+        resolve(result)
+      });
+    });
+    console.log(promise15)
     if (promise15.length != 0) return res.status(200).json({ success: 2, Message: "Account Already Closed For Session", });
 
     let code = "session_" + createHash(9);
@@ -1784,6 +1814,22 @@ LIMIT 1;`;
       res.status(200).json({ success: 1, data: result });
     });
   },
+  fetchaccountUpdate: (req, res) => {
+    const id = parseInt(req.params.fee_id);
+    let sqlQuery = `SELECT * FROM accountupdatelog  order by id desc limit 50`;
+    pool.query(sqlQuery, (error, result) => {
+      if (error) {
+        console.log(
+          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch fee by id`
+        );
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error", message: error });
+      }
+      console.log(`${req.method} ${req.originalUrl}, fetch fee by id`);
+      res.status(200).json({ success: 1, data: result });
+    });
+  },
   getfeeById: (req, res) => {
     const id = parseInt(req.params.fee_id);
     let sqlQuery = `select * from fee where fee_id = ${id}`;
@@ -1838,7 +1884,7 @@ LIMIT 1;`;
       for (let i = 0; i < info.length; i++) {
         let sdtID = info[i].student_id;
 
-        let sqlQuery6 = `update student set accountbalance = '${data.amount}' where student_id = '${sdtID}'`;
+        let sqlQuery6 = data.type == 'custom' ? `update student set accountbalance = '${data.amount}' where student_id = '${sdtID}'` : `update student set accountbalance = '0',arrears='0', scholarship ='0',feepayable ='0',amountpaid ='0' where student_id = '${sdtID}'`;;
 
         async function resetfeepayable(sqlQuery6) {
           const promise3 = await new Promise((resolve, reject) => {
@@ -1861,6 +1907,15 @@ LIMIT 1;`;
 
         if (i == info.length - 1) {
           resolve(gg);
+          let val = {
+            createdby: data.createdby,
+            createdat: date,
+            activity: data.type == 'custom' ? 'Update Class(es) account bal' : 'Reset class(es) Account to ) bal',
+            balance: data.amount,
+            arrears: '-'
+
+          }
+          UpdateAccountLog(val)
           res
             .status(200)
             .json({ success: 1, message: "All Accounts Updated successfully" });
@@ -1892,6 +1947,17 @@ LIMIT 1;`;
         `${req.method} ${req.originalUrl},'success', reset all account`
       );
 
+      let val = {
+        createdby: data.createdby,
+        createdat: date,
+        activity: 'Update All Students Account Bal',
+        balance: data.amount,
+        arrears: '-'
+
+      }
+
+
+      UpdateAccountLog(val)
       res
         .status(200)
         .json({ success: 1, message: "All Accounts Updated successfully" });
@@ -2236,9 +2302,99 @@ LIMIT 1;`;
       console.log(
         `${req.method} ${req.originalUrl},'success', 'revoked scholarship`
       );
-      if (result.affectedRows == 1) {
-        res.status(200).json({ success: 1, data: "Revoked Successfully" });
+      if (result.affectedRows) {
+
+        let sqlQuery = `update student set scholarship = 0 where student_id ='${data.id}' `;
+        pool.query(sqlQuery, (error, result) => {
+          if (error) {
+            console.log(
+              `${req.method} ${req.originalUrl}, 'server error', fetch all fee`
+            );
+
+            return res
+              .status(500)
+              .json({ success: 0, error: "internal server error", message: error });
+          }
+
+          let sqlQuery = `select scholarshipenroll.*, student.class, student.firstName,student.lastName, student.otherName from scholarshipenroll left join student on scholarshipenroll.student_id = student.student_id`;
+
+          pool.query(sqlQuery, (error, result) => {
+            if (error) {
+              console.log(
+                `${req.method} ${req.originalUrl}, 'server error', fetch all fee`
+              );
+
+              return res
+                .status(500)
+                .json({ success: 0, error: "internal server error", message: error });
+            }
+            res.status(200).json({ success: 1, data: result });
+
+          });
+        });
+
+
       }
+    });
+  },
+
+
+  clearlog: async (req, res) => {
+    let data = req.body;
+    console.log(data)
+    async function query(data) {
+      if (data.log == "assignfee") {
+
+        return `Truncate Table assignfeelog`;
+      }
+      if (data.log == "generatefee") {
+        return `Truncate Table feegeneraterecord`;
+      }
+      if (data.log == "accountclosure") {
+        return `Truncate Table accountclosure`;
+
+      }
+      if (data.log == "accountupdate") {
+        return `Truncate Table accountupdatelog`;
+
+      }
+    }
+
+    pool.query(await query(data), async (error, result) => {
+      if (error) {
+        console.log(`${req.method} ${error}, 'server error', fetch all fee`);
+        console.log(error)
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error", message: error });
+      }
+
+      console.log(
+        `${req.method} ${req.originalUrl},'success', fetch scholarship list`
+      );
+      let sqlQuery = `insert into clearlog (createdby,createdat,activity) values
+      ('${data.createdBy}','${date}','${data.log}')`;
+      pool.query(sqlQuery, (error, result) => {
+        console.log(result);
+        res.status(200).json({ success: 1, });
+      });
+    });
+
+  },
+  getclearlog: (req, res) => {
+    const id = parseInt(req.params.fee_id);
+    let sqlQuery = `SELECT * FROM clearlog  order by id desc limit 50`;
+    pool.query(sqlQuery, (error, result) => {
+      if (error) {
+        console.log(
+          `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch fee by id`
+        );
+        return res
+          .status(500)
+          .json({ success: 0, error: "internal server error", message: error });
+      }
+      console.log(`${req.method} ${req.originalUrl}, fetch fee by id`);
+      res.status(200).json({ success: 1, data: result });
     });
   },
   getScholarshipEnroll: async (req, res) => {
@@ -3115,7 +3271,7 @@ LIMIT 1;`;
     let date = new Date();
     date = date.toLocaleDateString("en-CA");
     let data = req.body;
-    let sqlQuery = `update student  set accountbalance ='${data.amount}' where student_id='${data.id}'`;
+    let sqlQuery = `update student  set accountbalance ='${data.amount}',arrears ='${data.arrears}' where student_id='${data.id}'`;
 
     pool.query(sqlQuery, (error, result) => {
       if (error) {
@@ -3132,8 +3288,18 @@ LIMIT 1;`;
           `${req.method} ${req.originalUrl}, update fee data: no record found`
         );
       }
+      let val = {
+        createdby: data.collectedby,
+        createdat: date,
+        activity: 'Update Student Account Bal & Arrears',
+        balance: data.amount,
+        arrears: data.arrears
 
+      }
       if (result.affectedRows == 1) {
+
+
+        UpdateAccountLog(val)
         let data = req.body;
         let sqlQuery = `insert into feepaymentrecords (student_id,amountinvolved,activity,date,collectedby,class) values
         ('${data.id}','${data.amount}','Update Balance','${date}','${data.collectedby}','${data.class}')`;
@@ -3218,11 +3384,11 @@ LIMIT 1;`;
           error: "delete fee by id: no fee record found",
         });
       }
-        if (result.affectedRows == 1) {
-          
-            res.status(200).json({ success: 1 });
-        }
-      
+      if (result.affectedRows == 1) {
+
+        res.status(200).json({ success: 1 });
+      }
+
     });
   },
 
@@ -3354,9 +3520,9 @@ LIMIT 1;`;
           message: error,
         });
       }
-      if (result.affectedRows ) {
-       
-          res.status(200).json({ success: 1, data: result });
+      if (result.affectedRows) {
+
+        res.status(200).json({ success: 1, data: result });
       }
     });
   },

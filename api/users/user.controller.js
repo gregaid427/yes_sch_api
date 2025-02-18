@@ -831,7 +831,7 @@ module.exports = {
         //   `${req.originalUrl},'DB error:'${err.sqlMessage}, server error`
         // );
         console.log('kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk')
-        return res.status(500).json({
+        return res.status(200).json({
           success: 0,
           message: "Database Connection Error",
           data: [],
