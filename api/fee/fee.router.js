@@ -114,7 +114,7 @@ router.post("/paymentscholarshiprecords", paymentWithscholarship);
 router.post("/feespaidsession", feespaidsession);
 router.post("/closeaccount", closeaccount);
 router.post("/sessionaccountrecords", sessionaccountrecords);
-router.post("/fetchaccountUpdate", fetchaccountUpdate);
+router.get("/fetchaccountUpdate", fetchaccountUpdate);
 
 
 router.post("/getsinglebill", getsinglebill);
