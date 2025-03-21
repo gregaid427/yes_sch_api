@@ -694,7 +694,7 @@ module.exports = {
     console.log(data);
 
     let sqlQuery = `insert into scholarshiplist (title,amount,CreatedBy,createdAt,percent,applicable,type) values
-   ('${data.title}','${data.amount}','${data.CreatedBy}','${date}','${data.percent}','${data.applicable}','${data.type}')`;
+   ('${data.title}','${data.amount}','${data.Createdby}','${date}','${data.percent}','${data.applicable}','${data.type}')`;
 
     pool.query(sqlQuery, (error, result) => {
       if (error) {
@@ -738,8 +738,7 @@ module.exports = {
       });
     });
     let bb = promise8
-
-    let sqlQuery = `update student set scholarship = '${data.amount}', accountbalance = '${data.accountbalance}' where student_id ='${data.id}' `;
+    let sqlQuery = `update student set scholarship = '${data.amount}',feepayable = '${data.feepayable}', accountbalance = '${data.accountbalance}' where student_id ='${data.id}' `;
     pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(
@@ -1884,7 +1883,7 @@ LIMIT 1;`;
       for (let i = 0; i < info.length; i++) {
         let sdtID = info[i].student_id;
 
-        let sqlQuery6 = data.type == 'custom' ? `update student set accountbalance = '${data.amount}' where student_id = '${sdtID}'` : `update student set accountbalance = '0',arrears='0', scholarship ='0',feepayable ='0',amountpaid ='0' where student_id = '${sdtID}'`;;
+        let sqlQuery6 = data.type == 'custom' ? `update student set accountbalance = '${data.amount}' where student_id = '${sdtID}'` : `update student set accountbalance = '0',arrears='0',feepayable ='0',amountpaid ='0' where student_id = '${sdtID}'`;;
 
         async function resetfeepayable(sqlQuery6) {
           const promise3 = await new Promise((resolve, reject) => {
@@ -2683,12 +2682,15 @@ LIMIT 1;`;
 
 
         let scholarship = info[0].scholarship;
-        let value = assign;
+               let value = eval(assign - info[0].scholarship);
+
         let bal = info[0].accountbalance;
 
 
+
+
         let amount = eval(
-          parseFloat(bal) + parseFloat(value) - parseFloat(scholarship)
+           parseFloat(bal) + parseFloat(value) 
         );
         console.log("amount");
         console.log(amount);
@@ -2802,15 +2804,24 @@ LIMIT 1;`;
 
 
       let scholarship = info[0].scholarship;
-      let value = assign;
-      let bal = info[0].accountbalance;
+             let value = eval(assign - info[0].scholarship);
 
+      let bal = info[0].accountbalance;
+      let arrears = info[0].arrears;
+
+
+      console.log('bala' + bal)
+      console.log( 'assing ' +value)
+      console.log('scholarship' +scholarship)
+      console.log('arrears' + arrears)
+      console.log()
 
       let amount = eval(
-        parseFloat(bal) + parseFloat(value) - parseFloat(scholarship)
+         parseFloat(bal) + parseFloat(value)  
       );
       console.log("amount");
       console.log(amount);
+
 
       let sqlQuery6 = `update student set arrears = '${bal}', accountbalance ='${amount}',feegeneratecode  ='${code}', feegeneratedate = '${date}', feegenerateforsession = '${data.session}',feepayable = '${value}' where student_id = '${id}'`;
 
@@ -2966,12 +2977,13 @@ LIMIT 1;`;
 
 
         let scholarship = info[0].scholarship;
-        let value = assign;
+               let value = eval(assign - info[0].scholarship);
+
         let bal = info[0].accountbalance;
 
 
         let amount = eval(
-          parseFloat(bal) + parseFloat(value) - parseFloat(scholarship)
+           parseFloat(bal) + parseFloat(value) 
         );
         console.log("amount");
         console.log(amount);
@@ -3191,6 +3203,10 @@ LIMIT 1;`;
       }
 
       if (results.affectedRows == 1) {
+
+
+
+
         let sqlQuery = `select student.*, account.preference  from student left join account on student.student_id = account.student_id   where student.class='${data.class}' and student.isActive = 'true'; `;
         pool.query(sqlQuery, (error, result) => {
           res.status(200).json({ success: 1, data: result });
@@ -3271,7 +3287,7 @@ LIMIT 1;`;
     let date = new Date();
     date = date.toLocaleDateString("en-CA");
     let data = req.body;
-    let sqlQuery = `update student  set accountbalance ='${data.amount}',arrears ='${data.arrears}' where student_id='${data.id}'`;
+    let sqlQuery = `update student  set accountbalance ='${data.amount}' where student_id='${data.id}'`;
 
     pool.query(sqlQuery, (error, result) => {
       if (error) {

@@ -26,24 +26,24 @@ var transporter = nodemailer.createTransport({
 });
 
 function getUserByEmail(email, callBack) {
-  
-          try {
-          pool.query(
-    `select * from users where email = ? `,
-    [email],
-    (error, results, fields) => {
-      // if (error) {
-      //   callBack(error);
-      // }
-      if(!results){
-        return callBack(null,null);
 
+  try {
+    pool.query(
+      `select * from users where email = ? `,
+      [email],
+      (error, results, fields) => {
+        // if (error) {
+        //   callBack(error);
+        // }
+        if (!results) {
+          return callBack(null, null);
+
+        }
+        return callBack(null, results[0]);
       }
-      return callBack(null, results[0]);
-    }
-  );
-} catch (error) {
-}
+    );
+  } catch (error) {
+  }
 
 }
 
@@ -53,9 +53,30 @@ var regex = new RegExp("(^|[^" + letters + "])([" + letters + "])", "g");
 
 function capitalizeWords(str1) {
   let str = str1.toLowerCase()
-    return str.replace(regex, function(s, m1, m2) {
-        return m1 + m2.toUpperCase();
-    });
+  return str.replace(regex, function (s, m1, m2) {
+    return m1 + m2.toUpperCase();
+  });
+}
+
+function createScholarship(id, data, createdby) {
+  console.log('functioonnnnnnnnnnnnnnnnnn callllllllllllllll');
+
+  let sqlQuery = `insert into scholarshipenroll (student_id,scholarshiptitle,scholarshipid,createdat,createdby,amount,cartegorycovering) values
+      ('${id}','${data.title}','${data.id}','${date}','${createdby}','${data.amount}','${data.applicable}')`;
+
+  pool.query(sqlQuery, (error, result) => {
+    console.log(sqlQuery);
+    if (error) {
+      console.log(
+        `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, create enroll scholarship`
+      );
+      console.log(error
+      );
+
+
+    }
+
+  })
 }
 
 module.exports = {
@@ -104,106 +125,107 @@ module.exports = {
 
         try {
           pool.query(sqlQuery, (error, result) => {
-          console.log(error);
+            console.log(error);
 
-          /////////////////////// check if initial data insert is successful then proceed to insert general users data
-          if (result.affectedRows == 1) {
-            let sqlQuery1 = `insert into users (userId,email,createdAt,createdBy,pincode,role,password,rolecode ) values
+            /////////////////////// check if initial data insert is successful then proceed to insert general users data
+            if (result.affectedRows == 1) {
+              let sqlQuery1 = `insert into users (userId,email,createdAt,createdBy,pincode,role,password,rolecode ) values
               ('${customStaffId}','${data.email}','${date}','${data.createdBy}',${userPin},'staff','${password}','${data.rolecode}')`;
 
-            try {
-          pool.query(sqlQuery1, (error, result) => {
-              if (error) {
-                // logger.info(
-                //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, create new user -error`
-                // );
-                return res.status(500).json({
-                  success: 0,
-                  error: "internal server error -create New user",
-                });
-              }
+              try {
+                pool.query(sqlQuery1, (error, result) => {
+                  if (error) {
+                    // logger.info(
+                    //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, create new user -error`
+                    // );
+                    return res.status(500).json({
+                      success: 0,
+                      error: "internal server error -create New user",
+                    });
+                  }
 
-              if (result.affectedRows == 1) {
-                console.log("create new user successful");
-                let sqlQuery = `select * from staff left join users on staff.userId = users.userId  where users.role = 'staff'`;
-                try {
-          pool.query(sqlQuery, (error, result) => {
-                  res.status(200).json({ success: 1, data: result });
-                });
-                const signedToken = jwt.sign(
-                  { data: result.email },
-                  process.env.JWT_KEY
-                );
+                  if (result.affectedRows == 1) {
+                    console.log("create new user successful");
+                    let sqlQuery = `select * from staff left join users on staff.userId = users.userId  where users.role = 'staff'`;
+                    try {
+                      pool.query(sqlQuery, (error, result) => {
+                        res.status(200).json({ success: 1, data: result });
+                      });
+                      const signedToken = jwt.sign(
+                        { data: result.email },
+                        process.env.JWT_KEY
+                      );
 
-                // send mail to user email
-                var mailOptions = {
-                  from: 'Yes School Support "seedo@seedogh.com"',
-                  to: result.email,
-                  subject: "Email Verification",
-                  html: `<h2>Thanks for registering on our Platform</h2>
+                      // send mail to user email
+                      var mailOptions = {
+                        from: 'Yes School Support "seedo@seedogh.com"',
+                        to: result.email,
+                        subject: "Email Verification",
+                        html: `<h2>Thanks for registering on our Platform</h2>
                       <h4>Kindly click on the link below to verify your account</h2>
         
                       
                           <a href=" https://optimumpay.vercel.app/admin9/${result.email}/verify/${signedToken}" >click this link to verify Email </a>`,
-                };
-                transporter.sendMail(mailOptions, function (error, info) {
-                  const jsontoken = sign(
-                    { result: result.userId },
-                    process.env.JWT_KEY3
-                  );
+                      };
+                      transporter.sendMail(mailOptions, function (error, info) {
+                        const jsontoken = sign(
+                          { result: result.userId },
+                          process.env.JWT_KEY3
+                        );
 
-                  // if (error) {
-                  //   console.log("mail not sent");
-                  //   console.log(signedToken);
-                  //   result.password = "";
-                  //   return res.status(200).json({
-                  //     success: 1,
-                  //     message: "sign up  successful",
-                  //     userPin: userPin,
-                  //     data: logInfo,
-                  //     access_token: jsontoken,
-                  //     Verification_mail: "mail not sent - network Connectivity",
-                  //   });
-                  // } else {
-                  //   console.log("verification mail sent");
-                  //   return res.status(200).json({
-                  //     success: 1,
-                  //     message: "sign up successful",
-                  //     data: logInfo,
-                  //     access_token: jsontoken,
-                  //     Verification_mail: "mail sent",
-                  //     userPin: userPin,
-                  //   });
-                  // }
+                        // if (error) {
+                        //   console.log("mail not sent");
+                        //   console.log(signedToken);
+                        //   result.password = "";
+                        //   return res.status(200).json({
+                        //     success: 1,
+                        //     message: "sign up  successful",
+                        //     userPin: userPin,
+                        //     data: logInfo,
+                        //     access_token: jsontoken,
+                        //     Verification_mail: "mail not sent - network Connectivity",
+                        //   });
+                        // } else {
+                        //   console.log("verification mail sent");
+                        //   return res.status(200).json({
+                        //     success: 1,
+                        //     message: "sign up successful",
+                        //     data: logInfo,
+                        //     access_token: jsontoken,
+                        //     Verification_mail: "mail sent",
+                        //     userPin: userPin,
+                        //   });
+                        // }
+                      });
+                    } catch (error) {
+                    }
+                  }
+
+
+
+
+                  else
+                    res.status(500).json({
+                      success: 0,
+                      error: "internal server error",
+                      message: error,
+                    });
                 });
-              } catch (error) {
+              }
+              catch (error) {
               }
             }
 
-           
-            
-          
-           else
-            res.status(500).json({
-              success: 0,
-              error: "internal server error",
-              message: error,
-            });
-           });
-             }
-            catch (error) {
-             }
-            }
-    
           });
-  
-         }
-          catch (error) {
-        
+
         }
+        catch (error) {
+
         }
-})  } ,
-  
+      }
+    })
+  },
+
 
   setStudentPicture: async (req, res) => {
     await uploadFile(req, res);
@@ -215,24 +237,25 @@ module.exports = {
      where userId = '${data.id}' `;
 
     try {
-          pool.query(sqlQuery, (error, result) => {
-      console.log(result);
-      console.log(error);
+      pool.query(sqlQuery, (error, result) => {
+        console.log(result);
+        console.log(error);
 
-      if (error) {
-        return res
-          .status(500)
-          .json({ success: 0, Message: "Error Uploadeding Image" });
-      }
+        if (error) {
+          return res
+            .status(500)
+            .json({ success: 0, Message: "Error Uploadeding Image" });
+        }
 
-      if (result.affectedRows == 1) {
-        return res
-          .status(200)
-          .json({ success: 1, Message: "Student Image Uploaded Successfully" });
-      }
-    
-  })  }
-  catch (error) {
+        if (result.affectedRows == 1) {
+          return res
+            .status(200)
+            .json({ success: 1, Message: "Student Image Uploaded Successfully" });
+        }
+
+      })
+    }
+    catch (error) {
     }
   },
 
@@ -245,25 +268,27 @@ module.exports = {
      where id = '1' `;
 
     try {
-          pool.query(sqlQuery, (error, result) => {
-      //  console.log()
-      if (error)
-        return res
-          .status(500)
-          .json({ success: 0, Message: "Error Uploadeding Image" });
+      pool.query(sqlQuery, (error, result) => {
+        //  console.log()
+        if (error)
+          return res
+            .status(500)
+            .json({ success: 0, Message: "Error Uploadeding Image" });
 
-      if (result.affectedRows == 1) {
-        return res
-          .status(200)
-          .json({ success: 1, Message: "Student Image Uploaded Successfully" });
-      }
-    });
-  }
-  catch (error) {
+        if (result.affectedRows == 1) {
+          return res
+            .status(200)
+            .json({ success: 1, Message: "Student Image Uploaded Successfully" });
+        }
+      });
+    }
+    catch (error) {
     }
   },
 
   createUserStudent: async (req, res) => {
+
+
     const data = req.body;
     const saltRounds = 10;
 
@@ -290,293 +315,298 @@ module.exports = {
       customStudentId,
       customguardian1Id,
       customguardian2Id,
-      sqlQueryAccount
+      sqlQueryAccount,
+      studentid
     ) {
       // first create student into student table
       try {
-          pool.query(sqlQuery, (error, result) => {
-        if (error) return console.log(error);
+        pool.query(sqlQuery, (error, result) => {
+          if (error) return console.log(error);
+          /////////////////////// check if initial data insert is successful then proceed to insert general users data
+          let GeneratedEmail = data.firstName + createHash(4);
+          let GeneratedEmail1 = data.gfName1.toString() + createHash(4);
+          let GeneratedEmail2 = data.gfName2.toString() + createHash(4);
 
-        /////////////////////// check if initial data insert is successful then proceed to insert general users data
-        let GeneratedEmail = data.firstName + createHash(4);
-        let GeneratedEmail1 = data.gfName1.toString() + createHash(4);
-        let GeneratedEmail2 = data.gfName2.toString() + createHash(4);
+          data.email = GeneratedEmail.toLowerCase();
 
-        data.email = GeneratedEmail.toLowerCase();
+          data.gemail1 =
+            data.gemail1 == "" ? GeneratedEmail1.toLowerCase() : data.gemail1;
 
-        data.gemail1 =
-          data.gemail1 == "" ? GeneratedEmail1.toLowerCase() : data.gemail1;
-
-        data.gemail2 =
-          data.gemail2 == "" ? GeneratedEmail2.toLowerCase() : data.gemail2;
-        console.log(customStudentId + customguardian1Id + customguardian2Id);
-        if (result.affectedRows == 1) {
-          // insert first guardian into users table
-          if (data.gfName1 != "") {
-            let sqlQuery1 = `insert into users (email,createdAt,createdBy,pincode,role,password ,userId,pass) values
+          data.gemail2 =
+            data.gemail2 == "" ? GeneratedEmail2.toLowerCase() : data.gemail2;
+          console.log(customStudentId + customguardian1Id + customguardian2Id);
+          if (result.affectedRows == 1) {
+            // insert first guardian into users table
+            if (data.gfName1 != "") {
+              let sqlQuery1 = `insert into users (email,createdAt,createdBy,pincode,role,password ,userId,pass) values
           ('${data.gemail1}','${date}','${data.createdBy}',${userPin1},'parent','${hashedPass1}','${customguardian1Id}','${gaurdian2Pass}')`;
 
-            try {
-          pool.query(sqlQuery1, (error, result) => {
-              if (error) {
-                console.log("guardian 1 error");
-                return res.status(500).json({ success: 0, Message: error });
-              }
-
-              if (result.affectedRows == 1) {
-                const signedToken = jwt.sign(
-                  { data: result.email },
-                  process.env.JWT_KEY
-                );
-
-                // send mail to user email
-                // var mailOptions = {
-                //   from: 'Sentel Support "seedo@seedogh.com"',
-                //   to: result.email,
-                //   subject: "Email Verification",
-                //   html: `<h2>Thanks for registering on our Platform</h2>
-                //     <h4>Kindly click on the link below to verify your account</h2>
-
-                //         <a href=" https://optimumpay.vercel.app/admin9/${result.email}/verify/${signedToken}" >click this link to verify Email </a>`,
-                // };
-                // transporter.sendMail(mailOptions, function (error, info) {
-                //   const jsontoken = sign(
-                //     { result: result.userId },
-                //     process.env.JWT_KEY3
-                //   );
-
-                //   let logInfo;
-                //   if (data.role == "student") {
-                //     logInfo = { user: data.email, pass: data.password };
-                //   } else {
-                //     logInfo = "";
-                //   }
-                //   if (error) {
-                //     console.log("mail not sent");
-                //     console.log(signedToken);
-                //     result.password = "";
-                //     return res.status(200).json({
-                //       success: 1,
-                //       message: "sign up  successful",
-                //       userPin: userPin,
-                //       data: logInfo,
-                //       access_token: jsontoken,
-                //       Verification_mail: "mail not sent - network Connectivity",
-                //     });
-                //   } else {
-                //     console.log("verification mail sent");
-                //     return res.status(200).json({
-                //       success: 1,
-                //       message: "sign up successful",
-                //       data: logInfo,
-                //       access_token: jsontoken,
-                //       Verification_mail: "mail sent",
-                //       userPin: userPin,
-                //     });
-                //   }
-                // });
-              }
-            });
-          }
-          catch (error) {
-            }
-          }
-
-          // insert second guardian into users table
-          if (data.gfName2 != "") {
-            let sqlQuery1 = `insert into users (email,createdAt,createdBy,pincode,role,password,userId,pass ) values
-          ('${data.gemail2}','${date}','${data.createdBy}',${userPin1},'parent','${hashedPass2}','${customguardian2Id}','${gaurdian2Pass}')`;
-
-            try {
-          pool.query(sqlQuery1, (error, result) => {
-              if (error) {
-                console.log("parent1 success");
-                return res.status(500).json({ success: 0, Message: error });
-              }
-
-              if (result.affectedRows == 1) {
-                const signedToken = jwt.sign(
-                  { data: result.email },
-                  process.env.JWT_KEY
-                );
-
-                // send mail to user email
-                // var mailOptions = {
-                //   from: 'Sentel Support "seedo@seedogh.com"',
-                //   to: result.email,
-                //   subject: "Email Verification",
-                //   html: `<h2>Thanks for registering on our Platform</h2>
-                //     <h4>Kindly click on the link below to verify your account</h2>
-
-                //         <a href=" https://optimumpay.vercel.app/admin9/${result.email}/verify/${signedToken}" >click this link to verify Email </a>`,
-                // };
-                // transporter.sendMail(mailOptions, function (error, info) {
-                //   const jsontoken = sign(
-                //     { result: result.userId },
-                //     process.env.JWT_KEY3
-                //   );
-
-                //   let logInfo;
-                //   if (data.role == "student") {
-                //     logInfo = { user: data.email, pass: data.password };
-                //   } else {
-                //     logInfo = "";
-                //   }
-                //   if (error) {
-                //     console.log("mail not sent");
-                //     console.log(signedToken);
-                //     result.password = "";
-                //     return res.status(200).json({
-                //       success: 1,
-                //       message: "sign up  successful",
-                //       userPin: userPin,
-                //       data: logInfo,
-                //       access_token: jsontoken,
-                //       Verification_mail: "mail not sent - network Connectivity",
-                //     });
-                //   } else {
-                //     console.log("verification mail sent");
-                //     return res.status(200).json({
-                //       success: 1,
-                //       message: "sign up successful",
-                //       data: logInfo,
-                //       access_token: jsontoken,
-                //       Verification_mail: "mail sent",
-                //       userPin: userPin,
-                //     });
-                //   }
-                // });
-              }
-            });
-          }
-          catch (error) {
-            }
-          }
-
-          // insert student into users table
-          if (data.firstName != "") {
-            let sqlQuery1 = `insert into users (email,createdAt,createdBy,pincode,role,password,userId,pass) values
-          ('${data.email}','${date}','${data.createdBy}',${userPin},'student','${hashedPass}','${customStudentId}','${studentPass}')`;
-
-            try {
-          pool.query(sqlQuery1, (error, result) => {
-              if (error) {
-                console.log("student eeror error");
-                return res.status(500).json({ success: 0, Message: error });
-              }
-
-              if (result.affectedRows == 1) {
-                try {
-          pool.query(sqlQueryAccount, (error, result) => {
+              try {
+                pool.query(sqlQuery1, (error, result) => {
                   if (error) {
-                    console.log("student account error");
-                    console.log(error);
-
+                    console.log("guardian 1 error");
                     return res.status(500).json({ success: 0, Message: error });
+                  }
+
+                  if (result.affectedRows == 1) {
+
+
+                    const signedToken = jwt.sign(
+                      { data: result.email },
+                      process.env.JWT_KEY
+                    );
+
+                    // send mail to user email
+                    // var mailOptions = {
+                    //   from: 'Sentel Support "seedo@seedogh.com"',
+                    //   to: result.email,
+                    //   subject: "Email Verification",
+                    //   html: `<h2>Thanks for registering on our Platform</h2>
+                    //     <h4>Kindly click on the link below to verify your account</h2>
+
+                    //         <a href=" https://optimumpay.vercel.app/admin9/${result.email}/verify/${signedToken}" >click this link to verify Email </a>`,
+                    // };
+                    // transporter.sendMail(mailOptions, function (error, info) {
+                    //   const jsontoken = sign(
+                    //     { result: result.userId },
+                    //     process.env.JWT_KEY3
+                    //   );
+
+                    //   let logInfo;
+                    //   if (data.role == "student") {
+                    //     logInfo = { user: data.email, pass: data.password };
+                    //   } else {
+                    //     logInfo = "";
+                    //   }
+                    //   if (error) {
+                    //     console.log("mail not sent");
+                    //     console.log(signedToken);
+                    //     result.password = "";
+                    //     return res.status(200).json({
+                    //       success: 1,
+                    //       message: "sign up  successful",
+                    //       userPin: userPin,
+                    //       data: logInfo,
+                    //       access_token: jsontoken,
+                    //       Verification_mail: "mail not sent - network Connectivity",
+                    //     });
+                    //   } else {
+                    //     console.log("verification mail sent");
+                    //     return res.status(200).json({
+                    //       success: 1,
+                    //       message: "sign up successful",
+                    //       data: logInfo,
+                    //       access_token: jsontoken,
+                    //       Verification_mail: "mail sent",
+                    //       userPin: userPin,
+                    //     });
+                    //   }
+                    // });
                   }
                 });
               }
               catch (error) {
-                }
-
-                const signedToken = jwt.sign(
-                  { data: result.email },
-                  process.env.JWT_KEY
-                );
-
-                // send mail to user email
-                // var mailOptions = {
-                //   from: 'Sentel Support "seedo@seedogh.com"',
-                //   to: result.email,
-                //   subject: "Email Verification",
-                //   html: `<h2>Thanks for registering on our Platform</h2>
-                //     <h4>Kindly click on the link below to verify your account</h2>
-
-                //         <a href=" https://optimumpay.vercel.app/admin9/${result.email}/verify/${signedToken}" >click this link to verify Email </a>`,
-                // };
-                // transporter.sendMail(mailOptions, function (error, info) {
-                //   const jsontoken = sign(
-                //     { result: result.userId },
-                //     process.env.JWT_KEY3
-                //   );
-
-                //   let logInfo;
-                //   if (data.role == "student") {
-                //     logInfo = { user: data.email, pass: data.password };
-                //   } else {
-                //     logInfo = "";
-                //   }
-                //   if (error) {
-                //     console.log("mail not sent");
-                //     console.log(signedToken);
-                //     result.password = "";
-                //     return res.status(200).json({
-                //       success: 1,
-                //       message: "sign up  successful",
-                //       userPin: userPin,
-                //       data: logInfo,
-                //       access_token: jsontoken,
-                //       Verification_mail: "mail not sent - network Connectivity",
-                //     });
-                //   } else {
-                //     console.log("verification mail sent");
-                //     return res.status(200).json({
-                //       success: 1,
-                //       message: "sign up successful",
-                //       data: logInfo,
-                //       access_token: jsontoken,
-                //       Verification_mail: "mail sent",
-                //       userPin: userPin,
-                //     });
-                //   }
-                // });
               }
-            });
-          }
-          catch (error) {
             }
-          }
 
-          let studName =
-            data.firstName + " " + data.otherName + " " + data.lastName;
-          let guardian1 = data.gfName1 + " " + data.glName1;
-          let guardian2 = data.gfName2 + " " + data.glName2;
+            // insert second guardian into users table
+            if (data.gfName2 != "") {
+              let sqlQuery1 = `insert into users (email,createdAt,createdBy,pincode,role,password,userId,pass ) values
+          ('${data.gemail2}','${date}','${data.createdBy}',${userPin1},'parent','${hashedPass2}','${customguardian2Id}','${gaurdian2Pass}')`;
 
-          let dataArray = [
-            {
-              id: customStudentId,
-              studentName: studName,
-              studentEmail: data.email,
-              studentPass: studentPass,
-            },
-            {
-              guardian1Name: guardian1 != " " ? guardian1 : null,
-              guardian1Email: data.gemail1,
-              guardian1Pass: gaurdian1Pass,
-            },
-            {
-              guardian2Name: guardian2 != " " ? guardian2 : null,
-              guardian2Email: data.gemail2,
-              guardian2Pass: gaurdian2Pass,
-            },
-          ];
+              try {
+                pool.query(sqlQuery1, (error, result) => {
+                  if (error) {
+                    console.log("parent1 success");
+                    return res.status(500).json({ success: 0, Message: error });
+                  }
 
-          return res.status(200).json({
-            success: 1,
-            data: dataArray,
-            message: "Student and/or Guardian created successfully",
-          });
-          
-        } else
-          res.status(500).json({
-            success: 0,
-            error: "internal server error",
-            message: error,
-          });
-          
-      });
-    }
-    catch (error) {
+                  if (result.affectedRows == 1) {
+                    const signedToken = jwt.sign(
+                      { data: result.email },
+                      process.env.JWT_KEY
+                    );
+
+                    // send mail to user email
+                    // var mailOptions = {
+                    //   from: 'Sentel Support "seedo@seedogh.com"',
+                    //   to: result.email,
+                    //   subject: "Email Verification",
+                    //   html: `<h2>Thanks for registering on our Platform</h2>
+                    //     <h4>Kindly click on the link below to verify your account</h2>
+
+                    //         <a href=" https://optimumpay.vercel.app/admin9/${result.email}/verify/${signedToken}" >click this link to verify Email </a>`,
+                    // };
+                    // transporter.sendMail(mailOptions, function (error, info) {
+                    //   const jsontoken = sign(
+                    //     { result: result.userId },
+                    //     process.env.JWT_KEY3
+                    //   );
+
+                    //   let logInfo;
+                    //   if (data.role == "student") {
+                    //     logInfo = { user: data.email, pass: data.password };
+                    //   } else {
+                    //     logInfo = "";
+                    //   }
+                    //   if (error) {
+                    //     console.log("mail not sent");
+                    //     console.log(signedToken);
+                    //     result.password = "";
+                    //     return res.status(200).json({
+                    //       success: 1,
+                    //       message: "sign up  successful",
+                    //       userPin: userPin,
+                    //       data: logInfo,
+                    //       access_token: jsontoken,
+                    //       Verification_mail: "mail not sent - network Connectivity",
+                    //     });
+                    //   } else {
+                    //     console.log("verification mail sent");
+                    //     return res.status(200).json({
+                    //       success: 1,
+                    //       message: "sign up successful",
+                    //       data: logInfo,
+                    //       access_token: jsontoken,
+                    //       Verification_mail: "mail sent",
+                    //       userPin: userPin,
+                    //     });
+                    //   }
+                    // });
+                  }
+                });
+              }
+              catch (error) {
+              }
+            }
+
+            // insert student into users table
+            if (data.firstName != "") {
+              let sqlQuery1 = `insert into users (email,createdAt,createdBy,pincode,role,password,userId,pass) values
+          ('${data.email}','${date}','${data.createdBy}',${userPin},'student','${hashedPass}','${customStudentId}','${studentPass}')`;
+
+              try {
+                pool.query(sqlQuery1, (error, result) => {
+                  if (error) {
+                    console.log("student eeror error");
+                    return res.status(500).json({ success: 0, Message: error });
+                  }
+                  if (result.affectedRows == 1) {
+                    try {
+                      pool.query(sqlQueryAccount, (error, result) => {
+                        if (error) {
+                          console.log("student account error");
+                          console.log(error);
+
+                          return res.status(500).json({ success: 0, Message: error });
+                        }
+                        // insert into scholarshipenroll if scholarinfo has data
+                        // if (data.scholarinfo.length) {
+                        //   createScholarship(studentid, data.scholarinfo[0], data.createdBy)
+                        // }
+                      });
+                    }
+                    catch (error) {
+                    }
+
+                    const signedToken = jwt.sign(
+                      { data: result.email },
+                      process.env.JWT_KEY
+                    );
+
+                    // send mail to user email
+                    // var mailOptions = {
+                    //   from: 'Sentel Support "seedo@seedogh.com"',
+                    //   to: result.email,
+                    //   subject: "Email Verification",
+                    //   html: `<h2>Thanks for registering on our Platform</h2>
+                    //     <h4>Kindly click on the link below to verify your account</h2>
+
+                    //         <a href=" https://optimumpay.vercel.app/admin9/${result.email}/verify/${signedToken}" >click this link to verify Email </a>`,
+                    // };
+                    // transporter.sendMail(mailOptions, function (error, info) {
+                    //   const jsontoken = sign(
+                    //     { result: result.userId },
+                    //     process.env.JWT_KEY3
+                    //   );
+
+                    //   let logInfo;
+                    //   if (data.role == "student") {
+                    //     logInfo = { user: data.email, pass: data.password };
+                    //   } else {
+                    //     logInfo = "";
+                    //   }
+                    //   if (error) {
+                    //     console.log("mail not sent");
+                    //     console.log(signedToken);
+                    //     result.password = "";
+                    //     return res.status(200).json({
+                    //       success: 1,
+                    //       message: "sign up  successful",
+                    //       userPin: userPin,
+                    //       data: logInfo,
+                    //       access_token: jsontoken,
+                    //       Verification_mail: "mail not sent - network Connectivity",
+                    //     });
+                    //   } else {
+                    //     console.log("verification mail sent");
+                    //     return res.status(200).json({
+                    //       success: 1,
+                    //       message: "sign up successful",
+                    //       data: logInfo,
+                    //       access_token: jsontoken,
+                    //       Verification_mail: "mail sent",
+                    //       userPin: userPin,
+                    //     });
+                    //   }
+                    // });
+                  }
+                });
+              }
+              catch (error) {
+              }
+            }
+
+            let studName =
+              data.firstName + " " + data.otherName + " " + data.lastName;
+            let guardian1 = data.gfName1 + " " + data.glName1;
+            let guardian2 = data.gfName2 + " " + data.glName2;
+
+            let dataArray = [
+              {
+                id: customStudentId,
+                studentName: studName,
+                studentEmail: data.email,
+                studentPass: studentPass,
+              },
+              {
+                guardian1Name: guardian1 != " " ? guardian1 : null,
+                guardian1Email: data.gemail1,
+                guardian1Pass: gaurdian1Pass,
+              },
+              {
+                guardian2Name: guardian2 != " " ? guardian2 : null,
+                guardian2Email: data.gemail2,
+                guardian2Pass: gaurdian2Pass,
+              },
+            ];
+
+            return res.status(200).json({
+              success: 1,
+              data: dataArray,
+              message: "Student and/or Guardian created successfully",
+            });
+
+          } else
+            res.status(500).json({
+              success: 0,
+              error: "internal server error",
+              message: error,
+            });
+
+        });
+      }
+      catch (error) {
       }
     }
 
@@ -608,72 +638,72 @@ module.exports = {
 
         try {
           pool.query(sqlQuery3, (error, result) => {
-          function myresult() {
-            let val = result[0].student_id;
-            val = val.slice(-4);
-            val = parseInt(val) + 1;
-            return "SD" + partId + val;
-          }
+            function myresult() {
+              let val = result[0].student_id;
+              val = val.slice(-4);
+              val = parseInt(val) + 1;
+              return "SD" + partId + val;
+            }
 
-          // check if db is empty start with a default student_id
-          const student_id = result[0] ? myresult() : "SD" + partId + "1110";
+            // check if db is empty start with a default student_id
+            const student_id = result[0] ? myresult() : "SD" + partId + "1110";
 
-          //inserting to guardian table when guardian info is posted together with student
-          //after generating student id we need it to insert into guardian table for reference
-          if (data.gfName1 != "") {
-            sqlQuery = `insert into guardian (gEmail,gSex,gLastName,gFirstName,gContact1,gContact2,gAddress,student_id,gRelation,userId ) values
+            //inserting to guardian table when guardian info is posted together with student
+            //after generating student id we need it to insert into guardian table for reference
+            if (data.gfName1 != "") {
+              sqlQuery = `insert into guardian (gEmail,gSex,gLastName,gFirstName,gContact1,gContact2,gAddress,student_id,gRelation,userId ) values
               ('${data.gemail1}','${data.gsex1}','${capitalizeWords(data.glName1)}','${capitalizeWords(data.gfName1)}','${data.contact1}','${data.contact2}','${data.gAddress1}','${student_id}','${data.gRelation1}','${customguardian1Id}') `;
-            try {
-          pool.query(sqlQuery, (error, result) => {
-              console.log("guardian1 created successfully");
-            });
-          } catch (error) {
-          }
-            
-          }
+              try {
+                pool.query(sqlQuery, (error, result) => {
+                  console.log("guardian1 created successfully");
+                });
+              } catch (error) {
+              }
 
-          //inserting to guardian table when guardian info is posted together with student
-          //after generating student id we need it to insert into guardian table for reference
-          if (data.gfName2 != "") {
-            sqlQuery = `insert into guardian (gEmail,gSex,gLastName,gFirstName,gContact1,gContact2,gAddress,student_id,gRelation,userId ) values
+            }
+
+            //inserting to guardian table when guardian info is posted together with student
+            //after generating student id we need it to insert into guardian table for reference
+            if (data.gfName2 != "") {
+              sqlQuery = `insert into guardian (gEmail,gSex,gLastName,gFirstName,gContact1,gContact2,gAddress,student_id,gRelation,userId ) values
               ('${data.gemail2}','${data.gsex2}','${capitalizeWords(data.glName2)}','${capitalizeWords(data.gfName2)}','${data.contact3}','${data.contact4}','${data.gAddress2}','${student_id}','${data.gRelation2}','${customguardian2Id}') `;
 
-            try {
-          pool.query(sqlQuery, (error, result) => {
-              console.log("guardian2 created successfully");
-            });
-          } catch (error) {
-          }
-          }
+              try {
+                pool.query(sqlQuery, (error, result) => {
+                  console.log("guardian2 created successfully");
+                });
+              } catch (error) {
+              }
+            }
 
-          let link = process.env.SERVERLINK + "/" + data.filename;
-          
+            let link = process.env.SERVERLINK + "/" + data.filename;
 
-          //insert into student table
-          sqlQuery = `insert into student (userId,student_id,cartegory,firstName,lastName,otherName,class,section,religion,dateofbirth,gender) values
-            ('${customStudentId}','${student_id}','${data.cartegory}','${capitalizeWords(data.firstName)}','${capitalizeWords(data.lastName)}','${capitalizeWords(data.otherName)}','${data.class}','${data.section}','${capitalizeWords(data.religion)}','${data.dateofbirth}','${data.gender}')`;
-          let sqlQueryAccount = `insert into account (student_id,cartegory,createdat,createdby) values ('${student_id}','${data.cartegory}','${date}','${data.createdBy}')`;
 
-          userCreaterStudent(
-            sqlQuery,
-            customStudentId,
-            customguardian1Id,
-            customguardian2Id,
-            sqlQueryAccount
-          );
-        
-        
-           })
-      
-           
-    
- 
+            //insert into student table
+            sqlQuery = `insert into student (userId,student_id,cartegory,firstName,lastName,otherName,class,section,religion,dateofbirth,gender,preference,accountbalance,scholarship) values
+            ('${customStudentId}','${student_id}','${data.cartegory}','${capitalizeWords(data.firstName)}','${capitalizeWords(data.lastName)}','${capitalizeWords(data.otherName)}','${data.class}','${data.section}','${capitalizeWords(data.religion)}','${data.dateofbirth}','${data.gender}','${data.preference}','${data.accountbalance}','${data.scholarship}')`;
+            let sqlQueryAccount = `insert into account (student_id,cartegory,createdat,createdby) values ('${student_id}','${data.cartegory}','${date}','${data.createdBy}')`;
+
+            userCreaterStudent(
+              sqlQuery,
+              customStudentId,
+              customguardian1Id,
+              customguardian2Id,
+              sqlQueryAccount, student_id
+            );
+
+
+          })
+
+
+
+
         }
-         catch (error) {
-         }
+        catch (error) {
+        }
       }
 
-   })
+    })
   },
 
 
@@ -719,104 +749,104 @@ module.exports = {
 
         try {
           pool.query(sqlQuery, (error, result) => {
-          console.log(error);
-          /////////////////////// check if initial data insert is successful then proceed to insert general users data
-          if (result.affectedRows == 1) {
-            let sqlQuery1 = `insert into users (userId,email,createdAt,createdBy,pincode,role,password ) values
+            console.log(error);
+            /////////////////////// check if initial data insert is successful then proceed to insert general users data
+            if (result.affectedRows == 1) {
+              let sqlQuery1 = `insert into users (userId,email,createdAt,createdBy,pincode,role,password ) values
               ('${customguardian1Id}','${customEmail}','${date}','${data.createdBy}',${userPin},'${data.role}','${password}')`;
 
-            try {
-          pool.query(sqlQuery1, (error, result) => {
-              if (error) {
-                // logger.info(
-                //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, create new user -error`
-                // );
-                return res.status(500).json({
-                  success: 0,
-                  error: "internal server error -create New user",
-                });
-              }
+              try {
+                pool.query(sqlQuery1, (error, result) => {
+                  if (error) {
+                    // logger.info(
+                    //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, create new user -error`
+                    // );
+                    return res.status(500).json({
+                      success: 0,
+                      error: "internal server error -create New user",
+                    });
+                  }
 
-              if (result.affectedRows == 1) {
-                // logger.info(
-                //   `${req.method} ${req.originalUrl}, create new user successful`
-                // );
-                let data1 = {
-                  name: data.firstName + " " + data.lastName,
-                  username: customEmail,
-                  password: custompassword,
-                };
-                res.status(200).json({
-                  success: 1,
-                  Message: "create New user successful ",
-                  data: data1,
-                });
+                  if (result.affectedRows == 1) {
+                    // logger.info(
+                    //   `${req.method} ${req.originalUrl}, create new user successful`
+                    // );
+                    let data1 = {
+                      name: data.firstName + " " + data.lastName,
+                      username: customEmail,
+                      password: custompassword,
+                    };
+                    res.status(200).json({
+                      success: 1,
+                      Message: "create New user successful ",
+                      data: data1,
+                    });
 
-                const signedToken = jwt.sign(
-                  { data: result.email },
-                  process.env.JWT_KEY
-                );
+                    const signedToken = jwt.sign(
+                      { data: result.email },
+                      process.env.JWT_KEY
+                    );
 
-                // send mail to user email
-                var mailOptions = {
-                  from: 'Yes School Support "seedo@seedogh.com"',
-                  to: result.email,
-                  subject: "Email Verification",
-                  html: `<h2>Thanks for registering on our Platform</h2>
+                    // send mail to user email
+                    var mailOptions = {
+                      from: 'Yes School Support "seedo@seedogh.com"',
+                      to: result.email,
+                      subject: "Email Verification",
+                      html: `<h2>Thanks for registering on our Platform</h2>
                       <h4>Kindly click on the link below to verify your account</h2>
         
                       
                           <a href=" https://optimumpay.vercel.app/admin9/${result.email}/verify/${signedToken}" >click this link to verify Email </a>`,
-                };
-                transporter.sendMail(mailOptions, function (error, info) {
-                  const jsontoken = sign(
-                    { result: result.userId },
-                    process.env.JWT_KEY3
-                  );
+                    };
+                    transporter.sendMail(mailOptions, function (error, info) {
+                      const jsontoken = sign(
+                        { result: result.userId },
+                        process.env.JWT_KEY3
+                      );
 
-                  // if (error) {
-                  //   console.log("mail not sent");
-                  //   console.log(signedToken);
-                  //   result.password = "";
-                  //   return res.status(200).json({
-                  //     success: 1,
-                  //     message: "sign up  successful",
-                  //     userPin: userPin,
-                  //     data: logInfo,
-                  //     access_token: jsontoken,
-                  //     Verification_mail: "mail not sent - network Connectivity",
-                  //   });
-                  // } else {
-                  //   console.log("verification mail sent");
-                  //   return res.status(200).json({
-                  //     success: 1,
-                  //     message: "sign up successful",
-                  //     data: logInfo,
-                  //     access_token: jsontoken,
-                  //     Verification_mail: "mail sent",
-                  //     userPin: userPin,
-                  //   });
-                  // }
+                      // if (error) {
+                      //   console.log("mail not sent");
+                      //   console.log(signedToken);
+                      //   result.password = "";
+                      //   return res.status(200).json({
+                      //     success: 1,
+                      //     message: "sign up  successful",
+                      //     userPin: userPin,
+                      //     data: logInfo,
+                      //     access_token: jsontoken,
+                      //     Verification_mail: "mail not sent - network Connectivity",
+                      //   });
+                      // } else {
+                      //   console.log("verification mail sent");
+                      //   return res.status(200).json({
+                      //     success: 1,
+                      //     message: "sign up successful",
+                      //     data: logInfo,
+                      //     access_token: jsontoken,
+                      //     Verification_mail: "mail sent",
+                      //     userPin: userPin,
+                      //   });
+                      // }
+                    });
+                  }
                 });
+              } catch (error) {
               }
-            });
-          } catch (error) {
-          }
-          } else {
-            res.status(500).json({
-              success: 0,
-              error: "internal server error",
-              message: error,
-            });
-      
-            } 
+            } else {
+              res.status(500).json({
+                success: 0,
+                error: "internal server error",
+                message: error,
+              });
+
+            }
           })
         }
-          catch (error) {
-          }
-        };
+        catch (error) {
+        }
+      };
 
-           });
+    });
 
   },
 
@@ -837,193 +867,194 @@ module.exports = {
           data: [],
         });
       }
-      else{
+      else {
         console.log('qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq')
 
-      // if (results == undefined ) {
-      //   // logger.info(
-      //   //   `${req.method} ${req.originalUrl}, user doesn't exist, authentication `
-      //   // );
-      //   return res.status(200).json({
-      //     success: 0,
-      //     data: [],
-      //     message: "Incorrect Email or Password",
-      //   });
-      // }
+        // if (results == undefined ) {
+        //   // logger.info(
+        //   //   `${req.method} ${req.originalUrl}, user doesn't exist, authentication `
+        //   // );
+        //   return res.status(200).json({
+        //     success: 0,
+        //     data: [],
+        //     message: "Incorrect Email or Password",
+        //   });
+        // }
 
-      // if (results == null ) {
-      //   // logger.info(
-      //   //   `${req.method} ${req.originalUrl}, user doesn't exist, authentication `
-      //   // );
-      //   return res.status(200).json({
-      //     success: 0,
-      //     data: [],
-      //     message: "Incorrect Email or Password",
-      //   });
-      // }
+        // if (results == null ) {
+        //   // logger.info(
+        //   //   `${req.method} ${req.originalUrl}, user doesn't exist, authentication `
+        //   // );
+        //   return res.status(200).json({
+        //     success: 0,
+        //     data: [],
+        //     message: "Incorrect Email or Password",
+        //   });
+        // }
 
-      var compare;
-      async function compareReseult() {
-        compare = await bcrypt.compare(body.password, results.password);
-        return compare;
+        var compare;
+        async function compareReseult() {
+          compare = await bcrypt.compare(body.password, results.password);
+          return compare;
+        }
+
+        const resultz = await compareReseult();
+
+        if (resultz == true) {
+          // logger.info(
+          //   `${req.method} ${req.originalUrl}, correct credentials, authentication`
+          // );
+          const jsontoken = sign({ result: results.email }, process.env.JWT_KEY);
+
+          if (results.role == "student") {
+            let sqlQuery = `select * from student where userId ='${results.userId}'  `;
+            try {
+              pool.query(sqlQuery, (error, result) => {
+                let returnData = [
+                  {
+                    userId: results.userId,
+                    rolecode: results.rolecode,
+                    data: result,
+                    role: results.role,
+                    email: results.email,
+                    token: jsontoken,
+                  },
+                ];
+                if (error) {
+                  return res.status(201).json({
+                    success: 1,
+                    data: returnData,
+                    token: jsontoken,
+                    message: "User data Does not Exist",
+                  });
+                }
+
+                return res.status(200).json({
+                  success: 1,
+                  data: returnData,
+                  token: jsontoken,
+                });
+              });
+            } catch (error) {
+            }
+          }
+
+          if (results.role == "parent") {
+            let sqlQuery = `select * from guardian where userId ='${results.userId}'  `;
+            try {
+              pool.query(sqlQuery, (error, result) => {
+                let returnData = [
+                  {
+                    userId: results.userId,
+                    rolecode: results.rolecode,
+                    data: result,
+                    role: results.role,
+                    email: results.email,
+                    token: jsontoken,
+                  },
+                ];
+                if (error) {
+                  return res.status(201).json({
+                    success: 1,
+                    data: returnData,
+                    token: jsontoken,
+                    message: "User data Does not Exist",
+                  });
+                }
+
+                return res.status(200).json({
+                  success: 1,
+                  data: returnData,
+                  token: jsontoken,
+                });
+              });
+            } catch (error) {
+            }
+          }
+
+          if (results.role == "staff") {
+            let sqlQuery = `select * from staff where userId ='${results.userId}'  `;
+            try {
+              pool.query(sqlQuery, (error, result) => {
+                let returnData = [
+                  {
+                    userId: results.userId,
+                    rolecode: results.rolecode,
+                    data: result,
+                    role: results.role,
+                    email: results.email,
+                    token: jsontoken,
+                  },
+                ];
+                if (error) {
+                  return res.status(201).json({
+                    success: 1,
+                    data: returnData,
+                    token: jsontoken,
+                    message: "User data Does not Exist",
+                  });
+                }
+
+                return res.status(200).json({
+                  success: 1,
+                  data: returnData,
+                });
+              });
+            } catch (error) {
+            }
+          }
+
+          // });
+        } else {
+          // logger.info(
+          //   `${req.method} ${req.originalUrl}, Incorrect Email and Password combination`
+          // );
+          return res.status(200).json({
+            success: 0,
+            message: "Invalid Email or Password",
+            data: [],
+          });
+
+        }
       }
-
-      const resultz = await compareReseult();
-
-      if (resultz == true) {
-        // logger.info(
-        //   `${req.method} ${req.originalUrl}, correct credentials, authentication`
-        // );
-        const jsontoken = sign({ result: results.email }, process.env.JWT_KEY);
-
-        if (results.role == "student") {
-          let sqlQuery = `select * from student where userId ='${results.userId}'  `;
-          try {
-          pool.query(sqlQuery, (error, result) => {
-            let returnData = [
-              {
-                userId: results.userId,
-                rolecode: results.rolecode,
-                data: result,
-                role: results.role,
-                email: results.email,
-                token: jsontoken,
-              },
-            ];
-            if (error) {
-              return res.status(201).json({
-                success: 1,
-                data: returnData,
-                token: jsontoken,
-                message: "User data Does not Exist",
-              });
-            }
-
-            return res.status(200).json({
-              success: 1,
-              data: returnData,
-              token: jsontoken,
-            });
-          });
-        } catch (error) {
-        }
-        }
-
-        if (results.role == "parent") {
-          let sqlQuery = `select * from guardian where userId ='${results.userId}'  `;
-          try {
-          pool.query(sqlQuery, (error, result) => {
-            let returnData = [
-              {
-                userId: results.userId,
-                rolecode: results.rolecode,
-                data: result,
-                role: results.role,
-                email: results.email,
-                token: jsontoken,
-              },
-            ];
-            if (error) {
-              return res.status(201).json({
-                success: 1,
-                data: returnData,
-                token: jsontoken,
-                message: "User data Does not Exist",
-              });
-            }
-
-            return res.status(200).json({
-              success: 1,
-              data: returnData,
-              token: jsontoken,
-            });
-          });
-        } catch (error) {
-        }
-        }
-
-        if (results.role == "staff") {
-          let sqlQuery = `select * from staff where userId ='${results.userId}'  `;
-          try {
-          pool.query(sqlQuery, (error, result) => {
-            let returnData = [
-              {
-                userId: results.userId,
-                rolecode: results.rolecode,
-                data: result,
-                role: results.role,
-                email: results.email,
-                token: jsontoken,
-              },
-            ];
-            if (error) {
-              return res.status(201).json({
-                success: 1,
-                data: returnData,
-                token: jsontoken,
-                message: "User data Does not Exist",
-              });
-            }
-
-            return res.status(200).json({
-              success: 1,
-              data: returnData,
-            });
-          });
-        } catch (error) {
-        }
-        }
-
-        // });
-      } else {
-        // logger.info(
-        //   `${req.method} ${req.originalUrl}, Incorrect Email and Password combination`
-        // );
-        return res.status(200).json({
-          success: 0,
-          message: "Invalid Email or Password",
-          data: [],
-        });
-     
-      }}
     });
-  
+
   },
 
   getUserByUserId: (req, res) => {
     const data = req.body;
     let sqlQuery = `select * from users left join staff on users.userId = staff.UserId where users.userId = '${data.id}' `;
     try {
-          pool.query(sqlQuery, (error, result) => {
-      if (error) {
-        console.log(error)
-        // logger.info(
-        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch user by id`
-        // );
-        return res
-          .status(500)
-          .json({ success: 0, error: "internal server error", message: error });
-      }
+      pool.query(sqlQuery, (error, result) => {
+        if (error) {
+          console.log(error)
+          // logger.info(
+          //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch user by id`
+          // );
+          return res
+            .status(500)
+            .json({ success: 0, error: "internal server error", message: error });
+        }
 
-      if (result == []) {
-        // logger.info(
-        //   `${req.method} ${req.originalUrl}, fetch user by id: no record found`
-        // );
-        return res
-          .status(200)
-          .json({ success: 0, error: "Error Fetching Data" });
-      }
-      // logger.info(`${req.method} ${req.originalUrl}, fetch user by id`);
-      console.log(result)
-      if (result.length) {
-
-        result[0].password = null
+        if (result == []) {
+          // logger.info(
+          //   `${req.method} ${req.originalUrl}, fetch user by id: no record found`
+          // );
+          return res
+            .status(200)
+            .json({ success: 0, error: "Error Fetching Data" });
+        }
+        // logger.info(`${req.method} ${req.originalUrl}, fetch user by id`);
         console.log(result)
-        res.status(200).json({ success: 1, data: result });
-      }
-    });
-  } catch (error) {
-  }
+        if (result.length) {
+
+          result[0].password = null
+          console.log(result)
+          res.status(200).json({ success: 1, data: result });
+        }
+      });
+    } catch (error) {
+    }
   },
 
   getUserByUserIdRole: (req, res) => {
@@ -1038,76 +1069,76 @@ module.exports = {
           : `select * from guardian where userId = '${id}'`;
 
     try {
-          pool.query(query, (error, result) => {
-      if (error) {
-        // logger.info(
-        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch user by id`
-        // );
-        return res
-          .status(500)
-          .json({ success: 0, error: "internal server error", message: error });
-      }
+      pool.query(query, (error, result) => {
+        if (error) {
+          // logger.info(
+          //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch user by id`
+          // );
+          return res
+            .status(500)
+            .json({ success: 0, error: "internal server error", message: error });
+        }
 
-      if (!result) {
-        // logger.info(
-        //   `${req.method} ${req.originalUrl}, fetch user by id: no record found`
-        // );
-        return res
-          .status(200)
-          .json({ success: 1, error: "fetch user by id: no record found" });
-      }
-      // logger.info(`${req.method} ${req.originalUrl}, fetch user by id`);
-      res.status(200).json({ success: 1, data: result });
-    });
-  } catch (error) {
-  }
+        if (!result) {
+          // logger.info(
+          //   `${req.method} ${req.originalUrl}, fetch user by id: no record found`
+          // );
+          return res
+            .status(200)
+            .json({ success: 1, error: "fetch user by id: no record found" });
+        }
+        // logger.info(`${req.method} ${req.originalUrl}, fetch user by id`);
+        res.status(200).json({ success: 1, data: result });
+      });
+    } catch (error) {
+    }
   },
 
   getUsers: (req, res) => {
     let sqlQuery = `select * from users`;
     try {
-          pool.query(sqlQuery, (error, result) => {
-      if (error) {
+      pool.query(sqlQuery, (error, result) => {
+        if (error) {
+          // logger.info(
+          //   `${req.method} ${req.originalUrl}, 'server error', fetch all users`
+          // );
+
+          return res
+            .status(500)
+            .json({ success: 0, error: "internal server error", message: error });
+        }
+
         // logger.info(
-        //   `${req.method} ${req.originalUrl}, 'server error', fetch all users`
+        //   `${req.method} ${req.originalUrl},'success', fetch all users`
         // );
 
-        return res
-          .status(500)
-          .json({ success: 0, error: "internal server error", message: error });
-      }
-
-      // logger.info(
-      //   `${req.method} ${req.originalUrl},'success', fetch all users`
-      // );
-
-      res.status(200).json({ success: 1, data: result });
-    });
-  } catch (error) {
-  }
+        res.status(200).json({ success: 1, data: result });
+      });
+    } catch (error) {
+    }
   },
   schoolinfo: (req, res) => {
     let sqlQuery = `select * from school`;
     try {
-          pool.query(sqlQuery, (error, result) => {
-      if (error) {
+      pool.query(sqlQuery, (error, result) => {
+        if (error) {
+          // logger.info(
+          //   `${req.method} ${req.originalUrl}, 'server error', fetch all users`
+          // );
+
+          return res
+            .status(500)
+            .json({ success: 0, error: "internal server error", message: error });
+        }
+
         // logger.info(
-        //   `${req.method} ${req.originalUrl}, 'server error', fetch all users`
+        //   `${req.method} ${req.originalUrl},'success', fetch all users`
         // );
 
-        return res
-          .status(500)
-          .json({ success: 0, error: "internal server error", message: error });
-      }
-
-      // logger.info(
-      //   `${req.method} ${req.originalUrl},'success', fetch all users`
-      // );
-
-      res.status(200).json({ success: 1, data: result });
-    });
-  } catch (error) {
-  }
+        res.status(200).json({ success: 1, data: result });
+      });
+    } catch (error) {
+    }
   },
   schoolinfoupdate: (req, res) => {
     let data = req.body;
@@ -1117,73 +1148,74 @@ module.exports = {
         ? `insert into school (name,address,contact1,contact2,email) values('${data.name}','${data.address}','${data.contact1}','${data.contact2}','${data.email}')`
         : `update school set name='${data.name}',address='${data.address}',contact1='${data.contact1}',contact2='${data.contact2}',email='${data.email}',name='${data.name}' where id = '1'`;
     try {
-          pool.query(sqlQuery, (error, result) => {
-      if (error) {
+      pool.query(sqlQuery, (error, result) => {
+        if (error) {
+          // logger.info(
+          //   `${req.method} ${req.originalUrl}, 'server error', fetch all users`
+          // );
+
+          return res
+            .status(500)
+            .json({ success: 0, error: "internal server error", message: error });
+        }
+
         // logger.info(
-        //   `${req.method} ${req.originalUrl}, 'server error', fetch all users`
+        //   `${req.method} ${req.originalUrl},'success', fetch all users`
         // );
-
-        return res
-          .status(500)
-          .json({ success: 0, error: "internal server error", message: error });
-      }
-
-      // logger.info(
-      //   `${req.method} ${req.originalUrl},'success', fetch all users`
-      // );
-      let sqlQuery = `select * from school limit 1 `;
-      try {
+        let sqlQuery = `select * from school limit 1 `;
+        try {
           pool.query(sqlQuery, (error, result) => {
-        res.status(200).json({ success: 1, data: result });
-      }); } catch (error) {
-      }
-    });
-  } catch (error) {
-  }
+            res.status(200).json({ success: 1, data: result });
+          });
+        } catch (error) {
+        }
+      });
+    } catch (error) {
+    }
   },
 
   getAllStaff: (req, res) => {
     let sqlQuery = `select * from staff left join users on staff.userId = users.userId  where users.role = 'staff'`;
     try {
-          pool.query(sqlQuery, (error, result) => {
-      if (error) {
+      pool.query(sqlQuery, (error, result) => {
+        if (error) {
+          // logger.info(
+          //   `${req.method} ${req.originalUrl}, 'server error', fetch all users`
+          // );
+
+          return res
+            .status(500)
+            .json({ success: 0, error: "internal server error", message: error });
+        }
+
         // logger.info(
-        //   `${req.method} ${req.originalUrl}, 'server error', fetch all users`
+        //   `${req.method} ${req.originalUrl},'success', fetch all users`
         // );
 
-        return res
-          .status(500)
-          .json({ success: 0, error: "internal server error", message: error });
-      }
-
-      // logger.info(
-      //   `${req.method} ${req.originalUrl},'success', fetch all users`
-      // );
-
-      res.status(200).json({ success: 1, data: result });
-    });
-  } catch (error) {
-  }
+        res.status(200).json({ success: 1, data: result });
+      });
+    } catch (error) {
+    }
   },
   getuserdata: async (req, res) => {
     let data = req.body;
     const promise5 = await new Promise((resolve, reject) => {
       let sqlQuery = `select userid from guardian where student_id = '${data.id}' `;
       try {
-          pool.query(sqlQuery, (error, result) => {
-        if (error) {
-         // reject('error')
-          return res.status(500).json({
-            success: 0,
-            error: "internal server error",
-            message: error,
-          });
-        }
-        console.log(result);
-        resolve(result);
-      });
-    } catch (error) {
-    }
+        pool.query(sqlQuery, (error, result) => {
+          if (error) {
+            // reject('error')
+            return res.status(500).json({
+              success: 0,
+              error: "internal server error",
+              message: error,
+            });
+          }
+          console.log(result);
+          resolve(result);
+        });
+      } catch (error) {
+      }
     });
     let arr = promise5
     //  if(data.role=='student')
@@ -1191,109 +1223,109 @@ module.exports = {
     const promise9 = await new Promise((resolve, reject) => {
       let sqlQuery = `select email, pass from users where userId = '${data.userid}' `;
       try {
-          pool.query(sqlQuery, (error, result) => {
-        if (error) {
-         // reject('error')
-          return res.status(500).json({
-            success: 0,
-            error: "internal server error",
-            message: error,
-          });
-        }
-        console.log(result);
-        resolve(result);
-      });
-    } catch (error) {
-    }
+        pool.query(sqlQuery, (error, result) => {
+          if (error) {
+            // reject('error')
+            return res.status(500).json({
+              success: 0,
+              error: "internal server error",
+              message: error,
+            });
+          }
+          console.log(result);
+          resolve(result);
+        });
+      } catch (error) {
+      }
     });
     const promise7 = await new Promise((resolve, reject) => {
       let sqlQuery = `select email, pass from users where userId = '${data.userid}' `;
       try {
-          pool.query(sqlQuery, (error, result) => {
-        if (error) {
-         // reject('error')
-          return res.status(500).json({
-            success: 0,
-            error: "internal server error",
-            message: error,
-          });
-        }
-        console.log(result);
-        resolve(result);
-      });
-    } catch (error) {
-    }
+        pool.query(sqlQuery, (error, result) => {
+          if (error) {
+            // reject('error')
+            return res.status(500).json({
+              success: 0,
+              error: "internal server error",
+              message: error,
+            });
+          }
+          console.log(result);
+          resolve(result);
+        });
+      } catch (error) {
+      }
     });
     const promise8 = await new Promise((resolve, reject) => {
       let sqlQuery = `select email, pass from users where userId = '${data.userid}' `;
       try {
-          pool.query(sqlQuery, (error, result) => {
-        if (error) {
-         // reject('error')
-          return res.status(500).json({
-            success: 0,
-            error: "internal server error",
-            message: error,
-          });
-        }
-        console.log(result);
-        resolve(result);
-      });
-    } catch (error) {
-    }
+        pool.query(sqlQuery, (error, result) => {
+          if (error) {
+            // reject('error')
+            return res.status(500).json({
+              success: 0,
+              error: "internal server error",
+              message: error,
+            });
+          }
+          console.log(result);
+          resolve(result);
+        });
+      } catch (error) {
+      }
     });
     console.log(promise8)
     let sqlQuery = `select * from guardian  where student_id = '${data.id}' `;
     console.log(sqlQuery);
 
     try {
-          pool.query(sqlQuery, (error, result) => {
-      if (error) {
+      pool.query(sqlQuery, (error, result) => {
+        if (error) {
+          // logger.info(
+          //   `${req.method} ${req.originalUrl}, 'server error', fetch all users`
+          // );
+
+          return res
+            .status(500)
+            .json({ success: 0, error: "internal server error", message: error });
+        }
+
         // logger.info(
-        //   `${req.method} ${req.originalUrl}, 'server error', fetch all users`
+        //   `${req.method} ${req.originalUrl},'success', fetch all users`
         // );
-
-        return res
-          .status(500)
-          .json({ success: 0, error: "internal server error", message: error });
-      }
-
-      // logger.info(
-      //   `${req.method} ${req.originalUrl},'success', fetch all users`
-      // );
-      result.password = "";
-      res.status(200).json({ success: 1, data: result ,info:promise8, info1:promise9,info2:promise7 });
-    });
-  } catch (error) {
-  }
+        result.password = "";
+        res.status(200).json({ success: 1, data: result, info: promise8, info1: promise9, info2: promise7 });
+      });
+    } catch (error) {
+    }
   },
   getOTPpin: (req, res) => {
     const id = parseInt(req.params.userId);
     let sqlQuery = `select pincode from users where userId = ${id}`;
     try {
-          pool.query(sqlQuery, (error, result) => {
-      if (error) {
-        // logger.info(
-        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, get pin user by id`
-        // );
-        return res
-          .status(500)
-          .json({ success: 0, error: "internal server error", message: error });
-      }
+      pool.query(sqlQuery, (error, result) => {
+        if (error) {
+          // logger.info(
+          //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, get pin user by id`
+          // );
+          return res
+            .status(500)
+            .json({ success: 0, error: "internal server error", message: error });
+        }
 
-      if (!result) {
-        // logger.info(
-        //   `${req.method} ${req.originalUrl}, fetch pin by user id: no record found`
-        // );
-        return res
-          .status(200)
-          .json({ success: 1, error: "fetch pin by id: no record found" });
-      }
-      // logger.info(`${req.method} ${req.originalUrl}, fetch pin by id`);
-      res.status(200).json({ success: 1, data: result });
-    });
-  } catch (error) {
-  }
+        if (!result) {
+          // logger.info(
+          //   `${req.method} ${req.originalUrl}, fetch pin by user id: no record found`
+          // );
+          return res
+            .status(200)
+            .json({ success: 1, error: "fetch pin by id: no record found" });
+        }
+        // logger.info(`${req.method} ${req.originalUrl}, fetch pin by id`);
+        res.status(200).json({ success: 1, data: result });
+      });
+    } catch (error) {
+    }
   },
 
   resetOTP: (req, res) => {
@@ -1301,98 +1333,98 @@ module.exports = {
     const id = parseInt(req.params.userId);
     let sqlQuery = `update users set pincode = ${userPin} where userId = ${id}`;
     try {
-          pool.query(sqlQuery, (error, result) => {
-      if (error) {
-        // logger.info(
-        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, reset pin user by id`
-        // );
-        return res
-          .status(500)
-          .json({ success: 0, error: "internal server error", message: error });
-      }
+      pool.query(sqlQuery, (error, result) => {
+        if (error) {
+          // logger.info(
+          //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, reset pin user by id`
+          // );
+          return res
+            .status(500)
+            .json({ success: 0, error: "internal server error", message: error });
+        }
 
-      if (result.affectedRows != 1) {
-        logger.info(
-          `${req.method} ${req.originalUrl}, fetch pin by user id: no user record found`
-        );
-        return res
-          .status(200)
-          .json({ success: 1, error: "fetch pin by id: no user record found" });
-      }
+        if (result.affectedRows != 1) {
+          logger.info(
+            `${req.method} ${req.originalUrl}, fetch pin by user id: no user record found`
+          );
+          return res
+            .status(200)
+            .json({ success: 1, error: "fetch pin by id: no user record found" });
+        }
 
-      // logger.info(`${req.method} ${req.originalUrl}, update user pin by id`);
-      return res.status(200).json({
-        success: 1,
-        message: "OTP updated successfully",
-        data: userPin,
+        // logger.info(`${req.method} ${req.originalUrl}, update user pin by id`);
+        return res.status(200).json({
+          success: 1,
+          message: "OTP updated successfully",
+          data: userPin,
+        });
       });
-    });
-  } catch (error) {
-  }
+    } catch (error) {
+    }
   },
-  updatestaff: async(req, res) => {
+  updatestaff: async (req, res) => {
     const data = req.body;
-console.log(data)
+    console.log(data)
 
-const saltRounds = 10;
+    const saltRounds = 10;
 
-let password = await bcrypt.hash(data.password, saltRounds);
-    let sqlQuery = data.password == null ? `update users set email ='${data.email}',createdBy='${data.createdBy}',role='${data.role}',rolecode='${data.rolecode}' where userId = '${data.userId}'` :`update users set email ='${data.email}',createdBy='${data.createdBy}',role='${data.role}',rolecode='${data.rolecode}',password='${password}' where userId = '${data.userId}'`;
+    let password = await bcrypt.hash(data.password, saltRounds);
+    let sqlQuery = data.password == null ? `update users set email ='${data.email}',createdBy='${data.createdBy}',role='${data.role}',rolecode='${data.rolecode}' where userId = '${data.userId}'` : `update users set email ='${data.email}',createdBy='${data.createdBy}',role='${data.role}',rolecode='${data.rolecode}',password='${password}' where userId = '${data.userId}'`;
 
     try {
-          pool.query(sqlQuery, (error, result) => {
-      console.log(sqlQuery)
-      if (error) {
-        // logger.info(
-        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update user data`
-        // );
-        return res
-          .status(500)
-          .json({ success: 0, error: "internal server error", message: error });
-      }
+      pool.query(sqlQuery, (error, result) => {
+        console.log(sqlQuery)
+        if (error) {
+          // logger.info(
+          //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update user data`
+          // );
+          return res
+            .status(500)
+            .json({ success: 0, error: "internal server error", message: error });
+        }
 
-      if (result.affectedRows != 1) {
-        // logger.info(
-        //   `${req.method} ${req.originalUrl}, update user data: no record found`
-        // );
-        return res
-          .status(200)
-          .json({ success: 0, error: "update user data: no record found" });
-      }
+        if (result.affectedRows != 1) {
+          // logger.info(
+          //   `${req.method} ${req.originalUrl}, update user data: no record found`
+          // );
+          return res
+            .status(200)
+            .json({ success: 0, error: "update user data: no record found" });
+        }
 
-      if (result.affectedRows == 1) {
-        // logger.info(`${req.method} ${req.originalUrl}, update user data`);
+        if (result.affectedRows == 1) {
+          // logger.info(`${req.method} ${req.originalUrl}, update user data`);
 
 
-        let sqlQuery = `update staff set sEmail ='${data.email}',sFirstName='${data.fname}',sLastName='${data.lname}',contact1='${data.contact1}',contact2='${data.contact2}',sGender ='${data.sex}',rolecode='${data.rolecode}' where userId = '${data.userId}'`;
+          let sqlQuery = `update staff set sEmail ='${data.email}',sFirstName='${data.fname}',sLastName='${data.lname}',contact1='${data.contact1}',contact2='${data.contact2}',sGender ='${data.sex}',rolecode='${data.rolecode}' where userId = '${data.userId}'`;
 
-       
-    
-        try {
-          pool.query(sqlQuery, (error, result) => {
-          console.log(result);
-          console.log(error);
-          if (error) {
-            // logger.info(
-            //   `${req.method} ${req.originalUrl}, 'server error', fetch all users`
-            // );
-    
-            return res
-              .status(500)
-              .json({ success: 0, error: "internal server error", message: error });
+
+
+          try {
+            pool.query(sqlQuery, (error, result) => {
+              console.log(result);
+              console.log(error);
+              if (error) {
+                // logger.info(
+                //   `${req.method} ${req.originalUrl}, 'server error', fetch all users`
+                // );
+
+                return res
+                  .status(500)
+                  .json({ success: 0, error: "internal server error", message: error });
+              }
+            });
+          } catch (error) {
           }
-        });
-      } catch (error) {
-      }
 
 
-        return res
-          .status(200)
-          .json({ success: 1, error: "update user data success" });
-      }
-    });
-  } catch (error) {
-  }
+          return res
+            .status(200)
+            .json({ success: 1, error: "update user data success" });
+        }
+      });
+    } catch (error) {
+    }
   },
   updateUsers: (req, res) => {
     const data = req.body;
@@ -1400,34 +1432,34 @@ let password = await bcrypt.hash(data.password, saltRounds);
     let sqlQuery = `update users set email ='${data.email}',firstName='${data.firstName}',lastName='${data.lastName}',otherName='${data.otherName}',contact1='${data.contact1}',contact2='${data.contact2}',gender ='${data.gender}',createdBy='${data.createdBy}',role='${data.role}',active='${data.active}' where userId = '${data.userId}'`;
 
     try {
-          pool.query(sqlQuery, (error, result) => {
-      if (error) {
-        // logger.info(
-        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update user data`
-        // );
-        return res
-          .status(500)
-          .json({ success: 0, error: "internal server error", message: error });
-      }
+      pool.query(sqlQuery, (error, result) => {
+        if (error) {
+          // logger.info(
+          //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update user data`
+          // );
+          return res
+            .status(500)
+            .json({ success: 0, error: "internal server error", message: error });
+        }
 
-      if (result.affectedRows != 1) {
-        // logger.info(
-        //   `${req.method} ${req.originalUrl}, update user data: no record found`
-        // );
-        return res
-          .status(200)
-          .json({ success: 0, error: "update user data: no record found" });
-      }
+        if (result.affectedRows != 1) {
+          // logger.info(
+          //   `${req.method} ${req.originalUrl}, update user data: no record found`
+          // );
+          return res
+            .status(200)
+            .json({ success: 0, error: "update user data: no record found" });
+        }
 
-      if (result.affectedRows == 1) {
-        // logger.info(`${req.method} ${req.originalUrl}, update user data`);
-        return res
-          .status(200)
-          .json({ success: 1, error: "update user data success" });
-      }
-    });
-  } catch (error) {
-  }
+        if (result.affectedRows == 1) {
+          // logger.info(`${req.method} ${req.originalUrl}, update user data`);
+          return res
+            .status(200)
+            .json({ success: 1, error: "update user data success" });
+        }
+      });
+    } catch (error) {
+    }
   },
 
   verifymail: (req, res) => {
@@ -1463,24 +1495,24 @@ let password = await bcrypt.hash(data.password, saltRounds);
         let sqlQuery = `update users set verified='true' where email = '${body.email}'`;
         try {
           pool.query(sqlQuery, (error, result) => {
-          if (error) {
-            // logger.info(
-            //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, verify email by token`
-            // );
-            return res.status(500).json({
-              success: 0,
-              error: "internal server error",
-              message: error,
-            });
-          }
+            if (error) {
+              // logger.info(
+              //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, verify email by token`
+              // );
+              return res.status(500).json({
+                success: 0,
+                error: "internal server error",
+                message: error,
+              });
+            }
 
-          // logger.info(
-          //   `${req.method} ${req.originalUrl}, verify email by jwt signed token successful`
-          // );
-          res.status(200).json({ success: 1, data: result });
-        });
-      } catch (error) {
-      }
+            // logger.info(
+            //   `${req.method} ${req.originalUrl}, verify email by jwt signed token successful`
+            // );
+            res.status(200).json({ success: 1, data: result });
+          });
+        } catch (error) {
+        }
       } else {
         //throw error when code mismatches
         return res.status(200).json({
@@ -1522,38 +1554,38 @@ let password = await bcrypt.hash(data.password, saltRounds);
         let sqlQuery = `update users set password = ${body.password} where email = ${body.email}`;
         try {
           pool.query(sqlQuery, (error, result) => {
-          if (error) {
-            // logger.info(
-            //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update user password`
-            // );
-            return res.status(500).json({
-              success: 0,
-              error: "internal server error",
-              message: error,
-            });
-          }
+            if (error) {
+              // logger.info(
+              //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update user password`
+              // );
+              return res.status(500).json({
+                success: 0,
+                error: "internal server error",
+                message: error,
+              });
+            }
 
-          if (result.affectedRows != 1) {
-            // logger.info(
-            //   `${req.method} ${req.originalUrl}, update user password: no user record found`
-            // );
-            return res.status(200).json({
-              success: 0,
-              error: "update user password: no user record found",
-            });
-          }
-          if (result.affectedRows == 1) {
-            // logger.info(
-            //   `${req.method} ${req.originalUrl}, update user password success`
-            // );
-            return res.status(200).json({
-              success: 1,
-              message: "update user password successfully",
-            });
-          }
-        });
-      } catch (error) {
-      }
+            if (result.affectedRows != 1) {
+              // logger.info(
+              //   `${req.method} ${req.originalUrl}, update user password: no user record found`
+              // );
+              return res.status(200).json({
+                success: 0,
+                error: "update user password: no user record found",
+              });
+            }
+            if (result.affectedRows == 1) {
+              // logger.info(
+              //   `${req.method} ${req.originalUrl}, update user password success`
+              // );
+              return res.status(200).json({
+                success: 1,
+                message: "update user password successfully",
+              });
+            }
+          });
+        } catch (error) {
+        }
       } else {
         return res.status(200).json({
           success: 1,
@@ -1618,46 +1650,46 @@ let password = await bcrypt.hash(data.password, saltRounds);
     let sqlQuery = `update staff set active ='True' where userId = '${id}'`;
 
     try {
-          pool.query(sqlQuery, (error, result) => {
-      if (error) {
-        // logger.info(
-        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete subject by id`
-        // );
-        return res
-          .status(500)
-          .json({ success: 0, error: "internal server error", message: error });
-      }
+      pool.query(sqlQuery, (error, result) => {
+        if (error) {
+          // logger.info(
+          //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete subject by id`
+          // );
+          return res
+            .status(500)
+            .json({ success: 0, error: "internal server error", message: error });
+        }
 
-      if (result.affectedRows != 1) {
-        // logger.info(
-        //   `${req.method} ${req.originalUrl}, delete subject by  id: no subject record found`
-        // );
-        return res.status(200).json({
-          success: 0,
-          error: "delete subject by id: no subject record found",
-        });
-      }
-      if (result.affectedRows == 1) {
-        // logger.info(`${req.method} ${req.originalUrl}, delete subject  by id`);
-        let sqlQuery1 = `update users set isActive ='True' where userId = '${id}'`;
-        try {
-          pool.query(sqlQuery1, (error, result) => {
-          console.log(result.affectedRows);
-        });
-      } catch (error) {
-      }
+        if (result.affectedRows != 1) {
+          // logger.info(
+          //   `${req.method} ${req.originalUrl}, delete subject by  id: no subject record found`
+          // );
+          return res.status(200).json({
+            success: 0,
+            error: "delete subject by id: no subject record found",
+          });
+        }
+        if (result.affectedRows == 1) {
+          // logger.info(`${req.method} ${req.originalUrl}, delete subject  by id`);
+          let sqlQuery1 = `update users set isActive ='True' where userId = '${id}'`;
+          try {
+            pool.query(sqlQuery1, (error, result) => {
+              console.log(result.affectedRows);
+            });
+          } catch (error) {
+          }
 
-        let sqlQuery = `select * from staff left join users on staff.userId = users.userId  where users.role = 'staff'`;
-        try {
-          pool.query(sqlQuery, (error, result) => {
-          res.status(200).json({ success: 1, data: result });
-        });
-      } catch (error) {
-      }
-      }
-    });
-  } catch (error) {
-  }
+          let sqlQuery = `select * from staff left join users on staff.userId = users.userId  where users.role = 'staff'`;
+          try {
+            pool.query(sqlQuery, (error, result) => {
+              res.status(200).json({ success: 1, data: result });
+            });
+          } catch (error) {
+          }
+        }
+      });
+    } catch (error) {
+    }
   },
   InactiveStaff: (req, res) => {
     const id = req.params.id;
@@ -1665,44 +1697,44 @@ let password = await bcrypt.hash(data.password, saltRounds);
     let sqlQuery = `update staff set active ='false' where userId = '${id}'`;
 
     try {
-          pool.query(sqlQuery, (error, result) => {
-      if (error) {
-        // logger.info(
-        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete subject by id`
-        // );
-        return res
-          .status(500)
-          .json({ success: 0, error: "internal server error", message: error });
-      }
-
-      if (result.affectedRows != 1) {
-        // logger.info(
-        //   `${req.method} ${req.originalUrl}, delete subject by  id: no subject record found`
-        // );
-        return res.status(200).json({
-          success: 0,
-          error: "delete subject by id: no subject record found",
-        });
-      }
-      if (result.affectedRows == 1) {
-        // logger.info(`${req.method} ${req.originalUrl}, delete subject  by id`);
-        let sqlQuery1 = `update users set isActive ='False' where userId = '${id}'`;
-        try {
-          pool.query(sqlQuery1, (error, result) => { });
-        } catch (error) {
+      pool.query(sqlQuery, (error, result) => {
+        if (error) {
+          // logger.info(
+          //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete subject by id`
+          // );
+          return res
+            .status(500)
+            .json({ success: 0, error: "internal server error", message: error });
         }
 
-        let sqlQuery = `select * from staff left join users on staff.userId = users.userId  where users.role = 'staff'`;
-        try {
-          pool.query(sqlQuery, (error, result) => {
-          res.status(200).json({ success: 1, data: result });
-        });
-      } catch (error) {
-      }
-      }
-    });
-  } catch (error) {
-  }
+        if (result.affectedRows != 1) {
+          // logger.info(
+          //   `${req.method} ${req.originalUrl}, delete subject by  id: no subject record found`
+          // );
+          return res.status(200).json({
+            success: 0,
+            error: "delete subject by id: no subject record found",
+          });
+        }
+        if (result.affectedRows == 1) {
+          // logger.info(`${req.method} ${req.originalUrl}, delete subject  by id`);
+          let sqlQuery1 = `update users set isActive ='False' where userId = '${id}'`;
+          try {
+            pool.query(sqlQuery1, (error, result) => { });
+          } catch (error) {
+          }
+
+          let sqlQuery = `select * from staff left join users on staff.userId = users.userId  where users.role = 'staff'`;
+          try {
+            pool.query(sqlQuery, (error, result) => {
+              res.status(200).json({ success: 1, data: result });
+            });
+          } catch (error) {
+          }
+        }
+      });
+    } catch (error) {
+    }
   },
   deleteStaff: (req, res) => {
     const id = req.params.id;
@@ -1710,79 +1742,79 @@ let password = await bcrypt.hash(data.password, saltRounds);
     let sqlQuery = `delete from staff where userId = '${id}'`;
 
     try {
-          pool.query(sqlQuery, (error, result) => {
-      if (error) {
-        // logger.info(
-        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete subject by id`
-        // );
-        return res
-          .status(500)
-          .json({ success: 0, error: "internal server error", message: error });
-      }
-
-      if (result.affectedRows != 1) {
-        // logger.info(
-        //   `${req.method} ${req.originalUrl}, delete subject by  id: no subject record found`
-        // );
-        return res.status(200).json({
-          success: 0,
-          error: "delete subject by id: no subject record found",
-        });
-      }
-      if (result.affectedRows == 1) {
-        // logger.info(`${req.method} ${req.originalUrl}, delete subject  by id`);
-        let sqlQuery1 = `delete from users where userId = '${id}'`;
-        try {
-          pool.query(sqlQuery1, (error, result) => { });
-        } catch (error) {
+      pool.query(sqlQuery, (error, result) => {
+        if (error) {
+          // logger.info(
+          //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete subject by id`
+          // );
+          return res
+            .status(500)
+            .json({ success: 0, error: "internal server error", message: error });
         }
 
-        let sqlQuery = `select * from staff left join users on staff.userId = users.userId  where users.role = 'staff'`;
-        try {
-          pool.query(sqlQuery, (error, result) => {
-          res.status(200).json({ success: 1, data: result });
-        });
-      } catch (error) {
-      }
-      }
-    });
-  } catch (error) {
-  }
+        if (result.affectedRows != 1) {
+          // logger.info(
+          //   `${req.method} ${req.originalUrl}, delete subject by  id: no subject record found`
+          // );
+          return res.status(200).json({
+            success: 0,
+            error: "delete subject by id: no subject record found",
+          });
+        }
+        if (result.affectedRows == 1) {
+          // logger.info(`${req.method} ${req.originalUrl}, delete subject  by id`);
+          let sqlQuery1 = `delete from users where userId = '${id}'`;
+          try {
+            pool.query(sqlQuery1, (error, result) => { });
+          } catch (error) {
+          }
+
+          let sqlQuery = `select * from staff left join users on staff.userId = users.userId  where users.role = 'staff'`;
+          try {
+            pool.query(sqlQuery, (error, result) => {
+              res.status(200).json({ success: 1, data: result });
+            });
+          } catch (error) {
+          }
+        }
+      });
+    } catch (error) {
+    }
   },
 
   deleteUser: (req, res) => {
     const id = req.body;
     let sqlQuery = `delete from users where userId = '${id.userId}'`;
     try {
-          pool.query(sqlQuery, (error, result) => {
-      if (error) {
-        // logger.info(
-        //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete user by id`
-        // );
-        return res
-          .status(500)
-          .json({ success: 0, error: "internal server error", message: error });
-      }
+      pool.query(sqlQuery, (error, result) => {
+        if (error) {
+          // logger.info(
+          //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete user by id`
+          // );
+          return res
+            .status(500)
+            .json({ success: 0, error: "internal server error", message: error });
+        }
 
-      if (result.affectedRows != 1) {
-        // logger.info(
-        //   `${req.method} ${req.originalUrl}, delete user by user id: no user record found`
-        // );
-        return res.status(200).json({
-          success: 0,
-          error: "delete user by id: no user record found",
-        });
-      }
-      if (result.affectedRows == 1) {
-        // logger.info(`${req.method} ${req.originalUrl}, delete user pin by id`);
-        return res.status(200).json({
-          success: 1,
-          message: "user deleted successfully",
-        });
-      }
-      
-    });
-  } catch (error) {
-  }
+        if (result.affectedRows != 1) {
+          // logger.info(
+          //   `${req.method} ${req.originalUrl}, delete user by user id: no user record found`
+          // );
+          return res.status(200).json({
+            success: 0,
+            error: "delete user by id: no user record found",
+          });
+        }
+        if (result.affectedRows == 1) {
+          // logger.info(`${req.method} ${req.originalUrl}, delete user pin by id`);
+          return res.status(200).json({
+            success: 1,
+            message: "user deleted successfully",
+          });
+        }
+
+      });
+    } catch (error) {
+    }
   },
 };

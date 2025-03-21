@@ -416,7 +416,6 @@ module.exports = {
       // logger.info(
       //   `${req.method} ${req.originalUrl},'success', fetch all sections`
       // );
-
       res.status(200).json({ success: 1, data: result });
     });
   },

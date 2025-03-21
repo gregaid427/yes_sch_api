@@ -67,7 +67,7 @@ app.use("/api/attendance", attendanceRouter);
 //app.use("/api/patients", patientsRouter);
 //app.use("/api/vitals", vitalsRouter);
 //app.use("/api/log", logRouter);
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 5400;
 app.listen(port, () => {
   console.log("server up and running on PORT :", port);
 });
