@@ -2,7 +2,8 @@ const pool = require("../../config/database.js");
 // const logger = require("../../util/logger.js");
 
 function getClassByName(email, callBack) {
-  pool.query(
+  try {
+        pool.query(
     `select * from class where title = ? `,
     [email],
     (error, results, fields) => {
@@ -13,9 +14,13 @@ function getClassByName(email, callBack) {
     }
   );
 }
+catch (error) {
+}
+}
 
 function getsectionByName(email, callBack) {
-  pool.query(
+  try {
+        pool.query(
     `select * from section where sectionName = ? `,
     [email],
     (error, results, fields) => {
@@ -25,6 +30,9 @@ function getsectionByName(email, callBack) {
       return callBack(null, results[0]);
     }
   );
+}
+catch (error) {
+}
 }
 
 let date = new Date();
@@ -52,7 +60,8 @@ module.exports = {
 
           let sqlQuery = `insert into class (classId,title,createdAt,createdBy,isActive,instructor) values
           ('${classId}','${data.title}','${date}','${data.createdBy}','true','${data.instructor}')`;
-          pool.query(sqlQuery, (error, result) => {
+          try {
+        pool.query(sqlQuery, (error, result) => {
             if (error) {
               console.log(error)
               // logger.info(
@@ -66,12 +75,19 @@ module.exports = {
 
             let sqlQuery = `select * from class where isActive = 'true' group by title`;
 
-            pool.query(sqlQuery, (error, result) => {
+            try {
+        pool.query(sqlQuery, (error, result) => {
               console.log(result)
               res.status(200).json({ success: 1, data: result });
             });
+          }
+          catch (error) {
+          }
 
           });
+        }
+        catch (error) {
+        }
         }
         else {
           let datas = data.sections;
@@ -82,7 +98,8 @@ module.exports = {
 
             let sqlQuery = `insert into class (classId,title,createdAt,createdBy,isActive,instructor,section) values
              ('${classId}','${data.title}','${date}','${data.createdBy}','true','${data.instructor}','${section}')`;
-            pool.query(sqlQuery, (error, result) => {
+            try {
+        pool.query(sqlQuery, (error, result) => {
               if (error) {
                 // logger.info(
                 //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, Error create new Class`
@@ -96,12 +113,20 @@ module.exports = {
               if (datas.length - 1 == i) {
                 let sqlQuery = `select * from class where isActive = 'true' group by title`;
 
-                pool.query(sqlQuery, (error, result) => {
+                try {
+        pool.query(sqlQuery, (error, result) => {
                   console.log(result)
                   res.status(200).json({ success: 1, data: result });
                 });
               }
+              catch (error) {
+              }
+              }
+              
             });
+          }
+          catch (error) {
+          }
           }
 
 
@@ -130,7 +155,8 @@ module.exports = {
 
   //   let sqlQuery = `insert into section (classId,sectionName,createdAt,createdBy,isActive) values
   //          ('${data.classId}','${data.sectionName}','${date}','${data.createdBy}','${data.isActive}')`;
-  //   pool.query(sqlQuery, (error, result) => {
+  //   try {
+   //     pool.query(sqlQuery, (error, result) => {
   //     if (error) {
   //       logger.info(
   //         `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, create new Class section`
@@ -170,6 +196,7 @@ module.exports = {
 
         let sqlQuery = `insert into sectiongroup (sectionName,createdAt,createdBy,isActive) values
            ('${data.sectionName}','${date}','${data.createdBy}','true')`;
+        try {
         pool.query(sqlQuery, (error, result) => {
           if (error) {
             // logger.info(
@@ -186,11 +213,21 @@ module.exports = {
             //   `${req.method} ${req.originalUrl}, create new Class section`
             // );
             let sqlQuery = `select * from sectiongroup where isActive = 'true'`;
-            pool.query(sqlQuery, (error, result) => {
+            try {
+        pool.query(sqlQuery, (error, result) => {
               res.status(200).json({ success: 1, data: result });
             });
           }
+          catch (error) {
+          }
+          }
+          
+          
         });
+      }
+      catch (error) {
+      }
+        
       }
     });
   },
@@ -201,13 +238,15 @@ module.exports = {
 
     let sqlQuery1 = `select count(student.student_id) as number from student where class = '${title}' and isActive ='true'`;
 
-    pool.query(sqlQuery1, (error, result1) => {
+    try {
+        pool.query(sqlQuery1, (error, result1) => {
       console.log(result1);
 
       //////////
 
       let sqlQuery = `select * from class left join section on class.classId = section.classId where class.classId = '${Id}' `;
-      pool.query(sqlQuery, (error, result) => {
+      try {
+        pool.query(sqlQuery, (error, result) => {
         if (error) {
           // logger.info(
           //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch Class by id`
@@ -235,15 +274,21 @@ module.exports = {
           // );
         }
       });
-
+    }
+    catch (error) {
+    }
       //////////
     });
+  }
+  catch (error) {
+  }
   },
   getClassTudentStat: (req, res) => {
     let sqlQuery =
       `SELECT class,count(student_id) from student where isActive='true' group by student.class`;
 
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       console.log(error);
 
       if (error) {
@@ -264,12 +309,16 @@ module.exports = {
 
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
   getAllClassNo: (req, res) => {
     let sqlQuery =
       `SELECT * from class where isActive='true' order by class.title`;
 
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       console.log(error);
 
       if (error) {
@@ -290,13 +339,17 @@ module.exports = {
 
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
   allclassexam: (req, res) => {
     let data = req.body
     console.log(data)
     let sqlQuery = `select * from examresultcode where class = '${data.classes}' and section = '${data.section}' and session = '${data.session}' and examgroup = '${data.examgroup}' and subject = '${data.subject}' `
     console.log(sqlQuery)
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       console.log(error);
 
       if (error) {
@@ -320,10 +373,14 @@ module.exports = {
 
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
   getAllClass: (req, res) => {
     let sqlQuery = `select * from class where isActive = 'true' group by title`;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       console.log(error);
 
       if (error) {
@@ -344,11 +401,15 @@ module.exports = {
 
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
 
   getAllSection: (req, res) => {
     let sqlQuery = `select * from section where isActive = 'true'`;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       console.log(error);
 
       if (error) {
@@ -369,12 +430,16 @@ module.exports = {
 
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
   getsectionByClassId: (req, res) => {
     let id = req.body.classId;
 
     let sqlQuery = `select * from section where classId = '${id}'`;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       console.log(error);
 
       if (error) {
@@ -395,10 +460,14 @@ module.exports = {
       console.log(result);
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
   getAllSectiongroup: (req, res) => {
     let sqlQuery = `select * from sectiongroup where isActive = 'true'`;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       console.log(error);
 
       if (error) {
@@ -418,11 +487,15 @@ module.exports = {
       // );
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
   getAllClassWithSection: (req, res) => {
     let data = req.body
     let sqlQuery = `select * from class where title ='${data.title}'`;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all Class with section`
@@ -440,6 +513,9 @@ module.exports = {
 
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
 
   updateClass: (req, res) => {
@@ -448,7 +524,8 @@ module.exports = {
     console.log(data);
     let sqlQuery = `update class set title ='${data.title}',instructor='${data.instructor}',updatedBy='${data.updatedBy}',updatedAt='${date}' where classId = ${data.classId}`;
 
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update Class data`
@@ -471,11 +548,18 @@ module.exports = {
       // logger.info(`${req.method} ${req.originalUrl}, delete Class  by id`);
       //return table data
       let sqlQuery = `SELECT * from class where isActive='true' order by class.title`;
-      pool.query(sqlQuery, (error, result) => {
+      try {
+        pool.query(sqlQuery, (error, result) => {
         res.status(200).json({ success: 1, data: result });
       });
+    }
+    catch (error) {
+    }
 
     });
+  }
+  catch (error) {
+  }
   },
 
   updateSection: (req, res) => {
@@ -484,7 +568,8 @@ module.exports = {
     console.log(data);
     let sqlQuery = `update sectiongroup set sectionName ='${data.sectionName}' where id = ${data.id}`;
 
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update section data`
@@ -511,11 +596,15 @@ module.exports = {
           .json({ success: 1, data: "update section data success" });
       }
     });
+  }
+  catch (error) {
+  }
   },
   updateClassStatus: (req, res) => {
     let sqlQuery = `update class set isActive ='false'`;
 
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update Class data`
@@ -542,6 +631,9 @@ module.exports = {
           .json({ success: 1, error: "update class data success" });
       }
     });
+  }
+  catch (error) {
+  }
   },
 
   deleteAllClass: (req, res) => {
@@ -549,7 +641,8 @@ module.exports = {
     // let sqlQuery = `delete from Class where userId = ${id.Class_id}`;
     let sqlQuery = `delete from class`;
 
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete Class by id`
@@ -577,12 +670,16 @@ module.exports = {
         });
       }
     });
+  }
+  catch (error) {
+  }
   },
   deleteSingleClass: (req, res) => {
     const id = req.params.classId;
     let sqlQuery = `delete from class where classId = '${id}'`;
 
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete Class by id`
@@ -606,18 +703,26 @@ module.exports = {
         // logger.info(`${req.method} ${req.originalUrl}, delete Class  by id`);
         //return table data
         let sqlQuery = `SELECT * from class where isActive='true' order by class.title`;
+        try {
         pool.query(sqlQuery, (error, result) => {
           res.status(200).json({ success: 1, data: result });
         });
       }
+      catch (error) {
+      }
+      }
     });
+  }
+  catch (error) {
+  }
   },
 
   deletesinglegroup: (req, res) => {
     const id = req.params.id;
     let sqlQuery = `delete from sectiongroup where id = '${id}'`;
 
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete Class by id`
@@ -641,16 +746,26 @@ module.exports = {
         // logger.info(`${req.method} ${req.originalUrl}, delete Class  by id`);
         //return table data
         let sqlQuery = `select * from sectiongroup `;
+        try {
         pool.query(sqlQuery, (error, result) => {
           res.status(200).json({ success: 1, data: result });
         });
       }
+      catch (error) {
+      }
+      }
+      
     });
+  }
+  catch (error) {
+  }
+    
   },
 
   truncateTable: (req, res) => {
     let sqlQuery = `truncate table class`;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete all records`
@@ -668,6 +783,9 @@ module.exports = {
         });
       }
     });
+  }
+  catch (error) {
+  }
   },
 
   deleteSectionbyClass: (req, res) => {
@@ -675,7 +793,8 @@ module.exports = {
     console.log(id);
     let sqlQuery = `delete from class where title = '${id.title}' and section = '${id.section}'`;
 
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       console.log(result);
       if (error) {
         // logger.info(
@@ -702,6 +821,7 @@ module.exports = {
         // );
 
         let sqlQuery = `select * from class where title ='${id.title}'`;
+        try {
         pool.query(sqlQuery, (error, result) => {
           if (error) {
             // logger.info(
@@ -721,6 +841,13 @@ module.exports = {
           res.status(200).json({ success: 1, data: result });
         });
       }
+      catch (error) {
+      }
+      }
+      
     });
+  }
+  catch (error) {
+  }
   },
 };

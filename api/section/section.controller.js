@@ -14,7 +14,8 @@ module.exports = {
 
     let sqlQuery = `insert into section (section_name,created_at,created_by) values
            ('${data.section_name}','${data.created_at}','${data.created_by}')`;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, create new section`
@@ -29,13 +30,17 @@ module.exports = {
         // logger.info(`${req.method} ${req.originalUrl}, create new section`);
       }
     });
+  }
+  catch (error) {
+  }
   },
 
 
   getSectionById: (req, res) => {
     const id = parseInt(req.params.section_id);
     let sqlQuery = `select * from section where section_id = ${id}`;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch section by id`
@@ -57,11 +62,15 @@ module.exports = {
       // logger.info(`${req.method} ${req.originalUrl}, fetch section by id`);
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
 
   getAllSection: (req, res) => {
     let sqlQuery = `select * from section`;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl}, 'server error', fetch all section`
@@ -79,6 +88,9 @@ module.exports = {
 
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
 
 
@@ -87,7 +99,8 @@ module.exports = {
 
     let sqlQuery = `update section set section_name ='${data.section_name}',date='${data.date}',section_group='${data.section_group}',updated_at='${data.created_at}',updated_at='${data.updated_by}' where section_id = ${data.section_id}`;
 
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update section data`
@@ -114,6 +127,9 @@ module.exports = {
           .json({ success: 1, error: "update section data success" });
       }
     });
+  }
+  catch (error) {
+  }
   },
 
 
@@ -122,7 +138,8 @@ module.exports = {
 
     let sqlQuery = `update section set section_status ='false'`;
 
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update section data`
@@ -149,10 +166,14 @@ module.exports = {
           .json({ success: 1, error: "update section data success" });
       }
     });
+  }
+  catch (error) {
+  }
   },
   truncateTable: (req, res) => {
     let sqlQuery = `truncate table section`;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete all records`
@@ -170,6 +191,9 @@ module.exports = {
         });
       }
     });
+  }
+  catch (error) {
+  }
   },
 
   deleteAllSection: (req, res) => {
@@ -177,7 +201,8 @@ module.exports = {
     // let sqlQuery = `delete from section where userId = ${id.section_id}`;
     let sqlQuery = `delete from section`;
 
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete section by id`
@@ -207,5 +232,8 @@ module.exports = {
         });
       }
     });
+  }
+  catch (error) {
+  }
   },
 };

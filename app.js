@@ -53,7 +53,7 @@ app.use("/api/statistics", statRouter);
 app.use("/api/inventory", inventoryRouter);
 app.use("/api/expense", expenseRouter);
 app.use("/api/session", sessionRouter);
-app.use("/api/setting", settingRouter);
+// app.use("/api/setting", settingRouter);
 app.use("/api/fee", feeRouter);
 app.use("/api/exam", examRouter);
 app.use("/api/attendance", attendanceRouter);

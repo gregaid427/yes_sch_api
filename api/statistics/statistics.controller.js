@@ -5,7 +5,8 @@ module.exports = {
   getAllStat1: (req, res) => {
     let sqlQuery1 = `select count(student.student_id) as noStudent from student where  isActive ='true'`;
 
-    pool.query(sqlQuery1, (error, result) => {
+    try {
+          pool.query(sqlQuery1, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl}, 'server error', result1 `
@@ -17,12 +18,16 @@ module.exports = {
       }
       return res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
 
   getAllStat2: (req, res) => {
     let sqlQuery2 = `select count(users.userId) as noStaff from users where isActive ='true' and role='staff'`;
 
-    pool.query(sqlQuery2, (error, result) => {
+    try {
+          pool.query(sqlQuery2, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl}, 'server error', result1 `
@@ -34,11 +39,15 @@ module.exports = {
       }
       return res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
   getAllStat3: (req, res) => {
     let sqlQuery3 = `select count(id) as noclass from class where isActive ='true'`;
 
-    pool.query(sqlQuery3, (error, result) => {
+    try {
+          pool.query(sqlQuery3, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl}, 'server error', result1 `
@@ -50,11 +59,15 @@ module.exports = {
       }
       return res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
 
   getAllStat4: (req, res) => {
     let sqlQuery4 = `select count(id) as nosubject from subject where isactive ='true'`;
-    pool.query(sqlQuery4, (error, result) => {
+    try {
+          pool.query(sqlQuery4, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl}, 'server error', result1 `
@@ -66,12 +79,16 @@ module.exports = {
       }
       return res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
 
   getAllStat5: (req, res) => {
     let sqlQuery5 = `select extract(MONTH from date) as month,sum(amount) as total_value from expense where YEAR(date) = YEAR(CURDATE()) group by month; `;
 
-    pool.query(sqlQuery5, (error, result) => {
+    try {
+          pool.query(sqlQuery5, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl}, 'server error', result1 `
@@ -84,12 +101,16 @@ module.exports = {
       console.log(result)
       return res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
 
   getAllStat6: (req, res) => {
     let sqlQuery5 = `select count(userId) as noParent from guardian `;
 
-    pool.query(sqlQuery5, (error, result) => {
+    try {
+          pool.query(sqlQuery5, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl}, 'server error', result1 `
@@ -101,11 +122,15 @@ module.exports = {
       }
       return res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
   getAllStat7: (req, res) => {
     let sqlQuery5 = `SELECT class,count(student_id) as count from student where isActive='true' group by student.class;  `;
 
-    pool.query(sqlQuery5, (error, result) => {
+    try {
+          pool.query(sqlQuery5, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl}, 'server error', result1 `
@@ -117,5 +142,8 @@ module.exports = {
       }
       return res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
 };

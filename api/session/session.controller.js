@@ -15,12 +15,14 @@ module.exports = {
 
     let query = data.active == true ? sqlQuery1 : sqlQuery2;
 
-    pool.query(query, (error, result) => {
+    try {
+          pool.query(query, (error, result) => {
       // }
 
       let sqlQuery = `insert into session (sessionname,sessionaccountid,createdat,sessioncode,createdby,active,startmonth) values
            ('${data.sessionname}','${code}','${date}','${code}','${data.createdby}','${data.active}','${data.startmonth}')`;
-      pool.query(sqlQuery, (error, result) => {
+      try {
+          pool.query(sqlQuery, (error, result) => {
         if (error) {
           // logger.info(
           //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, create new session`
@@ -50,23 +52,39 @@ module.exports = {
        date varchar(50) DEFAULT NULL,
        createdby varchar(10) DEFAULT '0'
        )`;
+          try {
           pool.query(sqlQuery1, (error, result) => {
             // res.status(200).json({ success: 1, data: result });
           });
+        }
+        catch (error) {
+        }
 
           let sqlQuery = `select * from session order by id desc limit 50`;
+          try {
           pool.query(sqlQuery, (error, result) => {
             res.status(200).json({ success: 1, data: result });
           });
         }
+        catch (error) {
+        }
+        }
       });
+      
+    }
+    catch (error) {
+    }
     });
+  }
+  catch (error) {
+  }
   },
 
   getsessionById: (req, res) => {
     const id = parseInt(req.params.session_id);
     let sqlQuery = `select * from session where id = ${id}`;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch session by id`
@@ -87,11 +105,15 @@ module.exports = {
       // logger.info(`${req.method} ${req.originalUrl}, fetch session by id`);
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
 
   getAllsession: (req, res) => {
     let sqlQuery = `select * from session order by id desc limit 50`;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl}, 'server error', fetch all session`
@@ -108,11 +130,15 @@ module.exports = {
 
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
 
   getActivesession: (req, res) => {
     let sqlQuery = `select sessionname,activeaccountid  from session where active = 'true'`;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl}, 'server error', fetch all session`
@@ -129,6 +155,9 @@ module.exports = {
 
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
 
   updatesession: (req, res) => {
@@ -136,7 +165,8 @@ module.exports = {
 
     let sqlQuery = `update session set sessionname ='${data.sessionname}',createdat='${date}',createdby='${data.createdby}' where id = ${data.id}`;
 
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update session data`
@@ -158,18 +188,28 @@ module.exports = {
       if (result.affectedRows == 1) {
         // logger.info(`${req.method} ${req.originalUrl}, update session data`);
         let sqlQuery = `select * from session`;
-        pool.query(sqlQuery, (error, result) => {
+        try {
+          pool.query(sqlQuery, (error, result) => {
           res.status(200).json({ success: 1, data: result });
         });
       }
+      catch (error) {
+      }
+      }
+      
     });
+  }
+  catch (error) {
+  }
+    
   },
 
   updatesessionStatus: (req, res) => {
     let data = req.body;
     let sqlQuery = `update session set active ='false'`;
     console.log(data)
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update session data`
@@ -182,14 +222,28 @@ module.exports = {
       if (result.affectedRows) {
         // logger.info(`${req.method} ${req.originalUrl}, update session data`);
         let sqlQuery = `update session set active ='true' , startmonth='${data.startmonth}' where sessionname = '${data.session}'`;
-        pool.query(sqlQuery, (error, result) => {
+        try {
+          pool.query(sqlQuery, (error, result) => {
           let sqlQuery = `select * from session`;
+          try {
           pool.query(sqlQuery, (error, result) => {
             res.status(200).json({ success: 1, data: result });
           });
+        }
+        catch (error) {
+        }
         });
       }
+      catch (error) {
+      }
+      }
+  
+      
+      
     });
+  }
+  catch (error) {
+  }
   },
 
   deleteAllsession: (req, res) => {
@@ -197,7 +251,8 @@ module.exports = {
     // let sqlQuery = `delete from session where userId = ${id.session_id}`;
     let sqlQuery = `delete from session`;
 
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete session by id`
@@ -224,6 +279,9 @@ module.exports = {
         });
       }
     });
+  }
+  catch (error) {
+  }
   },
   deleteSinglesession: (req, res) => {
     const data = req.body;
@@ -231,7 +289,8 @@ module.exports = {
     // let sqlQuery = `delete from session where userId = ${id.session_id}`;
     let sqlQuery = `delete from session where id='${data.id}'`;
 
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete session by id`
@@ -253,19 +312,34 @@ module.exports = {
       if (result.affectedRows == 1) {
         console.log('session deleted')
         let sqlQuery1 = `drop table ${data.code}`;
-        pool.query(sqlQuery1, (error, result) => {
+        try {
+          pool.query(sqlQuery1, (error, result) => {
           if (error) console.log(error.sqlMessage);
           //  res.status(200).json({ success: 1, data: result });
           console.log('table dropped')
 
         });
+      }
+      catch (error) {
+      }
 
         // logger.info(`${req.method} ${req.originalUrl}, delete session  by id`);
         let sqlQuery = `select * from session order by id desc limit 50`;
-        pool.query(sqlQuery, (error, result) => {
+        try {
+          pool.query(sqlQuery, (error, result) => {
           res.status(200).json({ success: 1, data: result });
         });
       }
-    });
+      catch (error) {
+      }
+      
+    
+  
+    }
+  });
+
+  }
+  catch (error) {
+  }
   },
 };

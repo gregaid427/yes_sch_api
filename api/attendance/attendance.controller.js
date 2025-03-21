@@ -12,12 +12,14 @@ module.exports = {
 
     let query = data.active == true ? sqlQuery1 : sqlQuery2;
 
-    pool.query(query, (error, result) => {
+   try {
+        pool.query(query, (error, result) => {
       // }
 
       let sqlQuery = `insert into session (sessionname,createdat,createdby,active,startmonth) values
            ('${data.sessionname}','${date}','${data.createdby}','${data.active}','${data.startmonth}')`;
-      pool.query(sqlQuery, (error, result) => {
+     try {
+        pool.query(sqlQuery, (error, result) => {
         if (error) {
           // logger.info(
           //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, create new session`
@@ -31,18 +33,29 @@ module.exports = {
 
         if (result.affectedRows == 1) {
           let sqlQuery = `select * from session`;
-          pool.query(sqlQuery, (error, result) => {
+         try {
+        pool.query(sqlQuery, (error, result) => {
             res.status(200).json({ success: 1, data: result });
           });
         }
+        catch (error) {
+        }
+        }
       });
+    }
+    catch (error) {
+    }
     });
+  }
+  catch (error) {
+  }
   },
 
   getsessionById: (req, res) => {
     const id = parseInt(req.params.session_id);
     let sqlQuery = `select * from session where id = ${id}`;
-    pool.query(sqlQuery, (error, result) => {
+   try {
+        pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch session by id`
@@ -63,13 +76,17 @@ module.exports = {
       // logger.info(`${req.method} ${req.originalUrl}, fetch session by id`);
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
 
   UpdateStatus: (req, res) => {
     let value = req.body;
     console.log(value);
     let sqlQuery = `update attendance set status = '${value.status}' where entityid = '${value.id}' and groupecode = '${value.code}'`;
-    pool.query(sqlQuery, (error, result) => {
+   try {
+        pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl}, 'server error', fetch all session`
@@ -81,7 +98,8 @@ module.exports = {
       }
 
       let sqlQuery = `select attendance.*,student.firstName,student.otherName, student.lastName from attendance left join student on attendance.entityid = student.student_id where attendance.groupecode = '${value.code}'`;
-      pool.query(sqlQuery, (error, result) => {
+     try {
+        pool.query(sqlQuery, (error, result) => {
         if (error) {
           // logger.info(
           //   `${req.method} ${req.originalUrl}, 'server error', fetch all session`
@@ -102,7 +120,13 @@ module.exports = {
 
         res.status(200).json({ success: 1, data: result });
       });
+    }
+    catch (error) {
+    }
     });
+  }
+  catch (error) {
+  }
   },
   gettodayrecord: (req, res) => {
   
@@ -110,7 +134,8 @@ module.exports = {
     date = date.toLocaleDateString("en-CA");
     let sqlQuery = `Select * from attendance where datetaken = '${date}'  group by groupecode order by classid `;
     console.log(sqlQuery)
-    pool.query(sqlQuery, (error, result) => {
+   try {
+        pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl}, 'server error', fetch all session`
@@ -127,11 +152,15 @@ module.exports = {
 
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
   getdetail: (req, res) => {
     let value = req.body.code;
     let sqlQuery = `select attendance.*,student.firstName,student.otherName, student.lastName from attendance left join student on attendance.entityid = student.student_id where attendance.groupecode = '${value}'`;
-    pool.query(sqlQuery, (error, result) => {
+   try {
+        pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl}, 'server error', fetch all session`
@@ -148,6 +177,9 @@ module.exports = {
 
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
 
   sessionrecords: (req, res) => {
@@ -158,7 +190,8 @@ module.exports = {
         ? `select  attendance.* from attendance where session = '${value.session}' and classid = '${value.class}'  group by groupecode`
         : `select  attendance.* from attendance where session = '${value.session}' and classid = '${value.class}' and section = '${value.section}' group by groupecode`;
     console.log(sqlQuery);
-    pool.query(sqlQuery, (error, result) => {
+   try {
+        pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl}, 'server error', fetch all session`
@@ -175,6 +208,9 @@ module.exports = {
 
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
   getdaterecords: (req, res) => {
     let value = req.body;
@@ -184,7 +220,8 @@ console.log(value)
       section == "All Sections"
         ? `select  attendance.* from attendance where datetaken = '${value.date}' and classid = '${value.class}'  group by groupecode`
         : `select  attendance.* from attendance where datetaken = '${value.date}' and classid = '${value.class}' and section = '${section}' group by groupecode`;
-    pool.query(sqlQuery, (error, result) => {
+   try {
+        pool.query(sqlQuery, (error, result) => {
       console.log(sqlQuery)
       if (error) {
         console.log(error)
@@ -203,13 +240,17 @@ console.log(value)
 
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
   updatesession: (req, res) => {
     const data = req.body;
 
     let sqlQuery = `update session set sessionname ='${data.sessionname}',createdat='${date}',createdby='${data.createdby}' where id = ${data.id}`;
 
-    pool.query(sqlQuery, (error, result) => {
+   try {
+        pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update session data`
@@ -231,11 +272,18 @@ console.log(value)
       if (result.affectedRows == 1) {
         // logger.info(`${req.method} ${req.originalUrl}, update session data`);
         let sqlQuery = `select * from session`;
+       try {
         pool.query(sqlQuery, (error, result) => {
           res.status(200).json({ success: 1, data: result });
         });
       }
+      catch (error) {
+      }
+      }
     });
+  }
+  catch (error) {
+  }
   },
 
   createattendance: (req, res) => {
@@ -254,6 +302,7 @@ console.log(value)
           : `INSERT INTO attendance(groupecode, entityid,classid, name, datetaken, createdat, createdby,status, session,section) VALUES
       ('${code}','${total}','${data.class}','${data.name}','${data.datetaken}','${date}','${data.createdby}','Absent','${data.session}','${data.section}')`;
 
+       try {
         pool.query(sqlQuery, (error, result) => {
           if (error) {
             console.log(error);
@@ -269,7 +318,11 @@ console.log(value)
             resolve(true);
           }
         });
+      }
+      catch (error) {
+      }
       });
+      
       return promise1;
     }
 
@@ -297,7 +350,8 @@ console.log(value)
     let data = req.body;
     let sqlQuery = `update session set active ='false'`;
 
-    pool.query(sqlQuery, (error, result) => {
+   try {
+        pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update session data`
@@ -310,14 +364,28 @@ console.log(value)
       if (result.affectedRows) {
         // logger.info(`${req.method} ${req.originalUrl}, update session data`);
         let sqlQuery = `update session set active ='true' , startmonth='${data.startmonth}' where sessionname = '${data.session}'`;
+       try {
         pool.query(sqlQuery, (error, result) => {
           let sqlQuery = `select * from session`;
-          pool.query(sqlQuery, (error, result) => {
+         try {
+        pool.query(sqlQuery, (error, result) => {
             res.status(200).json({ success: 1, data: result });
           });
+        }
+        catch (error) {
+        }
         });
       }
+      catch (error) {
+      }
+        
+      }
+      
     });
+  }
+  catch (error) {
+  }
+    
   },
 
   deleteAllAttendance: (req, res) => {
@@ -325,7 +393,8 @@ console.log(value)
     // let sqlQuery = `delete from session where userId = ${id.session_id}`;
     let sqlQuery = `delete from attendance`;
 
-    pool.query(sqlQuery, (error, result) => {
+   try {
+        pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete session by id`
@@ -352,13 +421,17 @@ console.log(value)
         });
       }
     });
+  }
+  catch (error) {
+  }
   },
   deleteSinglesession: (req, res) => {
     const id = req.params.id;
     // let sqlQuery = `delete from session where userId = ${id.session_id}`;
     let sqlQuery = `delete from session where id='${id}'`;
 
-    pool.query(sqlQuery, (error, result) => {
+   try {
+        pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete session by id`
@@ -380,10 +453,19 @@ console.log(value)
       if (result.affectedRows == 1) {
         // logger.info(`${req.method} ${req.originalUrl}, delete session  by id`);
         let sqlQuery = `select * from session`;
+       try {
         pool.query(sqlQuery, (error, result) => {
           res.status(200).json({ success: 1, data: result });
         });
       }
+      catch (error) {
+      }
+      }
+      
     });
+  }
+  catch (error) {
+  }
+    
   },
 };

@@ -18,7 +18,8 @@ module.exports = {
 
     let sqlQuery = `insert into expense (name,date,expensehead,createdby,invoice,description,amount,filename,link,createdat) values
            ('${data.name}','${data.date}','${data.expensehead}','${data.createdby}','${data.invoice}','${data.description}','${data.amount}','${data.filename}','${link}','${date}')`;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, create new expense`
@@ -33,11 +34,19 @@ module.exports = {
       if (result.affectedRows == 1) {
         // logger.info(`${req.method} ${req.originalUrl}, `);
         let sqlQuery = `select * from expense`;
+        try {
         pool.query(sqlQuery, (error, result) => {
           res.status(200).json({ success: 1, data: result });
         });
       }
+      catch (error) {
+      }
+      }
     });
+  }
+  catch (error) {
+  }
+    
   },
   createExpenseHead: async (req, res) => {
     const data = req.body;
@@ -45,7 +54,8 @@ module.exports = {
 
     let sqlQuery = `insert into expensehead (expensehead,createdat,createdby,notes) values
            ('${data.expensehead}','${date}','${data.createdby}','${data.notes}')`;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, create new expenseHead`
@@ -59,17 +69,27 @@ module.exports = {
       if (result.affectedRows == 1) {
         // logger.info(`${req.method} ${req.originalUrl}, `);
         let sqlQuery = `select * from expensehead`;
+        try {
         pool.query(sqlQuery, (error, result) => {
           res.status(200).json({ success: 1, data: result });
         });
       }
+      catch (error) {
+      }
+      }
+      
     });
+  }
+  catch (error) {
+  }
+    
   },
 
   getExpenseById: (req, res) => {
     const id = parseInt(req.params.expense_id);
     let sqlQuery = `select * from expense where expense_id = ${id}`;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch expense by id`
@@ -89,6 +109,9 @@ module.exports = {
       // logger.info(`${req.method} ${req.originalUrl}, fetch expense by id`);
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
 
   getcustomexpense: (req, res) => {
@@ -119,7 +142,8 @@ module.exports = {
         return `select * from expense `;
       }
     }
-    pool.query(getparams(date), (error, result) => {
+    try {
+        pool.query(getparams(date), (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${error}, 'server error', fetch custom expense`
@@ -137,11 +161,15 @@ module.exports = {
 
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
 
   getallexpense: (req, res) => {
     let sqlQuery = `select * from expense`;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl}, 'server error', fetch all expense`
@@ -159,11 +187,15 @@ module.exports = {
 
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
 
   getallexpensehead: (req, res) => {
     let sqlQuery = `select * from expensehead`;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl}, 'server error', fetch all expense`
@@ -181,6 +213,9 @@ module.exports = {
 
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
 
   updateExpense: async (req, res) => {
@@ -191,7 +226,8 @@ module.exports = {
     const data = JSON.parse(req.body.data);
     let sqlQuery = `update expense set name ='${data.expensename}',date='${data.date}',expensehead='${data.expensehead}',invoice='${data.invoice}',amount='${data.amount}',documentlink='${data.link}',createdby='${data.createdby}',filename='${data.filename}'   where id = '${data.id}'`;
     console.log(sqlQuery)
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update expense data`
@@ -219,17 +255,26 @@ module.exports = {
       if (result.affectedRows == 1) {
         // logger.info(`${req.method} ${req.originalUrl}, delete expense  by id`);
         let sqlQuery = `select * from expense`;
+        try {
         pool.query(sqlQuery, (error, result) => {
           res.status(200).json({ success: 1, data: result });
         });
       }
+      catch (error) {
+      }
+      }
+      
     });
+  }
+  catch (error) {
+  }
   },
   updateExpenseHead: async (req, res) => {
     const data = req.body;
     let sqlQuery = `update expensehead set expensehead ='${data.expensehead}',createdat='${date}',createdby='${data.createdby}',notes='${data.notes}' where id = ${data.id}`;
 
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update expense data`
@@ -253,17 +298,27 @@ module.exports = {
       if (result.affectedRows == 1) {
         // logger.info(`${req.method} ${req.originalUrl}, delete expense  by id`);
         let sqlQuery = `select * from expensehead`;
+        try {
         pool.query(sqlQuery, (error, result) => {
           res.status(200).json({ success: 1, data: result });
         });
       }
+      catch (error) {
+      }
+      }
+      
     });
+  }
+  catch (error) {
+  }
+    
   },
 
   updateExpensestatus: (req, res) => {
     let sqlQuery = `update expense set expense_status ='false'`;
 
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update expense data`
@@ -286,15 +341,24 @@ module.exports = {
       if (result.affectedRows == 1) {
         // logger.info(`${req.method} ${req.originalUrl}, delete expense  by id`);
         let sqlQuery = `select * from expense`;
+        try {
         pool.query(sqlQuery, (error, result) => {
           res.status(200).json({ success: 1, data: result });
         });
       }
+      catch (error) {
+      }
+      }
+      
     });
+  }
+  catch (error) {
+  }
   },
   truncateTable: (req, res) => {
     let sqlQuery = `truncate table expense`;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete all records`
@@ -307,6 +371,7 @@ module.exports = {
       if (result.affectedRows == 1) {
         // logger.info(`${req.method} ${req.originalUrl}, delete all records`);
         let sqlQuery1 = `truncate table expensehead`;
+        try {
         pool.query(sqlQuery1, (error, result) => {
           if (error) {
             // logger.info(
@@ -326,7 +391,14 @@ module.exports = {
           }
         });
       }
+      catch (error) {
+      }
+      }
+      
     });
+  }
+  catch (error) {
+  }
   },
 
   deleteSingleExpenseHead: (req, res) => {
@@ -334,7 +406,8 @@ module.exports = {
     let sqlQuery = `delete from expensehead where id = ${id}`;
     // let sqlQuery = `delete from expense`;
 
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete expense head by id`
@@ -359,18 +432,27 @@ module.exports = {
         //   `${req.method} ${req.originalUrl}, delete expense head by id`
         // );
         let sqlQuery = `select * from expensehead`;
+        try {
         pool.query(sqlQuery, (error, result) => {
           res.status(200).json({ success: 1, data: result });
         });
       }
+      catch (error) {
+      }
+      }
+      
     });
+  }
+  catch (error) {
+  }
   },
   deleteSingleExpense: (req, res) => {
     const id = req.params.id;
     let sqlQuery = `delete from expense where id = ${id}`;
     // let sqlQuery = `delete from expense`;
 
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete expense by id`
@@ -393,18 +475,26 @@ module.exports = {
       if (result.affectedRows == 1) {
         // logger.info(`${req.method} ${req.originalUrl}, delete expense  by id`);
         let sqlQuery = `select * from expense`;
+        try {
         pool.query(sqlQuery, (error, result) => {
           res.status(200).json({ success: 1, data: result });
         });
       }
+      catch (error) {
+      }
+      }
     });
+  }
+  catch (error) {
+  }
   },
   deleteallexpense: (req, res) => {
     const id = req.body;
     // let sqlQuery = `delete from expense where userId = ${id.expense_id}`;
     let sqlQuery = `delete from expense`;
 
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete expense by id`
@@ -432,6 +522,9 @@ module.exports = {
         });
       }
     });
+  }
+  catch (error) {
+  }
   },
 };
 

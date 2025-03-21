@@ -22,7 +22,8 @@ async function AssignFeeByClass(data) {
       const promise4 = await new Promise((resolve1, reject) => {
         let sqlQuery1 = `select  account.preference,account.student_id from student left join account on student.student_id = account.student_id where student.class ='${clazz}' and student.cartegory ='${cart}' `;
 
-        pool.query(sqlQuery1, async (error, resultz) => {
+        try {
+          pool.query(sqlQuery1, async (error, resultz) => {
           if (error) {
             console.log(
               `${req.method} ${req.originalUrl}, 'server error', fetch all fee`
@@ -48,7 +49,8 @@ async function AssignFeeByClass(data) {
               console.log(singlestudent);
               let sqlQuery2 = `select feepayable as feepay, scholarship from account where student_id='${singlestudent}' `;
               const promise = await new Promise((resolve, reject) => {
-                pool.query(sqlQuery2, async (error, resulty) => {
+                try {
+          pool.query(sqlQuery2, async (error, resulty) => {
                   if (error) {
                     console.log(
                       `${req.method} ${req.originalUrl}, 'server error', fetch all fee`
@@ -59,6 +61,10 @@ async function AssignFeeByClass(data) {
                   );
                   resolve(resulty);
                 });
+              }
+                catch (error) {
+                }
+                
               });
 
               const promise1 = await new Promise((resolve, reject) => {
@@ -87,7 +93,8 @@ async function AssignFeeByClass(data) {
                 console.log("amount is" + amount);
 
 
-                pool.query(sqlQuery6, async (error, result) => {
+                try {
+          pool.query(sqlQuery6, async (error, result) => {
                   if (error) {
                     console.log(
                       `${req.method} ${req.originalUrl}, 'server error', fetch all fee`
@@ -96,6 +103,9 @@ async function AssignFeeByClass(data) {
 
                   resolve1("done");
                 });
+              }
+              catch (error) {
+              }
               } else {
                 console.log(
                   "faaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaalllllllllllseeeeeeee"
@@ -108,6 +118,9 @@ async function AssignFeeByClass(data) {
             console.log(hh)
           }
         });
+      }
+      catch (error) {
+      }
       });
       let set = await promise4;
 
@@ -129,7 +142,8 @@ async function AssignFeeByClass(data) {
     }, 3000);
 
     // let sqlQuery = `select * from assignfeecartegory order by id desc`;
-    // pool.query(sqlQuery, (error, result) => {
+    // try {
+    //      pool.query(sqlQuery, (error, result) => {
     //   res.status(200).json({ success: 1, data: result });
     // });
     // console.log("Fees Assign logged Successfully");
@@ -154,7 +168,8 @@ async function recordfeepayment(data) {
       }','${data.balbeforepayment}','${data.balanceafterpayment
       }','${date.toLocaleDateString("en-CA")}','${data.collectedby}','${data.receiptid
       }','${data.arrears}','Fee Payment','${data.session}')`;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(error)
         console.log(
@@ -166,6 +181,9 @@ async function recordfeepayment(data) {
       //   `${req.method} ${req.originalUrl},'success', fetch all student by class`
       // );
     });
+  }
+  catch (error) {
+  }
   });
   return promise1
 
@@ -178,7 +196,8 @@ async function recordfeepayment(data) {
   //     }','${data.balbeforepayment}','${data.balanceafterpayment
   //     }','${date.toLocaleDateString("en-CA")}','${data.collectedby}','${data.receiptid
   //     }','${data.arrears}','Fee Payment','${data.session}')`;
-  //   pool.query(sqlQuery, (error, result) => {
+  //   try {
+  //        pool.query(sqlQuery, (error, result) => {
   //     if (error) {
   //       console.log(
   //         `${req.method} ${req.originalUrl},'success', fetch all student by class`
@@ -253,7 +272,8 @@ async function update(feedatas, student) {
 
   const promise9 = await new Promise((resolve, reject) => {
     let sqlQuery2 = `select feepayable as currentfeepayable from student where student_id = '${student.student_id}'`
-    pool.query(sqlQuery2, async (error, result) => {
+    try {
+          pool.query(sqlQuery2, async (error, result) => {
       if (error) {
         console.log(
           `${sqlQuery2} ${req.originalUrl}, 'server error', fetch all fee`
@@ -262,6 +282,9 @@ async function update(feedatas, student) {
 
       resolve(result);
     });
+  }
+  catch (error) {
+  }
   });
 
   let current = await promise9
@@ -280,7 +303,8 @@ async function update(feedatas, student) {
   //   console.log("amount is" + amount);
 
 
-  //   pool.query(sqlQuery6, async (error, result) => {
+  //   try {
+  //        pool.query(sqlQuery6, async (error, result) => {
   //     if (error) {
   //       console.log(
   //         `${req.method} ${req.originalUrl}, 'server error', fetch all fee`
@@ -330,7 +354,8 @@ async function RecordAssignFee(data) {
      ('${data.class}','${data.total}','${data.scartegory}','${date}','pending','${data.createdby
     }')`;
 
-  pool.query(sqlQuery, (error, results, fields) => {
+  try {
+          pool.query(sqlQuery, (error, results, fields) => {
     if (error) {
       console.log(error);
       return console.log("assignfeerecord log error");
@@ -338,10 +363,14 @@ async function RecordAssignFee(data) {
     console.log("assignfeerecord logged successfully");
   });
 }
+catch (error) {
+}
+}
 function checkFeeExist(data, callBack) {
   console.log(data)
   let qry = `select * from assignfeecartegory where feename = '${data.name}' and where class = '${data.class}' and where scartegory ='${data.cart}' `
-  pool.query(qry
+  try {
+          pool.query(qry
     ,
 
     (error, results, fields) => {
@@ -358,6 +387,9 @@ function checkFeeExist(data, callBack) {
     }
   );
 }
+catch (error) {
+}
+}
 
 
 
@@ -367,7 +399,8 @@ async function getfee(custom) {
   let tt = custom.class
   let uu = custom.cart
   let sqlQuery = `select id from assignfeecartegory where feename = '${kk}' and class = '${tt}' and scartegory = '${uu}' `
-  pool.query(sqlQuery, (error, results, fields) => {
+  try {
+          pool.query(sqlQuery, (error, results, fields) => {
     console.log(sqlQuery);
     console.log(results);
     if (error) {
@@ -388,8 +421,11 @@ async function getfee(custom) {
 
 
   });
-  return result
 
+  return result
+  }
+                catch (error) {
+                }
 }
 
 //function to check
@@ -401,7 +437,8 @@ async function generatefeecartchecker(classname) {
     let sqlQuery = `SELECT distinct(scartegory) as feecount FROM assignfeecartegory WHERE class = '${classname}' `
 
     try {
-      pool.query(sqlQuery, (error, results, fields) => {
+      try {
+          pool.query(sqlQuery, (error, results, fields) => {
         if (error) {
           console.log(error);
           resolve('false')
@@ -411,16 +448,22 @@ async function generatefeecartchecker(classname) {
         resolve(results);
 
       });
+    }
+    catch (error) {
+    }
 
     } catch (error) {
     }
     ;
-  });
+  })
+  
+  ;
   const promise1 = await new Promise((resolve, reject) => {
 
     let sqlQuery = `SELECT distinct(cartegory) as classcount  FROM student WHERE class = '${classname}' `
     try {
-      pool.query(sqlQuery, (error, results, fields) => {
+      try {
+          pool.query(sqlQuery, (error, results, fields) => {
         console.log(sqlQuery)
 
         if (error) {
@@ -436,7 +479,11 @@ async function generatefeecartchecker(classname) {
     } catch (error) {
     }
     ;
+  }
+  catch (error) {
+  }
   });
+  
 
 
   for (const count of promise1) {
@@ -471,7 +518,8 @@ async function CreateAssignFeeClass(data) {
 
       let sqlQuery = `delete from assignfeecartegory where class = '${data.class}' and scartegory = '${data.scartegory}' `;
 
-      pool.query(sqlQuery, (error, results, fields) => {
+      try {
+          pool.query(sqlQuery, (error, results, fields) => {
         if (error) {
           console.log(error);
           return console.log(
@@ -481,6 +529,10 @@ async function CreateAssignFeeClass(data) {
         resolve(results);
       });
     }
+    catch (error) {
+    }
+    }
+    
   });
 
   const val = await promise
@@ -543,7 +595,8 @@ function ActivityregisterLog(activity, user, amount, status, date, description) 
   let sqlQuery = `insert into financelog (activity,createdby,amount,createdAt,status,description) values
      ('${activity}','${user}','${amount}','${date}','applied','${description}')`;
 
-  pool.query(sqlQuery, (error, results, fields) => {
+  try {
+          pool.query(sqlQuery, (error, results, fields) => {
     if (error) {
       console.log(error);
       return console.log("financelog log error");
@@ -551,24 +604,32 @@ function ActivityregisterLog(activity, user, amount, status, date, description) 
     console.log("financelog logged successfully");
   });
 }
+catch (error) {
+}
+}
 function FeeGenerateLog(data, entity, description) {
   let sqlQuery = `insert into feegeneraterecord (code,session,createdby,date,entity,description) values
      ('${data.code}','${data.session}','${data.createdby}','${date}','${entity}','${description}')`;
 
-  pool.query(sqlQuery, (error, results, fields) => {
+  try {
+          pool.query(sqlQuery, (error, results, fields) => {
     if (error) {
       console.log(error);
       return console.log("financelog log error");
     }
     console.log("financelog logged successfully");
   });
+}
+catch (error) {
+}
 }
 
 function UpdateAccountLog(data) {
   let sqlQuery = `insert into accountupdatelog (createdby,createdat,balance,activity,arrears) values
      ('${data.createdby}','${date}','${data.balance}','${data.activity}','${data.arrears}')`;
 
-  pool.query(sqlQuery, (error, results, fields) => {
+  try {
+          pool.query(sqlQuery, (error, results, fields) => {
     if (error) {
       console.log(error);
       return console.log("Update log error");
@@ -576,11 +637,15 @@ function UpdateAccountLog(data) {
     console.log("update  logged successfully");
   });
 }
+catch (error) {
+}
+}
 function AssignFeeLog(createdby, entity) {
   let sqlQuery = `insert into assignfeelog (createdby,createdat,entity) values
      ('${createdby}','${date}','${entity}')`;
 
-  pool.query(sqlQuery, (error, results, fields) => {
+  try {
+          pool.query(sqlQuery, (error, results, fields) => {
     if (error) {
       console.log(error);
       return console.log("Assign log error");
@@ -588,8 +653,12 @@ function AssignFeeLog(createdby, entity) {
     console.log("Assign fee logged successfully");
   });
 }
+catch (error) {
+}
+}
 async function getfeepayable(stdid, callBack) {
-  pool.query(
+  try {
+          pool.query(
     `select feepayable  from account where student_id = '${stdid.student_id}' `,
     (error, results, fields) => {
       if (error) {
@@ -600,8 +669,12 @@ async function getfeepayable(stdid, callBack) {
     }
   );
 }
+catch (error) {
+}
+}
 async function getFeecart({ stdid, name }, callBack) {
-  pool.query(
+  try {
+          pool.query(
     `select ${name} as no from account  where student_id = '${stdid.student_id}' `,
 
     (error, results, fields) => {
@@ -612,8 +685,12 @@ async function getFeecart({ stdid, name }, callBack) {
     }
   );
 }
+catch (error) {
+}
+}
 async function updatefeepayable({ stdid, amount }, callBack) {
-  pool.query(
+  try {
+          pool.query(
     `update account set feepayable = '${amount}'  where student_id = '${stdid.student_id}' `,
     (error, results, fields) => {
       if (error) {
@@ -622,6 +699,9 @@ async function updatefeepayable({ stdid, amount }, callBack) {
       return callBack(null, results[0].no);
     }
   );
+}
+catch (error) {
+}
 }
 function hashgenerator(num) {
   return createHash(num);
@@ -639,7 +719,8 @@ module.exports = {
 
     let sqlQuery = `insert into fee (itemName,itemId,cartegory,quantity,CreatedBy,supplier,createdAt,supplierContact1,supplierContact2,SupplierInfo,isActive,description) values
  ('${data.itemName}','${code}','${data.cartegory}',${data.quantity},'${data.CreatedBy}','${data.supplier}','${date}','${data.supplierContact1}','${data.supplierContact2}','${data.SupplierInfo}','true','${data.description}')`;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(
           `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, create new fee`
@@ -652,11 +733,20 @@ module.exports = {
       if (result.affectedRows == 1) {
         console.log(`${req.method} ${req.originalUrl},Success create new fee`);
         let sqlQuery = `select * from fee  where isActive = 'true'`;
-        pool.query(sqlQuery, (error, result) => {
+        try {
+          pool.query(sqlQuery, (error, result) => {
           res.status(200).json({ success: 1, data: result });
         });
+        
       }
+      catch (error) {
+      }
+      }
+      
     });
+  }
+  catch (error) {
+  }
   },
   updatescholarship: async (req, res) => {
     const data = req.body;
@@ -665,7 +755,8 @@ module.exports = {
 
     let sqlQuery = `update scholarshiplist set title = '${data.title}',amount = '${data.amount}',createdby='${data.CreatedBy}',createdat='${date}',percent ='${data.percent}',feecartapplicable ='${data.applicable}',applicable ='${data.applicable}',type='${data.type}' where id='${data.id}' `;
     console.log(sqlQuery)
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(
           `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update scholarship`
@@ -679,11 +770,20 @@ module.exports = {
           `${req.method} ${req.originalUrl},Success update scholarship`
         );
         let sqlQuery = `select * from scholarshiplist `;
-        pool.query(sqlQuery, (error, result) => {
+        try {
+          pool.query(sqlQuery, (error, result) => {
           res.status(200).json({ success: 1, data: result });
         });
       }
+      catch (error) {
+      }
+      }
+      
     });
+  }
+  catch (error) {
+  }
+    
   },
 
 
@@ -696,7 +796,8 @@ module.exports = {
     let sqlQuery = `insert into scholarshiplist (title,amount,CreatedBy,createdAt,percent,applicable,type) values
    ('${data.title}','${data.amount}','${data.Createdby}','${date}','${data.percent}','${data.applicable}','${data.type}')`;
 
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(
           `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, create scholarship`
@@ -710,11 +811,18 @@ module.exports = {
           `${req.method} ${req.originalUrl},Success create scholarship`
         );
         let sqlQuery = `select * from scholarshiplist `;
-        pool.query(sqlQuery, (error, result) => {
+        try {
+          pool.query(sqlQuery, (error, result) => {
           res.status(200).json({ success: 1, data: result });
         });
       }
+      catch (error) {
+      }
+      }
     });
+  }
+  catch (error) {
+  }
   },
 
   enrollScholarship: async (req, res) => {
@@ -726,7 +834,8 @@ module.exports = {
 
       let sqlQuery3 = `delete from scholarshipenroll where student_id ='${data.id}' `;
 
-      pool.query(sqlQuery3, (error, result) => {
+      try {
+          pool.query(sqlQuery3, (error, result) => {
         if (error) {
           console.log(
             `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, create enroll scholarship`
@@ -736,10 +845,14 @@ module.exports = {
         resolve(result)
 
       });
+    }
+    catch (error) {
+    }
     });
     let bb = promise8
     let sqlQuery = `update student set scholarship = '${data.amount}',feepayable = '${data.feepayable}', accountbalance = '${data.accountbalance}' where student_id ='${data.id}' `;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(
           `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, create enroll scholarship`
@@ -753,7 +866,8 @@ module.exports = {
         let sqlQuery = `insert into scholarshipenroll (student_id,scholarshiptitle,scholarshipid,createdat,createdby,amount,cartegorycovering) values
         ('${data.id}','${data.scholarship}','${data.scholarId}','${date}','${data.createdby}','${data.amount}','${data.cover}')`;
 
-        pool.query(sqlQuery, (error, result) => {
+        try {
+          pool.query(sqlQuery, (error, result) => {
           if (error) {
             console.log(
               `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, create enroll scholarship`
@@ -772,13 +886,21 @@ module.exports = {
             success: 1,
           });
         });
+      }
+      catch (error) {
+      }
 
         // let sqlQuery = `select * from scholarshipenroll `;
-        // pool.query(sqlQuery, (error, result) => {
+        // try {
+         // pool.query(sqlQuery, (error, result) => {
         //   res.status(200).json({ success: 1, data: result });
         // });
       }
     });
+  }
+  catch (error) {
+  }
+    
   },
   totalfee: (req, res) => {
     let period = req.body.period
@@ -793,7 +915,8 @@ module.exports = {
 
     }
     let sqlQuery = getquery(period, session);
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(error)
         console.log(
@@ -816,6 +939,9 @@ module.exports = {
       console.log(`${req.method} ${req.originalUrl}, fetch fee by id`);
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
 
   getsinglebill: (req, res) => {
@@ -823,7 +949,8 @@ module.exports = {
     let sqlQuery = `select * from assignfeecartegory where assignfeecartegory.scartegory = '${data.cart}' and assignfeecartegory.class = '${data.class}' `;
     console.log(sqlQuery)
 
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(error)
         console.log(
@@ -846,6 +973,9 @@ module.exports = {
       console.log(`${result} ${req.originalUrl}, fetch fee by id`);
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
 
   getbulkbill: async (req, res) => {
@@ -854,7 +984,8 @@ module.exports = {
     let sqlQuery = `select student_id from student where class = '${data.class}'`;
 
     const promise8 = await new Promise((resolve, reject) => {
-      pool.query(sqlQuery, (error, result) => {
+      try {
+          pool.query(sqlQuery, (error, result) => {
         if (error) {
           console.log(error)
           console.log(
@@ -870,6 +1001,9 @@ module.exports = {
           resolve(result)
         }
       });
+    }
+    catch (error) {
+    }
     });
     let fetchedStudent = await promise8;
     let myArray = []
@@ -879,6 +1013,7 @@ module.exports = {
 
         let sqlQuery1 = `select student.*,assignfeecartegory.* from student right join assignfeecartegory on student.cartegory = assignfeecartegory.scartegory  where student.student_id = '${val.student_id}' and assignfeecartegory.class = '${data.class}'`;
         const promise9 = await new Promise((resolve, reject) => {
+          try {
           pool.query(sqlQuery1, (error, result) => {
             if (error) {
               console.log(error)
@@ -892,6 +1027,9 @@ module.exports = {
             resolve(result)
               ;
           });
+        }
+        catch (error) {
+        }
         });
 
         myArray.push(promise9)
@@ -922,7 +1060,8 @@ module.exports = {
 
     //get new session accountid 
     const promise15 = await new Promise((resolve, reject) => {
-      pool.query(sqlQuery15, (error, result) => {
+      try {
+          pool.query(sqlQuery15, (error, result) => {
         if (error) {
           console.log(error)
           console.log(
@@ -935,6 +1074,9 @@ module.exports = {
         console.log(`${req.method} ${req.originalUrl}, fetch fee by id`);
         resolve(result)
       });
+    }
+    catch (error) {
+    }
     });
     console.log(promise15)
     if (promise15.length != 0) return res.status(200).json({ success: 2, Message: "Account Already Closed For Session", });
@@ -949,7 +1091,8 @@ module.exports = {
 
     //get new session accountid 
     const promise1 = await new Promise((resolve, reject) => {
-      pool.query(sqlQuery10, (error, result) => {
+      try {
+          pool.query(sqlQuery10, (error, result) => {
         if (error) {
           console.log(error)
           console.log(
@@ -962,6 +1105,9 @@ module.exports = {
         console.log(`${req.method} ${req.originalUrl}, fetch fee by id`);
         resolve(result)
       });
+    }
+    catch (error) {
+    }
     });
 
     let val = await promise1
@@ -972,7 +1118,8 @@ module.exports = {
     let sqlQuery = `update session set activeaccountid =  '${val[0].sessionaccountid}',activesessionname = '${data.newsession}'`;
     const promise2 = await new Promise((resolve, reject) => {
 
-      pool.query(sqlQuery, (error, result) => {
+      try {
+          pool.query(sqlQuery, (error, result) => {
         if (error) {
           console.log(error)
           console.log(
@@ -991,6 +1138,9 @@ module.exports = {
         }
         resolve(result)
       });
+    }
+    catch (error) {
+    }
     });
     let val1 = await promise2
 
@@ -1000,7 +1150,8 @@ module.exports = {
     //get old session accountid 
     let sqlQuery11 = `select sessionaccountid from session where sessionname ='${data.oldsession}'`;
     const promise5 = await new Promise((resolve, reject) => {
-      pool.query(sqlQuery11, (error, result) => {
+      try {
+          pool.query(sqlQuery11, (error, result) => {
         if (error) {
           console.log(error)
           console.log(
@@ -1013,6 +1164,9 @@ module.exports = {
         console.log(`${req.method} ${req.originalUrl}, fetch fee by id`);
         resolve(result)
       });
+    }
+    catch (error) {
+    }
     });
 
     let oldsessionid = await promise5
@@ -1022,7 +1176,8 @@ module.exports = {
     // //get old session accountid 
     // let sqlQuery19 = `select sessionaccountid from session where sessionname ='${data.oldsession}'`;
     // const promise9 = await new Promise((resolve, reject) => {
-    //   pool.query(sqlQuery19, (error, result) => {
+    //   try {
+    //      pool.query(sqlQuery19, (error, result) => {
     //     if (error) {
     //       console.log(error)
     //       console.log(
@@ -1046,7 +1201,8 @@ WHERE table_schema = 'yes_school_db'
 LIMIT 1;`;
 
     const promise22 = await new Promise((resolve, reject) => {
-      pool.query(sqlQuery22, async (error, result) => {
+      try {
+          pool.query(sqlQuery22, async (error, result) => {
 
         if (error) {
           console.log(error)
@@ -1080,6 +1236,7 @@ LIMIT 1;`;
        date varchar(50) DEFAULT NULL,
        createdby varchar(10) DEFAULT '0'
        )`;
+          try {
           pool.query(sqlQuery1, async (error, result) => {
             // res.status(200).json({ success: 1, data: result });
             if (error) {
@@ -1092,7 +1249,8 @@ LIMIT 1;`;
               student_id,firstName,lastName,otherName,class,amountpaid,arrears,'${data.oldsession}',feepayable,preference,scholarship,accountbalance,'${date}','${data.createdby}' from student `;
               console.log(sqlQuery3)
               const promise = await new Promise((resolve, reject) => {
-                pool.query(sqlQuery3, async (error, result) => {
+                try {
+          pool.query(sqlQuery3, async (error, result) => {
                   if (error) {
                     console.log(error)
                     console.log(
@@ -1116,7 +1274,8 @@ LIMIT 1;`;
                     // reset amount paid  to 0 for all student in student table 
                     let sqlQuery6 = `update student set  amountpaid=0.00`;
 
-                    pool.query(sqlQuery6, (error, result) => {
+                    try {
+          pool.query(sqlQuery6, (error, result) => {
                       if (error) {
                         console.log(error)
                         console.log(
@@ -1145,7 +1304,8 @@ LIMIT 1;`;
                       ('${data.createdby}','${date}','${data.oldsession}','${data.newsession}','${oldsessionid[0].sessionaccountid}')`;
                     const promise = await new Promise((resolve, reject) => {
 
-                      pool.query(sqlQuery4, (error, result) => {
+                      try {
+          pool.query(sqlQuery4, (error, result) => {
                         if (error) {
                           console.log('account closure recorded')
                           console.log(error)
@@ -1157,18 +1317,31 @@ LIMIT 1;`;
                           data: [],
                         });
                       });
+                    }
+                    catch (error) {
+                    }
                     });
                     console.log('account closure recorded')
-
+                  }
+                  catch (error) {
+                  }
 
                   }
 
                 });
+                
+                
+              }
+              catch (error) {
+              }
               });
 
 
             }
           });
+        }
+        catch (error) {
+        }
         }
 
 
@@ -1181,7 +1354,8 @@ LIMIT 1;`;
           student_id,firstName,lastName,otherName,class,amountpaid,arrears,'${data.oldsession}',feepayable,preference,scholarship,accountbalance,'${date}','${data.createdby}' from student `;
           console.log(sqlQuery3)
           const promise = await new Promise((resolve, reject) => {
-            pool.query(sqlQuery3, async (error, result) => {
+            try {
+          pool.query(sqlQuery3, async (error, result) => {
               if (error) {
                 console.log(error)
                 console.log(
@@ -1208,7 +1382,8 @@ LIMIT 1;`;
                 // reset amount paid  to 0 for all student in student table 
                 let sqlQuery6 = `update student set  amountpaid=0.00`;
 
-                pool.query(sqlQuery6, (error, result) => {
+                try {
+          pool.query(sqlQuery6, (error, result) => {
                   if (error) {
                     console.log(error)
                     console.log(
@@ -1237,7 +1412,8 @@ LIMIT 1;`;
                       ('${data.createdby}','${date}','${data.oldsession}','${data.newsession}','${oldsessionid[0].sessionaccountid}')`;
                 const promise = await new Promise((resolve, reject) => {
 
-                  pool.query(sqlQuery4, (error, result) => {
+                  try {
+          pool.query(sqlQuery4, (error, result) => {
                     if (error) {
                       console.log('account closure recorded')
                       console.log(error)
@@ -1248,31 +1424,35 @@ LIMIT 1;`;
                       data: [],
                     });
                   });
+                }
+                catch (error) {
+                }
                 });
 
                 console.log('account closure recorded')
-
+              }
+              catch (error) {
+              }
               }
 
             });
+          }
+          catch (error) {
+          }
           });
 
         }
       });
+    }
+    catch (error) {
+    }
     });
-
-
-
-
-
-
-
-
   },
   getAllassignlog: (req, res) => {
     const id = req.body.id
     let sqlQuery = `select * from assignfeelog order by id desc limit  30 `;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(error)
         console.log(
@@ -1295,11 +1475,15 @@ LIMIT 1;`;
       console.log(`${req.method} ${req.originalUrl}, fetch fee by id`);
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
   getAssignRecordAction: (req, res) => {
     const id = req.body.id
     let sqlQuery = `select * from assignfeerecord order by id desc limit  100 `;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(error)
         console.log(
@@ -1322,13 +1506,17 @@ LIMIT 1;`;
       console.log(`${req.method} ${req.originalUrl}, fetch fee by id`);
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
   feespaidsession: async (req, res) => {
     const data = req.body
     let sqlQuery = `select sessionaccountid from session where sessionname = '${data.session}' `;
     const promise8 = await new Promise((resolve, reject) => {
       console.log(sqlQuery)
-      pool.query(sqlQuery, (error, result) => {
+      try {
+          pool.query(sqlQuery, (error, result) => {
         if (error) {
           console.log(
             `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch fee by id`
@@ -1349,6 +1537,9 @@ LIMIT 1;`;
         }
         resolve(result)
       });
+    }
+    catch (error) {
+    }
     });
 
     let students = await promise8
@@ -1357,7 +1548,8 @@ LIMIT 1;`;
     let sqlQuery5 = `select * from  ${db} where class = '${data.class}' `;
     console.log(sqlQuery5)
     const promise1 = await new Promise((resolve, reject) => {
-      pool.query(sqlQuery5, (error, result) => {
+      try {
+          pool.query(sqlQuery5, (error, result) => {
         if (error) {
           console.log(
             `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch fee by id`
@@ -1379,6 +1571,9 @@ LIMIT 1;`;
         res.status(200).json({ success: 1, data: result });
         resolve(result)
       });
+    }
+    catch (error) {
+    }
     });
 
 
@@ -1390,7 +1585,8 @@ LIMIT 1;`;
     let sqlQuery3 = `select sessionaccountid  from session where sessionname='${data.id}'`;
     const promise3 = await new Promise((resolve, reject) => {
 
-      pool.query(sqlQuery3, async (error, result) => {
+      try {
+          pool.query(sqlQuery3, async (error, result) => {
         if (error) {
           console.log(
             `${req.method} ${req.originalUrl}, 'server error', fetch accountid error`
@@ -1405,7 +1601,9 @@ LIMIT 1;`;
         resolve(result)
       })
       return resolve
-
+    }
+    catch (error) {
+    }
     });
     let acctid = promise3
     console.log(acctid)
@@ -1415,7 +1613,8 @@ LIMIT 1;`;
     let sqlQuery1 = `select distinct(class.title) as title,id from class order by class.title asc`;
     const promise1 = await new Promise((resolve, reject) => {
 
-      pool.query(sqlQuery1, async (error, result) => {
+      try {
+          pool.query(sqlQuery1, async (error, result) => {
         if (error) {
           console.log(
             `${req.method} ${req.originalUrl}, 'server error', fetch all fee`
@@ -1430,7 +1629,9 @@ LIMIT 1;`;
         resolve(result)
       })
       return resolve
-
+    }
+    catch (error) {
+    }
     });
 
     let clazz = promise1
@@ -1444,7 +1645,8 @@ LIMIT 1;`;
       let sqlQuery1 = `select sum(amountpaid) as paid, sum(arrears) as arrears, sum(accountbalance) as balance from ${acctid[0].sessionaccountid} where class = '${element.title}'`;
       const promise2 = await new Promise((resolve, reject) => {
 
-        pool.query(sqlQuery1, (error, result) => {
+        try {
+          pool.query(sqlQuery1, (error, result) => {
           console.log(result)
           if (error) {
             console.log(
@@ -1471,6 +1673,9 @@ LIMIT 1;`;
 
           resolve(result)
         });
+      }
+      catch (error) {
+      }
       });
 
       // console.log(element)
@@ -1487,7 +1692,8 @@ LIMIT 1;`;
 
     const promise6 = await new Promise((resolve, reject) => {
 
-      pool.query(sqlQuery6, (error, result) => {
+      try {
+          pool.query(sqlQuery6, (error, result) => {
         console.log(result)
         if (error) {
           console.log(
@@ -1499,6 +1705,9 @@ LIMIT 1;`;
         }
         resolve(result)
       });
+    }
+    catch (error) {
+    }
     });
     let subdata1 = promise6
     console.log(subdata1)
@@ -1506,7 +1715,8 @@ LIMIT 1;`;
     // let sqlQuery = `select * from student where class = '${data.class}' `;
     // const promise8 = await new Promise((resolve, reject) => {
 
-    //   pool.query(sqlQuery, (error, result) => {
+    //   try {
+     //     pool.query(sqlQuery, (error, result) => {
     //     if (error) {
     //       console.log(
     //         `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch fee by id`
@@ -1537,7 +1747,8 @@ LIMIT 1;`;
     //   let sqlQuery1 = `select sum(amountpaid) as paid from feepaymentrecords where student_id = '${element.student_id}' and session = '${data.session}'`;
     //   const promise2 = await new Promise((resolve, reject) => {
 
-    //     pool.query(sqlQuery1, (error, result) => {
+    //     try {
+    //      pool.query(sqlQuery1, (error, result) => {
     //       console.log(result)
     //       if (error) {
     //         console.log(
@@ -1608,7 +1819,8 @@ LIMIT 1;`;
     let sqlQuery = `select * from student where class = '${data.class}' `;
     const promise8 = await new Promise((resolve, reject) => {
 
-      pool.query(sqlQuery, (error, result) => {
+      try {
+          pool.query(sqlQuery, (error, result) => {
         if (error) {
           console.log(
             `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch fee by id`
@@ -1629,6 +1841,9 @@ LIMIT 1;`;
         }
         resolve(result)
       });
+    }
+    catch (error) {
+    }
     });
 
     let students = promise8
@@ -1639,7 +1854,8 @@ LIMIT 1;`;
       let sqlQuery1 = `select sum(amountpaid) as paid from feepaymentrecords where student_id = '${element.student_id}' and session = '${data.session}'`;
       const promise2 = await new Promise((resolve, reject) => {
 
-        pool.query(sqlQuery1, (error, result) => {
+        try {
+          pool.query(sqlQuery1, (error, result) => {
           console.log(result)
           if (error) {
             console.log(
@@ -1698,6 +1914,9 @@ LIMIT 1;`;
           }
           resolve(result)
         });
+      }
+      catch (error) {
+      }
       });
 
     };
@@ -1712,7 +1931,8 @@ LIMIT 1;`;
     let sqlQuery3 = `select sessionaccountid  from session where sessionname='${data.session}'`;
     const promise3 = await new Promise((resolve, reject) => {
 
-      pool.query(sqlQuery3, async (error, result) => {
+      try {
+          pool.query(sqlQuery3, async (error, result) => {
         if (error) {
           console.log(
             `${req.method} ${req.originalUrl}, 'server error', fetch accountid error`
@@ -1727,12 +1947,15 @@ LIMIT 1;`;
         resolve(result)
       })
       return resolve
-
+    }
+    catch (error) {
+    }
     });
     let acctid = promise3[0].sessionaccountid
     console.log()
     let sqlQuery = `select * from feepaymentrecords  where student_id = '${data.id}' and activeaccountid =  '${acctid}'  order by date desc limit  10`;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(
           `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch fee by id`
@@ -1754,11 +1977,15 @@ LIMIT 1;`;
       console.log(`${req.method} ${req.originalUrl}, fetch fee by id`);
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
   getstudentrecord: (req, res) => {
     const id = req.body.id
     let sqlQuery = `select * from feepaymentrecords where student_id = '${id}'  order by date desc limit  10`;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(
           `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch fee by id`
@@ -1780,11 +2007,15 @@ LIMIT 1;`;
       console.log(`${req.method} ${req.originalUrl}, fetch fee by id`);
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
   generatefeerecord: (req, res) => {
     const id = parseInt(req.params.fee_id);
     let sqlQuery = `SELECT * FROM feegeneraterecord order by id desc limit 50 `;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(
           `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch fee by id`
@@ -1796,11 +2027,15 @@ LIMIT 1;`;
       console.log(`${req.method} ${req.originalUrl}, fetch fee by id`);
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
   fetchaccountclosure: (req, res) => {
     const id = parseInt(req.params.fee_id);
     let sqlQuery = `SELECT * FROM accountclosure  order by id desc limit 50`;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(
           `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch fee by id`
@@ -1812,11 +2047,15 @@ LIMIT 1;`;
       console.log(`${req.method} ${req.originalUrl}, fetch fee by id`);
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
   fetchaccountUpdate: (req, res) => {
     const id = parseInt(req.params.fee_id);
     let sqlQuery = `SELECT * FROM accountupdatelog  order by id desc limit 50`;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(
           `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch fee by id`
@@ -1828,11 +2067,15 @@ LIMIT 1;`;
       console.log(`${req.method} ${req.originalUrl}, fetch fee by id`);
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
   getfeeById: (req, res) => {
     const id = parseInt(req.params.fee_id);
     let sqlQuery = `select * from fee where fee_id = ${id}`;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(
           `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch fee by id`
@@ -1854,13 +2097,17 @@ LIMIT 1;`;
       console.log(`${req.method} ${req.originalUrl}, fetch fee by id`);
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
   resetclassaccount: async (req, res) => {
     let data = req.body;
     console.log(data);
     const promise8 = await new Promise((resolve, reject) => {
       let sqlQuery = `select student_id from student where class in (${data.class}) `;
-      pool.query(sqlQuery, (error, result) => {
+      try {
+          pool.query(sqlQuery, (error, result) => {
         if (error) {
           return res.status(500).json({
             success: 0,
@@ -1871,6 +2118,9 @@ LIMIT 1;`;
         console.log(result);
         resolve(result);
       });
+    }
+    catch (error) {
+    }
     });
     let fetchedStudent = await promise8;
 
@@ -1887,7 +2137,8 @@ LIMIT 1;`;
 
         async function resetfeepayable(sqlQuery6) {
           const promise3 = await new Promise((resolve, reject) => {
-            pool.query(sqlQuery6, async (error, result) => {
+            try {
+          pool.query(sqlQuery6, async (error, result) => {
               if (error) {
                 console.log(error);
                 res.status(500).json({
@@ -1898,7 +2149,11 @@ LIMIT 1;`;
               }
               return resolve(result);
             });
+          }
+          catch (error) {
+          }
           });
+          
           return promise3;
         }
 
@@ -1931,7 +2186,8 @@ LIMIT 1;`;
     let data = req.body;
     console.log(data);
     let sqlQuery = `update student set accountbalance ='${data.amount}'`;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(
           `${req.method} ${req.originalUrl}, 'server error', fetch all fee`
@@ -1961,12 +2217,16 @@ LIMIT 1;`;
         .status(200)
         .json({ success: 1, message: "All Accounts Updated successfully" });
     });
+  }
+  catch (error) {
+  }
   },
 
   updatefeerecord: (req, res) => {
     let data = req.body;
     let sqlQuery = `update assignfeerecord set status = "Applied" where class='${data.class}'`;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(
           `${req.method} ${req.originalUrl}, 'server error', fetch all fee`
@@ -1981,10 +2241,14 @@ LIMIT 1;`;
 
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
   getAllfee: (req, res) => {
     let sqlQuery = `select * from fee  where isActive = 'true'`;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(
           `${req.method} ${req.originalUrl}, 'server error', fetch all fee`
@@ -1999,11 +2263,15 @@ LIMIT 1;`;
 
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
   getfeerecordgroup: (req, res) => {
     //let sqlQuery = `select DISTINCT(class.title), assignfeecartegory.* from class left join assignfeecartegory on class.title = assignfeecartegory.class group by class.title`;
     let sqlQuery = ` SELECT * FROM assignfeecartegory group by class,scartegory`;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(
           `${req.method} ${req.originalUrl}, 'server error', fetch all fee`
@@ -2018,12 +2286,16 @@ LIMIT 1;`;
 
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
   getfeerecord: (req, res) => {
     //  let sqlQuery = `select DISTINCT(class.title), assignfeecartegory.* from class left join assignfeecartegory on class.title = assignfeecartegory.class`;
     let sqlQuery = ` SELECT * FROM assignfeecartegory group by class,scartegory`;
 
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(
           `${req.method} ${req.originalUrl}, 'server error', fetch all fee`
@@ -2038,12 +2310,16 @@ LIMIT 1;`;
 
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
   getallassignedfeerecord: async (req, res) => {
     let arr = []
 
     let sqlQuery = `select distinct(class.title) as title from class`;
-    pool.query(sqlQuery, async (error, result) => {
+    try {
+          pool.query(sqlQuery, async (error, result) => {
       if (error) {
         console.log(
           `${req.method} ${req.originalUrl}, 'server error', fetch all fee`
@@ -2057,6 +2333,7 @@ LIMIT 1;`;
       async function getcart() {
         let sqlQuery1 = `select title from studentscartegory`;
         const promise5 = await new Promise((resolve, reject) => {
+          try {
           pool.query(sqlQuery1, (error, resultz) => {
             if (error) {
               console.log(
@@ -2074,6 +2351,9 @@ LIMIT 1;`;
             resolve(resultz)
             //  res.status(200).json({ success: 1, data: result });
           });
+        }
+        catch (error) {
+        }
         });
 
         return promise5
@@ -2081,6 +2361,7 @@ LIMIT 1;`;
       async function getdata(data, cart) {
         let sqlQuery1 = `select * from assignfeecartegory  where class = '${data}' and scartegory = '${cart}'`;
         const promise5 = await new Promise((resolve, reject) => {
+          try {
           pool.query(sqlQuery1, (error, resultz) => {
             if (error) {
               console.log(
@@ -2098,6 +2379,9 @@ LIMIT 1;`;
             resolve(resultz)
             //  res.status(200).json({ success: 1, data: result });
           });
+        }
+        catch (error) {
+        }
         });
 
         return promise5
@@ -2138,6 +2422,9 @@ LIMIT 1;`;
       }, 3000);
 
     });
+  }
+  catch (error) {
+  }
 
 
   },
@@ -2145,7 +2432,8 @@ LIMIT 1;`;
   getAssigncustom: (req, res) => {
     let data = req.body;
     let sqlQuery = `select * from assignfeecartegory where class ='${data.class}'`;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(
           `${req.method} ${req.originalUrl}, 'server error', fetch all fee`
@@ -2162,11 +2450,15 @@ LIMIT 1;`;
 
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
 
   getAssignfeerecord: (req, res) => {
     let sqlQuery = `select * from assignfeecartegory order by id desc`;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(
           `${req.method} ${req.originalUrl}, 'server error', fetch all fee`
@@ -2183,6 +2475,9 @@ LIMIT 1;`;
 
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
 
   paymentWithscholarship: async (req, res) => {
@@ -2190,7 +2485,8 @@ LIMIT 1;`;
     // const promise1 = await new Promise((resolve, reject) => {
 
     //   let sqlQuery = `select * from feepaymentrecords where student_id='${id}' limit 15 `;
-    //   pool.query(sqlQuery, (error, result) => {
+    //   try {
+     //     pool.query(sqlQuery, (error, result) => {
     //     if (error) {
     //       console.log(
     //         `${req.method} ${req.originalUrl}, 'server error', fetch all fee`
@@ -2210,7 +2506,8 @@ LIMIT 1;`;
     // let feedata = await promise1
 
     let sqlQuery1 = `select * from scholarshipenroll where student_id='${id}' `;
-    pool.query(sqlQuery1, (error, result) => {
+    try {
+          pool.query(sqlQuery1, (error, result) => {
       if (error) {
         console.log(
           `${req.method} ${req.originalUrl}, 'server error', fetch all fee`
@@ -2227,11 +2524,15 @@ LIMIT 1;`;
       res.status(200).json({ success: 1, scholarship: result });
 
     });
+  }
+  catch (error) {
+  }
 
   },
   getPaymentRecords: (req, res) => {
     let sqlQuery = `select feepaymentrecords.*, student.firstName, student.otherName, student.lastName ,student.class from feepaymentrecords left join student on feepaymentrecords.student_id = student.student_id order by id desc `;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(
           `${req.method} ${req.originalUrl}, 'server error', fetch all fee`
@@ -2246,10 +2547,14 @@ LIMIT 1;`;
 
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
   currentopenedaccount: (req, res) => {
     let sqlQuery = `select * from accountclosure order by id desc limit 1`;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(
           `${req.method} ${req.originalUrl}, 'server error',fetch Current Account details`
@@ -2264,10 +2569,14 @@ LIMIT 1;`;
 
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
   getScholarship: (req, res) => {
     let sqlQuery = `select * from scholarshiplist`;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(
           `${req.method} ${req.originalUrl}, 'server error', fetch all fee`
@@ -2282,12 +2591,16 @@ LIMIT 1;`;
 
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
   revokeScholarship: (req, res) => {
     let data = req.body;
 
     let sqlQuery = `Delete  from scholarshipenroll where id = '${data.id}'`;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(
           `${req.method} ${req.originalUrl}, 'server error', fetch all fee`
@@ -2304,7 +2617,8 @@ LIMIT 1;`;
       if (result.affectedRows) {
 
         let sqlQuery = `update student set scholarship = 0 where student_id ='${data.id}' `;
-        pool.query(sqlQuery, (error, result) => {
+        try {
+          pool.query(sqlQuery, (error, result) => {
           if (error) {
             console.log(
               `${req.method} ${req.originalUrl}, 'server error', fetch all fee`
@@ -2317,6 +2631,7 @@ LIMIT 1;`;
 
           let sqlQuery = `select scholarshipenroll.*, student.class, student.firstName,student.lastName, student.otherName from scholarshipenroll left join student on scholarshipenroll.student_id = student.student_id`;
 
+          try {
           pool.query(sqlQuery, (error, result) => {
             if (error) {
               console.log(
@@ -2330,11 +2645,21 @@ LIMIT 1;`;
             res.status(200).json({ success: 1, data: result });
 
           });
+        }
+        catch (error) {
+        }
         });
 
-
       }
+      catch (error) {
+      }
+      }
+      
+      
     });
+  }
+  catch (error) {
+  }
   },
 
 
@@ -2359,7 +2684,8 @@ LIMIT 1;`;
       }
     }
 
-    pool.query(await query(data), async (error, result) => {
+    try {
+          pool.query(await query(data), async (error, result) => {
       if (error) {
         console.log(`${req.method} ${error}, 'server error', fetch all fee`);
         console.log(error)
@@ -2373,17 +2699,25 @@ LIMIT 1;`;
       );
       let sqlQuery = `insert into clearlog (createdby,createdat,activity) values
       ('${data.createdBy}','${date}','${data.log}')`;
-      pool.query(sqlQuery, (error, result) => {
+      try {
+          pool.query(sqlQuery, (error, result) => {
         console.log(result);
         res.status(200).json({ success: 1, });
       });
+    }
+    catch (error) {
+    }
     });
+  }
+  catch (error) {
+  }
 
   },
   getclearlog: (req, res) => {
     const id = parseInt(req.params.fee_id);
     let sqlQuery = `SELECT * FROM clearlog  order by id desc limit 50`;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(
           `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch fee by id`
@@ -2395,6 +2729,9 @@ LIMIT 1;`;
       console.log(`${req.method} ${req.originalUrl}, fetch fee by id`);
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
   getScholarshipEnroll: async (req, res) => {
     let data = req.body;
@@ -2410,7 +2747,8 @@ LIMIT 1;`;
       }
     }
 
-    pool.query(await query(data), (error, result) => {
+    try {
+          pool.query(await query(data), (error, result) => {
       if (error) {
         console.log(`${req.method} ${error}, 'server error', fetch all fee`);
 
@@ -2425,6 +2763,9 @@ LIMIT 1;`;
       console.log(result);
       res.status(200).json({ success: 1, data: result, type: data.type });
     });
+  }
+  catch (error) {
+  }
   },
 
   createfeeCartegory: (req, res) => {
@@ -2433,7 +2774,8 @@ LIMIT 1;`;
     console.log(data);
     let sqlQuery = `insert into feesgroup (name,feeid,createdby,createdat,status,description) values
     ('${data.name}','${hash}','${data.createdby}','${date}','true','${data.description}')`;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(
           `${req.method}  ${error.sqlMessage}, ${req.originalUrl}, 'server error', create  fee cartegory`
@@ -2454,15 +2796,24 @@ LIMIT 1;`;
           `${req.method} ${req.originalUrl},Success create new column field`
         );
         let sqlQuery = `select * from feesgroup  where isActive = 'true'`;
-        pool.query(sqlQuery, (error, result) => {
+        try {
+          pool.query(sqlQuery, (error, result) => {
           res.status(200).json({ success: 1, data: result });
         });
       }
+      catch (error) {
+      }
+      }
+      
     });
+  }
+  catch (error) {
+  }
   },
   getCart: (req, res) => {
     let sqlQuery = `select * from feesgroup`;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(
           `${req.method} ${req.originalUrl}, 'server error', fetch all fee`
@@ -2477,13 +2828,17 @@ LIMIT 1;`;
 
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
   updatefee: (req, res) => {
     const data = req.body;
 
     let sqlQuery = `update fee set itemName ='${data.itemName}',cartegory='${data.cartegory}',quantity='${data.quantity}',description='${data.description}',CreatedBy='${data.CreatedBy}',supplier='${data.supplier}',supplierContact1='${data.supplierContact1}',supplierContact2='${data.supplierContact2}',SupplierInfo='${data.SupplierInfo}' where id = ${data.id}`;
 
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(
           `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update fee data`
@@ -2510,13 +2865,17 @@ LIMIT 1;`;
           .json({ success: 1, Message: "update fee data success" });
       }
     });
+  }
+  catch (error) {
+  }
   },
   updatefeecart: (req, res) => {
     const data = req.body;
 
     let sqlQuery = `update feesgroup set name ='${data.name}',description='${data.description}',CreatedBy='${data.CreatedBy}',createdat='${date}' where id = ${data.id}`;
 
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(
           `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update fee data`
@@ -2538,11 +2897,19 @@ LIMIT 1;`;
 
       if (result.affectedRows == 1) {
         let sqlQuery = `select * from feesgroup`;
-        pool.query(sqlQuery, (error, result) => {
+        try {
+          pool.query(sqlQuery, (error, result) => {
           res.status(200).json({ success: 1, data: result });
         });
       }
+      catch (error) {
+      }
+      }
+      
     });
+  }
+  catch (error) {
+  }
   },
   generatefeeallstudent: async (req, res) => {
     const data = req.body;
@@ -2552,7 +2919,8 @@ LIMIT 1;`;
     //get all distinct classnames 
     const promise4 = await new Promise((resolve, reject) => {
       let sqlQuery = `select distinct(class.title) as class from class `;
-      pool.query(sqlQuery, (error, result) => {
+      try {
+          pool.query(sqlQuery, (error, result) => {
         console.log(result)
         if (error) {
           return res.status(500).json({
@@ -2572,6 +2940,9 @@ LIMIT 1;`;
         console.log(result);
         resolve(result);
       });
+    }
+    catch (error) {
+    }
     });
 
     let clazz = await promise4
@@ -2599,7 +2970,8 @@ LIMIT 1;`;
     //get all student to be applied to
     const promise8 = await new Promise((resolve, reject) => {
       let sqlQuery = `select student_id from student where  student.isActive = 'true'; `;
-      pool.query(sqlQuery, (error, result) => {
+      try {
+          pool.query(sqlQuery, (error, result) => {
         console.log(result)
         if (error) {
           return res.status(500).json({
@@ -2619,6 +2991,9 @@ LIMIT 1;`;
         console.log(result);
         resolve(result);
       });
+    }
+    catch (error) {
+    }
     });
     let getstudent = promise8;
 
@@ -2628,7 +3003,8 @@ LIMIT 1;`;
 
       const promise5 = await new Promise((resolve, reject) => {
         let sqlQuery = `select * from student where student_id = '${stud.student_id}'`;
-        pool.query(sqlQuery, (error, result) => {
+        try {
+          pool.query(sqlQuery, (error, result) => {
           if (error) {
             return res.status(500).json({
               success: 0,
@@ -2639,6 +3015,9 @@ LIMIT 1;`;
           console.log(result);
           resolve(result);
         });
+      }
+      catch (error) {
+      }
       });
       let student = await promise5;
       console.log(student);
@@ -2647,7 +3026,8 @@ LIMIT 1;`;
       //check for assigned fee for chosen classes and get assigned fee
       const promise3 = await new Promise((resolve, reject) => {
         let sqlQuery = `select class, amount as amt , feename as name,scartegory as cart from assignfeecartegory where class = '${student[0].class}' and scartegory ='${student[0].cartegory}' `;
-        pool.query(sqlQuery, (error, result) => {
+        try {
+          pool.query(sqlQuery, (error, result) => {
           console.log(result)
           console.log(sqlQuery)
 
@@ -2669,6 +3049,9 @@ LIMIT 1;`;
           console.log(result);
           resolve(result);
         });
+      }
+      catch (error) {
+      }
       });
       let getassignedfee = promise3;
 
@@ -2699,6 +3082,7 @@ LIMIT 1;`;
 
         const promise2 = await new Promise((resolve, reject) => {
           console.log(sqlQuery6)
+          try {
           pool.query(sqlQuery6, async (error, result) => {
             if (error) {
               console.log(error);
@@ -2711,6 +3095,9 @@ LIMIT 1;`;
 
 
           });
+        }
+        catch (error) {
+        }
         });
       }
 
@@ -2723,7 +3110,8 @@ LIMIT 1;`;
     //  backup account data
     // const promise5 = await new Promise((resolve, reject) => {
     //   let sqlQuery = `SHOW TABLES LIKE '${data.prev}'`;
-    //   pool.query(sqlQuery, (error, result) => {
+    //   try {
+    //      pool.query(sqlQuery, (error, result) => {
     //     if (error) {
     //       return res.status(500).json({
     //         success: 0,
@@ -2754,7 +3142,8 @@ LIMIT 1;`;
     //get student data
     const promise5 = await new Promise((resolve, reject) => {
       let sqlQuery = `select * from student where student_id = '${data.id}'`;
-      pool.query(sqlQuery, (error, result) => {
+      try {
+          pool.query(sqlQuery, (error, result) => {
         if (error) {
           return res.status(500).json({
             success: 0,
@@ -2765,13 +3154,17 @@ LIMIT 1;`;
         console.log(result);
         resolve(result);
       });
+    }
+    catch (error) {
+    }
     });
     let student = await promise5;
 
     //check for assigned fee for chosen classes and get assigned fee
     const promise3 = await new Promise((resolve, reject) => {
       let sqlQuery = `select class, amount as amt , feename as name,scartegory as cart from assignfeecartegory where class = '${data.class}' and scartegory ='${data.cartegory}' `;
-      pool.query(sqlQuery, (error, result) => {
+      try {
+          pool.query(sqlQuery, (error, result) => {
         console.log(result)
         console.log(sqlQuery)
 
@@ -2791,6 +3184,9 @@ LIMIT 1;`;
         console.log(result);
         resolve(result);
       });
+    }
+    catch (error) {
+    }
     });
     let getassignedfee = promise3;
 
@@ -2827,7 +3223,8 @@ LIMIT 1;`;
 
       const promise2 = await new Promise((resolve, reject) => {
         console.log(sqlQuery6)
-        pool.query(sqlQuery6, async (error, result) => {
+        try {
+          pool.query(sqlQuery6, async (error, result) => {
           if (error) {
             console.log(error);
             res
@@ -2848,6 +3245,9 @@ LIMIT 1;`;
             .status(200)
             .json({ success: 7, message: "Fees Generated Successfully" });
         });
+      }
+      catch (error) {
+      }
       });
     }
 
@@ -2893,7 +3293,8 @@ LIMIT 1;`;
     const promise8 = await new Promise((resolve, reject) => {
       let sqlQuery = `select student_id from student where class in (${data.class}) and student.isActive = 'true'; `;
 
-      pool.query(sqlQuery, (error, result) => {
+      try {
+          pool.query(sqlQuery, (error, result) => {
         console.log(result)
 
         if (error) {
@@ -2913,6 +3314,9 @@ LIMIT 1;`;
         // }
         resolve(result);
       });
+    }
+    catch (error) {
+    }
     });
     let getstudent = promise8;
 
@@ -2922,7 +3326,8 @@ LIMIT 1;`;
 
       const promise5 = await new Promise((resolve, reject) => {
         let sqlQuery = `select * from student where student_id = '${stud.student_id}'`;
-        pool.query(sqlQuery, (error, result) => {
+        try {
+          pool.query(sqlQuery, (error, result) => {
           if (error) {
             return res.status(500).json({
               success: 0,
@@ -2933,6 +3338,9 @@ LIMIT 1;`;
           console.log(result);
           resolve(result);
         });
+      }
+      catch (error) {
+      }
       });
       let student = await promise5;
       console.log(student);
@@ -2941,7 +3349,8 @@ LIMIT 1;`;
       //check for assigned fee for chosen classes and get assigned fee
       const promise3 = await new Promise((resolve, reject) => {
         let sqlQuery = `select class, amount as amt , feename as name,scartegory as cart from assignfeecartegory where class = '${student[0].class}' and scartegory ='${student[0].cartegory}' `;
-        pool.query(sqlQuery, (error, result) => {
+        try {
+          pool.query(sqlQuery, (error, result) => {
           console.log(result)
           console.log(sqlQuery)
 
@@ -2964,6 +3373,9 @@ LIMIT 1;`;
           console.log(result);
           resolve(result);
         });
+      }
+      catch (error) {
+      }
       });
       let getassignedfee = promise3;
 
@@ -2992,6 +3404,7 @@ LIMIT 1;`;
 
         const promise2 = await new Promise((resolve, reject) => {
           console.log(sqlQuery6)
+          try {
           pool.query(sqlQuery6, async (error, result) => {
             if (error) {
               console.log(error);
@@ -3011,6 +3424,9 @@ LIMIT 1;`;
 
 
           });
+        }
+        catch (error) {
+        }
         });
       }
 
@@ -3057,9 +3473,13 @@ LIMIT 1;`;
       // let sqlQuery = `select DISTINCT(class.title), assignfeecartegory.* from class left join assignfeecartegory on class.title = assignfeecartegory.class group by class.title`;
       let sqlQuery = `SELECT * FROM assignfeecartegory group by class,scartegory`;
 
-      pool.query(sqlQuery, (error, result) => {
+      try {
+          pool.query(sqlQuery, (error, result) => {
         res.status(200).json({ success: 1, data: result });
       });
+    }
+    catch (error) {
+    }
       AssignFeeLog(data.createdby, data.class)
       console.log("Fees Assign logged Successfully");
     }
@@ -3073,7 +3493,8 @@ LIMIT 1;`;
     //get initial amount paid value for student
     const promise10 = await new Promise((resolve, reject) => {
       let sqlQuery = `select amountpaid as val from student where student_id ='${data.id}' `;
-      pool.query(sqlQuery, (error, result) => {
+      try {
+          pool.query(sqlQuery, (error, result) => {
         if (error) {
           console.log(
             `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, error update account balance `
@@ -3088,6 +3509,9 @@ LIMIT 1;`;
 
 
       })
+    }
+    catch (error) {
+    }
     })
     console.log(promise10)
     console.log(data.amountpaid)
@@ -3100,7 +3524,8 @@ LIMIT 1;`;
     //update account balances
     const promise1 = await new Promise((resolve, reject) => {
       let sqlQuery = `update student set accountbalance ='${data.balanceafterpayment}' , amountpaid ='${val}' where student_id ='${data.id}' `;
-      pool.query(sqlQuery, async (error, result) => {
+      try {
+          pool.query(sqlQuery, async (error, result) => {
         if (error) {
           console.log(
             `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, error update account balance `
@@ -3128,28 +3553,8 @@ LIMIT 1;`;
 
           if (data.infotype == "All Sections") {
             let sqlQuery = `select * from student  where student.class = '${data.class}' `;
-            pool.query(sqlQuery, (error, result) => {
-              if (error) {
-                return res.status(500).json({
-                  success: 0,
-                  error: "internal server error",
-                  message: error,
-                });
-              }
-
-              // logger.info(
-              //   `${req.method} ${req.originalUrl},'success', fetch all student by class`
-              // );
-              return res.status(200).json({
-                success: 1,
-                message: "update account balance successfull ",
-                data: result,
-                response: data,
-              });
-            });
-          } else {
-            let sqlQuery = `select * from student  where student.class = '${data.class}' and student.section = '${data.section}'`;
-            pool.query(sqlQuery, (error, result) => {
+            try {
+          pool.query(sqlQuery, (error, result) => {
               if (error) {
                 return res.status(500).json({
                   success: 0,
@@ -3169,8 +3574,44 @@ LIMIT 1;`;
               });
             });
           }
+          catch (error) {
+          }
+          } else {
+            let sqlQuery = `select * from student  where student.class = '${data.class}' and student.section = '${data.section}'`;
+            try {
+          pool.query(sqlQuery, (error, result) => {
+              if (error) {
+                return res.status(500).json({
+                  success: 0,
+                  error: "internal server error",
+                  message: error,
+                });
+              }
+
+              // logger.info(
+              //   `${req.method} ${req.originalUrl},'success', fetch all student by class`
+              // );
+              return res.status(200).json({
+                success: 1,
+                message: "update account balance successfull ",
+                data: result,
+                response: data,
+              });
+            });
+          }
+          catch (error) {
+          }
+          }
+          
+          
+          
         }
+        
       });
+      
+    }
+    catch (error) {
+    }
     });
   },
   deleteallasigned: async (req, res) => {
@@ -3178,7 +3619,8 @@ LIMIT 1;`;
     console.log(data.pref);
 
     let sqlQuery = `TRUNCATE TABLE assignfeecartegory`;
-    pool.query(sqlQuery, (error, results, fields) => {
+    try {
+          pool.query(sqlQuery, (error, results, fields) => {
       if (error) {
         console.log(error);
         console.log("Delete table values error");
@@ -3189,6 +3631,9 @@ LIMIT 1;`;
         .status(200)
         .json({ success: 1, Message: "Table Truncated Successfully" });
     });
+  }
+  catch (error) {
+  }
   },
 
   preferences: async (req, res) => {
@@ -3196,7 +3641,8 @@ LIMIT 1;`;
     console.log(data.pref);
 
     let sqlQuery = `update student set preference ='${data.pref}' where student_id = '${data.id}'  `;
-    pool.query(sqlQuery, (error, results, fields) => {
+    try {
+          pool.query(sqlQuery, (error, results, fields) => {
       if (error) {
         console.log(error);
         return console.log("Update preference  error");
@@ -3208,11 +3654,19 @@ LIMIT 1;`;
 
 
         let sqlQuery = `select student.*, account.preference  from student left join account on student.student_id = account.student_id   where student.class='${data.class}' and student.isActive = 'true'; `;
-        pool.query(sqlQuery, (error, result) => {
+        try {
+          pool.query(sqlQuery, (error, result) => {
           res.status(200).json({ success: 1, data: result });
         });
       }
+      catch (error) {
+      }
+      }
+      
     });
+  }
+  catch (error) {
+  }
   },
   reversefeepayment: (req, res) => {
     let date = new Date();
@@ -3221,7 +3675,8 @@ LIMIT 1;`;
     console.log(data);
     let sqlQuery = `update student set accountbalance ='${data.reverseamount}' where student_id ='${data.id}' `;
 
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(
           `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update fee data`
@@ -3245,7 +3700,8 @@ LIMIT 1;`;
       if (result.affectedRows == 1) {
         let sqlQuery = `insert into feepaymentrecords (student_id,amountinvolved,activity,date,collectedby,class) values
         ('${data.id}',${data.amount},'Payment Reversal','${date}','${data.collectedby}','${data.class}')`;
-        pool.query(sqlQuery, (error, result) => {
+        try {
+          pool.query(sqlQuery, (error, result) => {
           if (error) {
             console.log(
               `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, error update account balance `
@@ -3275,13 +3731,24 @@ LIMIT 1;`;
 
             let sqlQuery = `select feepaymentrecords.*, student.firstName, student.otherName, student.lastName ,student.class from feepaymentrecords left join student on feepaymentrecords.student_id = student.student_id order by id desc `;
 
-            pool.query(sqlQuery, (error, result) => {
+            try {
+          pool.query(sqlQuery, (error, result) => {
               res.status(200).json({ success: 1, data: result });
             });
           }
+          catch (error) {
+          }
+          }
         });
       }
+      catch (error) {
+      }
+      }
+      
     });
+  }
+  catch (error) {
+  }
   },
   updatebalance: (req, res) => {
     let date = new Date();
@@ -3289,7 +3756,8 @@ LIMIT 1;`;
     let data = req.body;
     let sqlQuery = `update student  set accountbalance ='${data.amount}' where student_id='${data.id}'`;
 
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(
           `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update fee data`
@@ -3319,7 +3787,8 @@ LIMIT 1;`;
         let data = req.body;
         let sqlQuery = `insert into feepaymentrecords (student_id,amountinvolved,activity,date,collectedby,class) values
         ('${data.id}','${data.amount}','Update Balance','${date}','${data.collectedby}','${data.class}')`;
-        pool.query(sqlQuery, (error, result) => {
+        try {
+          pool.query(sqlQuery, (error, result) => {
           if (error) {
             console.log(
               `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, error update account balance `
@@ -3348,17 +3817,30 @@ LIMIT 1;`;
             );
             let sqlQuery = `select feepaymentrecords.*, student.firstName, student.otherName, student.lastName ,student.class from feepaymentrecords left join student on feepaymentrecords.student_id = student.student_id order by id desc `;
 
-            pool.query(sqlQuery, (error, result) => {
+            try {
+          pool.query(sqlQuery, (error, result) => {
               res.status(200).json({ success: 1, data: result });
             });
           }
+          catch (error) {
+          }
+          }
+          
         });
       }
+      catch (error) {
+      }
+        
+      }
     });
+  }
+  catch (error) {
+  }
   },
   truncateTable: (req, res) => {
     let sqlQuery = `truncate table fee`;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(
           `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete all records`
@@ -3375,13 +3857,17 @@ LIMIT 1;`;
         });
       }
     });
+  }
+  catch (error) {
+  }
   },
   deleteSinglefee: (req, res) => {
     const id = req.params.id;
     let sqlQuery = `delete from fee where id = '${id}'`;
     // let sqlQuery = `delete from fee`;
 
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(
           `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete fee by id`
@@ -3406,6 +3892,9 @@ LIMIT 1;`;
       }
 
     });
+  }
+  catch (error) {
+  }
   },
 
   deletescholarship: (req, res) => {
@@ -3414,7 +3903,8 @@ LIMIT 1;`;
     let sqlQuery = `delete from scholarshiplist where id = '${id}'`;
     // let sqlQuery = `delete from fee`;
 
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(
           `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete fee Cartegory by id`
@@ -3436,11 +3926,20 @@ LIMIT 1;`;
       }
       if (result.affectedRows == 1) {
         let sqlQuery = `select * from scholarshiplist `;
-        pool.query(sqlQuery, (error, result) => {
+        try {
+          pool.query(sqlQuery, (error, result) => {
           res.status(200).json({ success: 1, data: result });
         });
       }
+      catch (error) {
+      }
+      }
+      
+      
     });
+  }
+  catch (error) {
+  }
   },
   updatecartitem: (req, res) => {
     const data = req.body;
@@ -3448,7 +3947,8 @@ LIMIT 1;`;
     let sqlQuery = `update  assignfeecartegory set amount = '${data.amount}' where id = '${data.id}'`;
     // let sqlQuery = `delete from fee`;
     console.log(sqlQuery)
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(
           `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update fee Cartegory by id`
@@ -3470,11 +3970,18 @@ LIMIT 1;`;
       }
       if (result.affectedRows == 1) {
         let sqlQuery = `select * from feesgroup `;
-        pool.query(sqlQuery, (error, result) => {
+        try {
+          pool.query(sqlQuery, (error, result) => {
           res.status(200).json({ success: 1, data: result });
         });
       }
+      catch (error) {
+      }
+      }
     });
+  }
+  catch (error) {
+  }
   },
   cartitemdel: (req, res) => {
     const data = req.body;
@@ -3482,7 +3989,8 @@ LIMIT 1;`;
     let sqlQuery = `delete from assignfeecartegory where id = '${data.id}'`;
     // let sqlQuery = `delete from fee`;
     console.log(sqlQuery)
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(
           `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete fee Cartegory by id`
@@ -3504,11 +4012,18 @@ LIMIT 1;`;
       }
       if (result.affectedRows == 1) {
         let sqlQuery = `select * from feesgroup `;
-        pool.query(sqlQuery, (error, result) => {
+        try {
+          pool.query(sqlQuery, (error, result) => {
           res.status(200).json({ success: 1, data: result });
         });
       }
+      catch (error) {
+      }
+      }
     });
+  }
+  catch (error) {
+  }
   },
   deleteSingleCartfee: (req, res) => {
     const data = req.body;
@@ -3516,7 +4031,8 @@ LIMIT 1;`;
     let sqlQuery = `delete from assignfeecartegory where class = '${data.class}' and scartegory = '${data.cart}'`;
     // let sqlQuery = `delete from fee`;
     console.log(sqlQuery)
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(
           `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete fee Cartegory by id`
@@ -3541,13 +4057,17 @@ LIMIT 1;`;
         res.status(200).json({ success: 1, data: result });
       }
     });
+  }
+  catch (error) {
+  }
   },
   deletegroupFeeCart: (req, res) => {
     const id = req.body.class;
     let sqlQuery = `delete from assignfeecartegory where class = '${id}'`;
     // let sqlQuery = `delete from fee`;
 
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         console.log(
           `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete fee stock by id`
@@ -3568,10 +4088,17 @@ LIMIT 1;`;
       }
       if (result.affectedRows == 1) {
         let sqlQuery = `select * from feestock  where isActive = 'true'`;
-        pool.query(sqlQuery, (error, result) => {
+        try {
+          pool.query(sqlQuery, (error, result) => {
           res.status(200).json({ success: 1, data: result });
         });
       }
+      catch (error) {
+      }
+      }
     });
+  }
+  catch (error) {
+  }
   },
 };

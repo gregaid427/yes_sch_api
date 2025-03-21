@@ -8,7 +8,8 @@ function hashgenerator(num) {
   return createHash(num);
 }
 function checkSubjectExist(data, callBack) {
-  pool.query(
+  try {
+          pool.query(
     `select * from subject where subjectname = '${data.subjectName}' and type = '${data.type}' `,
 
     (error, results, fields) => {
@@ -18,6 +19,9 @@ function checkSubjectExist(data, callBack) {
       return callBack(null, results[0]);
     }
   );
+}
+catch (error) {
+}
 }
 module.exports = {
   createsubject: async (req, res) => {
@@ -35,7 +39,8 @@ module.exports = {
         let code = hashgenerator(5);
         let sqlQuery = `insert into subject (subjectname,createdat,createdby,type,subjectcode) values
            ('${data.subjectName.toUpperCase()}','${date}','${data.createdBy}','${data.type}','${code}')`;
-        pool.query(sqlQuery, (error, result) => {
+        try {
+          pool.query(sqlQuery, (error, result) => {
           if (error) {
             // logger.info(
             //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, create new subject`
@@ -53,19 +58,31 @@ module.exports = {
             // logger.info(`${req.method} ${req.originalUrl}, create new  subject`);
 
             let sqlQuery = `select * from subject`;
-            pool.query(sqlQuery, (error, result) => {
+            try {
+          pool.query(sqlQuery, (error, result) => {
               res.status(200).json({ success: 1, data: result });
             });
           }
+          catch (error) {
+          }
+          }
         });
       }
+      catch (error) {
+      }
+        
+        
+      }
+   
+      
     });
   },
 
   getsubjectById: (req, res) => {
     const id = parseInt(req.params.subject_id);
     let sqlQuery = `select * from subject where subject_id = ${id}`;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch subject by id`
@@ -86,11 +103,15 @@ module.exports = {
       // logger.info(`${req.method} ${req.originalUrl}, fetch subject by id`);
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
 
   getAllSubject: (req, res) => {
     let sqlQuery = `select * from subject`;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl}, 'server error', fetch all subject`
@@ -107,6 +128,9 @@ module.exports = {
 
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
 
   updateSubject: (req, res) => {
@@ -114,7 +138,8 @@ module.exports = {
     console.log(data);
     let sqlQuery = `update subject set subjectname ='${data.subjectname}',createdat='${date}',createdby='${data.createdby}' , type='${data.type}' where id = ${data.id}`;
 
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update subject data`
@@ -136,18 +161,26 @@ module.exports = {
       if (result.affectedRows == 1) {
         // logger.info(`${req.method} ${req.originalUrl}, update subject data`);
         let sqlQuery = `select * from subject`;
-        pool.query(sqlQuery, (error, result) => {
+        try {
+          pool.query(sqlQuery, (error, result) => {
           res.status(200).json({ success: 1, data: result });
         });
       }
+      catch (error) {
+      }
+      }
     });
+  }
+  catch (error) {
+  }
   },
 
   deleteSingleSubject: (req, res) => {
     const id = req.params.subjectId;
     let sqlQuery = `delete from subject where id = ${id}`;
 
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete subject by id`
@@ -169,11 +202,18 @@ module.exports = {
       if (result.affectedRows == 1) {
         // logger.info(`${req.method} ${req.originalUrl}, delete subject  by id`);
         let sqlQuery = `select * from subject `;
-        pool.query(sqlQuery, (error, result) => {
+        try {
+          pool.query(sqlQuery, (error, result) => {
           res.status(200).json({ success: 1, data: result });
         });
       }
+      catch (error) {
+      }
+      }
     });
+  }
+  catch (error) {
+  }
   },
 
   deleteAllSubject: (req, res) => {
@@ -181,7 +221,8 @@ module.exports = {
     // let sqlQuery = `delete from subject where userId = ${id.subject_id}`;
     let sqlQuery = `delete from subject`;
 
-    pool.query(sqlQuery, (error, result) => {
+    try {
+          pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete subject by id`
@@ -203,10 +244,19 @@ module.exports = {
       if (result.affectedRows == 1) {
         // logger.info(`${req.method} ${req.originalUrl}, delete subject  by id`);
         let sqlQuery = `select * from subject `;
-        pool.query(sqlQuery, (error, result) => {
+        try {
+          pool.query(sqlQuery, (error, result) => {
           res.status(200).json({ success: 1, data: result });
         });
       }
+      catch (error) {
+      }
+      }
+      
     });
+    
+  }
+  catch (error) {
+  }
   },
 };

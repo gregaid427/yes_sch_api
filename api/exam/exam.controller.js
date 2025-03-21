@@ -3,7 +3,8 @@ const pool = require("../../config/database.js");
 var createHash = require("hash-generator");
 
 function checkGradTitleExist(data, callBack) {
-  pool.query(
+  try {
+        pool.query(
     `select * from grade where gradetitle = ? `,
     [data],
 
@@ -15,13 +16,18 @@ function checkGradTitleExist(data, callBack) {
     }
   );
 }
+catch (error) {
+}
+
+}
 function getresult(data, res) {
   let sqlQuery =
     data.section != null
       ? `select student_id, firstName,lastName,otherName  from student where class = '${data.clazz}' and section = '${data.section}'  `
       : `select student_id, firstName,lastName,otherName  from student where class = '${data.clazz}'  `;
 
-  pool.query(sqlQuery, async (error, result) => {
+  try {
+        pool.query(sqlQuery, async (error, result) => {
     console.log(sqlQuery);
 
     if (error) {
@@ -66,7 +72,8 @@ function getresult(data, res) {
     }
 
     // let sqlQuery = `select * from examresult where session = '${data.session}' and examgroup = '${data.examgroup}' and student_id = '${data.stdid}'  `;
-    // pool.query(sqlQuery, async (error, result) => {
+    // try {
+    //    pool.query(sqlQuery, async (error, result) => {
     //   console.log(error);
 
     //   if (error) {
@@ -91,6 +98,11 @@ function getresult(data, res) {
     //   res.status(200).json({ success: 1, data: result });
     // });
   });
+  
+}
+catch (error) {
+}
+
 }
 async function setposition(val) {
   const promise1 = await new Promise((resolve, reject) => {
@@ -121,7 +133,8 @@ async function setOverallpositions(data) {
     let sqlQuery = `select  SUM(totalscore) as total from examresult where examresult.session = '${data.session}' and examresult.examgroup = '${data.examgroup}' and examresult.student_id = '${data.id}'  `;
 
     console.log(sqlQuery);
-    pool.query(sqlQuery, (error, results, fields) => {
+    try {
+        pool.query(sqlQuery, (error, results, fields) => {
       if (error) {
         console.log(error);
         resolve(null);
@@ -142,6 +155,9 @@ async function setOverallpositions(data) {
       resolve(results);
       console.log("result retrieved successfully");
     });
+  }
+  catch (error) {
+  }
   });
   let val = await promise1[0].total;
   console.log(
@@ -152,7 +168,8 @@ async function setOverallpositions(data) {
     let sqlQuery = `update examresult set overallscore = ${val} WHERE student_id = '${data.id}'`;
 
     console.log(sqlQuery);
-    pool.query(sqlQuery, (error, results, fields) => {
+    try {
+        pool.query(sqlQuery, (error, results, fields) => {
       if (error) {
         console.log(error);
         resolve(null);
@@ -171,6 +188,9 @@ async function setOverallpositions(data) {
       resolve(results);
       console.log("result retrieved successfully");
     });
+  }
+  catch (error) {
+  }
   });
   return promise1;
 }
@@ -179,7 +199,8 @@ async function getStudentsubjectresult(data) {
     let sqlQuery = `select examresult.*,student.firstName,student.lastName,student.otherName from examresult left join student on examresult.student_id = student.student_id where examresult.session = '${data.session}' and examresult.examgroup = '${data.examgroup}' and examresult.student_id = '${data.id}'  `;
 
     console.log(sqlQuery);
-    pool.query(sqlQuery, (error, results, fields) => {
+    try {
+        pool.query(sqlQuery, (error, results, fields) => {
       if (error) {
         console.log(error);
         resolve(null);
@@ -198,6 +219,9 @@ async function getStudentsubjectresult(data) {
       resolve(results);
       console.log("result retrieved successfully");
     });
+  }
+  catch (error) {
+  }
   });
   return promise1;
 }
@@ -206,7 +230,8 @@ async function updateResultposition(position, examid, student_id) {
   const promise1 = await new Promise((resolve, reject) => {
     let sqlQuery = `update examresult set position = '${position}' where examid = '${examid}' and student_id = '${student_id}' `;
     console.log(sqlQuery);
-    pool.query(sqlQuery, (error, results, fields) => {
+    try {
+        pool.query(sqlQuery, (error, results, fields) => {
       if (error) {
         console.log(error);
         resolve(false);
@@ -215,14 +240,19 @@ async function updateResultposition(position, examid, student_id) {
       resolve(true);
       console.log("result inserted successfully");
     });
+  }
+  catch (error) {
+  }
   });
+  
   return promise1;
 }
 async function updateOverallposition(position, examclasscode, student_id) {
   const promise1 = await new Promise((resolve, reject) => {
     let sqlQuery = `update examresult set overallposition = '${position}' where examclasscode = '${examclasscode}' and student_id = '${student_id}' `;
     console.log(sqlQuery);
-    pool.query(sqlQuery, (error, results, fields) => {
+    try {
+        pool.query(sqlQuery, (error, results, fields) => {
       if (error) {
         console.log(error);
         resolve(false);
@@ -231,11 +261,15 @@ async function updateOverallposition(position, examclasscode, student_id) {
       resolve(true);
       console.log("result inserted successfully");
     });
+  }
+  catch (error) {
+  }
   });
   return promise1;
 }
 function checkExamGroupExist(data, callBack) {
-  pool.query(
+  try {
+        pool.query(
     `select * from grade where gradetitle = ? `,
     [data],
 
@@ -247,8 +281,12 @@ function checkExamGroupExist(data, callBack) {
     }
   );
 }
+catch (error) {
+}
+}
 function checkExamExist(data, callBack) {
-  pool.query(
+  try {
+        pool.query(
     `select * from exam where class = '${data.class}' and section = '${data.section}' and session = '${data.session}' and examgroup = '${data.examgroup}' `,
 
     (error, results, fields) => {
@@ -259,12 +297,16 @@ function checkExamExist(data, callBack) {
     }
   );
 }
+catch (error) {
+}
+}
 function checkExamResultCodeExist(data, callBack) {
   console.log(" data  isssssssssssssssssssssss ");
   let query = `select * from examresultcode where class = '${data.classes}' and section = '${data.section}' and session = '${data.session}' and examgroup = '${data.examgroup}' and subject = '${data.subject}' `;
   console.log(query);
 
-  pool.query(query, (error, results, fields) => {
+  try {
+        pool.query(query, (error, results, fields) => {
     console.log(results);
     if (error) {
       callBack(error);
@@ -273,8 +315,12 @@ function checkExamResultCodeExist(data, callBack) {
     return callBack(null, results[0]);
   });
 }
+catch (error) {
+}
+}
 function checkResultTableExist(data, callBack) {
-  pool.query(
+  try {
+        pool.query(
     `SELECT
    resultid
 FROM
@@ -293,6 +339,9 @@ FROM
       return callBack(null, results);
     }
   );
+}
+catch (error) {
+}
 }
 
 async function  creategradegroup(
@@ -314,7 +363,8 @@ async function  creategradegroup(
     let sqlQuery = `insert into grade (gradetitle,minscore,gradecode,maxscore,exampercent,classworkpercent,createdby,createdat,notes,grades,scoreremarks,otherscorepercent) values
  ('${title}','${min}','${code}','${max}','${examscore}','${classscore}','${createdby}','${date}','${notes}','${grade}','${remarks}','${otherscore}')`;
     console.log(sqlQuery);
-    pool.query(sqlQuery, (error, results, fields) => {
+    try {
+        pool.query(sqlQuery, (error, results, fields) => {
       if (error) {
         console.log(error);
         resolve(false);
@@ -323,6 +373,9 @@ async function  creategradegroup(
       resolve(true);
       console.log("grade group logged created successfully");
     });
+  }
+  catch (error) {
+  }
   });
 
   return promise1;
@@ -359,7 +412,8 @@ async function insertResult(
     let sqlQuery = `insert into examresult (examid,examclasscode,subject,student_id,totalscore,examscore,classworkscore,grade,examremark,othersscore,session,examgroup,classize) values
                                             ('${examid}','${classcode}','${subject}','${student_id}','${totalscore}','${examscore}','${classscore}','${grade}','${remarks}','${otherscore}','${session}','${examgroup}','${size}')`;
 
-    pool.query(sqlQuery, (error, results, fields) => {
+    try {
+        pool.query(sqlQuery, (error, results, fields) => {
       if (error) {
         console.log(error);
         resolve(false);
@@ -368,6 +422,9 @@ async function insertResult(
       resolve(true);
       console.log("result inserted successfully");
     });
+  }
+  catch (error) {
+  }
   });
 
   return promise1;
@@ -383,7 +440,8 @@ module.exports = {
       let sqlQuery = `Delete from grade where gradecode = '${data.code}'  `;
 
       console.log(sqlQuery);
-      pool.query(sqlQuery, (error, results, fields) => {
+      try {
+        pool.query(sqlQuery, (error, results, fields) => {
         if (error) {
           console.log(error);
           resolve(null);
@@ -404,6 +462,9 @@ module.exports = {
         resolve(results);
         console.log("result deleted successfully");
       });
+    }
+    catch (error) {
+    }
     });
     let val = await promise2;
 
@@ -458,7 +519,8 @@ module.exports = {
               console.log("successful creation");
 
               let sqlQuery = `SELECT DISTINCT(grade.gradetitle), exampercent,classworkpercent,gradeid,gradecode,createdby,otherscorepercent from grade group by gradetitle order by gradeid desc`;
-              pool.query(sqlQuery, (error, result) => {
+              try {
+        pool.query(sqlQuery, (error, result) => {
                 console.log(error);
 
                 if (error) {
@@ -481,6 +543,10 @@ module.exports = {
                 res.status(200).json({ success: 1, data: result });
               });
             }
+            catch (error) {
+            }
+            }
+            
           }
         }
       });
@@ -541,7 +607,8 @@ module.exports = {
               let sqlQuery = `SELECT DISTINCT(grade.gradetitle), exampercent,classworkpercent,gradeid,gradecode,createdby,otherscorepercent from grade group by gradetitle order by gradeid desc`;
             
             
-              pool.query(sqlQuery, (error, result) => {
+              try {
+        pool.query(sqlQuery, (error, result) => {
                 console.log(error);
 
                 if (error) {
@@ -563,6 +630,9 @@ module.exports = {
                 console.log(result);
                 res.status(200).json({ success: 1, data: result });
               });
+            }
+            catch (error) {
+            }
             }
           }
         }
@@ -592,7 +662,8 @@ module.exports = {
         if (data.section == "None") {
           let sqlQuery1 = `insert into exam (examcode,createdat,createdby,notes,examgroup,class,subject,session,examtable,gradingtype) values
           ('${code}','${date}','${data.createdby}','${data.notes}','${data.examgroup}','${data.class}','${data.subjects}','${data.session}','${resultTable}','${data.chosengrade}')`;
-          pool.query(sqlQuery1, (error, result) => {
+          try {
+        pool.query(sqlQuery1, (error, result) => {
             if (error) {
               // logger.info(
               //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all Class`
@@ -607,7 +678,8 @@ module.exports = {
               });
             }
             let sqlQuery = `SELECT * from exam order by examsid desc `;
-            pool.query(sqlQuery, (error, resultz) => {
+            try {
+        pool.query(sqlQuery, (error, resultz) => {
               console.log(error);
 
               if (error) {
@@ -629,11 +701,18 @@ module.exports = {
 
               res.status(200).json({ success: 1, data: resultz });
             });
+          }
+          catch (error) {
+          }
           });
+        }
+        catch (error) {
+        }
         } else {
           let sqlQuery1 = `insert into exam (examcode,createdat,createdby,notes,examgroup,class,section,subject,session,examtable,gradingtype) values
           ('${code}','${date}','${data.createdby}','${data.notes}','${data.examgroup}','${data.class}','${data.section}','${data.subjects}','${data.session}','${resultTable}','${data.chosengrade}')`;
-          pool.query(sqlQuery1, (error, result) => {
+          try {
+        pool.query(sqlQuery1, (error, result) => {
             if (error) {
               // logger.info(
               //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all Class`
@@ -646,9 +725,12 @@ module.exports = {
                 error: "internal server error",
                 message: error,
               });
+              
             }
+            
             let sqlQuery = `SELECT * from exam order by examsid desc `;
-            pool.query(sqlQuery, (error, resultz) => {
+            try {
+        pool.query(sqlQuery, (error, resultz) => {
               console.log(error);
 
               if (error) {
@@ -670,10 +752,18 @@ module.exports = {
 
               res.status(200).json({ success: 1, data: resultz });
             });
+          }
+          catch (error) {
+          }
           });
         }
+        catch (error) {
+        }
+        }
       }
+      
     });
+    
   },
   createexamgroup: async (req, res) => {
     let data = req.body;
@@ -688,6 +778,7 @@ module.exports = {
       } else {
         let sqlQuery1 = `insert into examgroup (grouptitle,createdat,createdby) values
           ('${data.title}','${date}','${data.createdby}')`;
+        try {
         pool.query(sqlQuery1, (error, result) => {
           if (error) {
             // logger.info(
@@ -702,7 +793,8 @@ module.exports = {
             });
           }
           let sqlQuery = `SELECT * from examgroup `;
-          pool.query(sqlQuery, (error, resultz) => {
+          try {
+        pool.query(sqlQuery, (error, resultz) => {
             console.log(error);
 
             if (error) {
@@ -723,7 +815,13 @@ module.exports = {
 
             res.status(200).json({ success: 1, data: resultz });
           });
+        }
+        catch (error) {
+        }
         });
+      }
+      catch (error) {
+      }
       }
     });
   },
@@ -731,7 +829,8 @@ module.exports = {
     let data = req.body;
     let sqlQuery = `SELECT * from grade where gradecode='${data.code}' `;
 
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       console.log(error);
 
       if (error) {
@@ -751,11 +850,15 @@ module.exports = {
 
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
   getexamlist: (req, res) => {
     let sqlQuery = `SELECT * from examresultcode order by id desc  `;
 
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       console.log(error);
 
       if (error) {
@@ -773,11 +876,15 @@ module.exports = {
 
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
   getexamgroup: async (req, res) => {
     let sqlQuery = `SELECT * from examgroup  `;
 
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       console.log(error);
 
       if (error) {
@@ -795,11 +902,15 @@ module.exports = {
 
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
   getexamresult: (req, res) => {
     let data = req.body;
     let sqlQuery = `select examresult.* , student.student_id,student.firstName,student.otherName, student.lastName,student.section, student.class from examresult  left join student on examresult.student_id = student.student_id  where examresult.examid = '${data.examid}'`;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       console.log(error);
 
       if (error) {
@@ -819,6 +930,9 @@ module.exports = {
 
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
   addexamresult: async (req, res) => {
     let data = req.body;
@@ -849,6 +963,7 @@ module.exports = {
       } else {
         console.log("exam code is not registered");
 
+        try {
         pool.query(sqlQuery, async (error, resulty) => {
           if (error) {
             // logger.info(
@@ -907,7 +1022,8 @@ module.exports = {
                 console.log("Successsssssssssssssssssssssssssssssssssss");
                 //get result inorder to set positions
                 let sqlQuery = `SELECT examresult.*, student.firstName,student.lastName,student.otherName from examresult left join student on examresult.student_id = student.student_id where examid = '${examid}'`;
-                pool.query(sqlQuery, async (error, result) => {
+                try {
+        pool.query(sqlQuery, async (error, result) => {
                   console.log(error);
 
                   if (error) {
@@ -948,6 +1064,10 @@ module.exports = {
                   }
                 });
               }
+              catch (error) {
+              }
+              }
+              
               if (i + 1 == data.result.length && create == false) {
                 console.log(create);
                 let vv = create;
@@ -965,6 +1085,11 @@ module.exports = {
 
           // res.status(200).json({ success: 1, data: resulty });
         });
+        
+      }
+      catch (error) {
+      }
+        
       }
     });
   },
@@ -986,7 +1111,8 @@ module.exports = {
       let sqlQuery = `Delete from examresult where examid = '${data.examid}'  `;
 
       console.log(sqlQuery);
-      pool.query(sqlQuery, (error, results, fields) => {
+      try {
+        pool.query(sqlQuery, (error, results, fields) => {
         if (error) {
           console.log(error);
           resolve(null);
@@ -1007,13 +1133,17 @@ module.exports = {
         resolve(results);
         console.log("result deleted successfully");
       });
+    }
+    catch (error) {
+    }
     });
     let val = await promise1;
     console.log("promise1");
 
     let sqlQuery = `update examresultcode set createdby = '${data.createdby}', createdat = '${date}' where code = '${examid}'`;
 
-    pool.query(sqlQuery, async (error, resulty) => {
+    try {
+        pool.query(sqlQuery, async (error, resulty) => {
       console.log(sqlQuery);
       if (error) {
         // logger.info(
@@ -1082,7 +1212,8 @@ module.exports = {
             let vv = create;
             //get result inorder to set positions
             let sqlQuery = `SELECT examresult.*, student.firstName,student.lastName,student.otherName from examresult left join student on examresult.student_id = student.student_id where examid = '${examid}'`;
-            pool.query(sqlQuery, async (error, result) => {
+            try {
+        pool.query(sqlQuery, async (error, result) => {
               console.log(error);
 
               if (error) {
@@ -1123,6 +1254,9 @@ module.exports = {
               }
             });
           }
+          catch (error) {
+          }
+          }
           if (i + 1 == data.result.length && create == false) {
             console.log(create);
             let vv = create;
@@ -1140,12 +1274,16 @@ module.exports = {
 
       // res.status(200).json({ success: 1, data: resulty });
     });
+  }
+  catch (error) {
+  }
   },
   getexamsubject: (req, res) => {
     let data = req.body;
     let sqlQuery = `select * from examresultcode where class = '${data.class}' and section = '${data.section}' and session = '${data.session}' and examgroup = '${data.examgroup}' `;
     console.log(sqlQuery);
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       console.log(error);
 
       if (error) {
@@ -1163,12 +1301,16 @@ module.exports = {
 
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
   getgradegroupbyName: (req, res) => {
     let data = req.body;
     let sqlQuery = `select * from grade where gradetitle = '${data.title}'`;
 
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       console.log(error);
 
       if (error) {
@@ -1186,12 +1328,16 @@ module.exports = {
 
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
   getexambycode: (req, res) => {
     let data = req.body;
     let sqlQuery = `SELECT examresult.*,student.firstName,student.lastName,student.otherName,student.class,student.section from examresult left join student on examresult.student_id = student.student_id where examresult.examid = '${data.id}'`;
     console.log(sqlQuery);
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       console.log(error);
 
       if (error) {
@@ -1209,6 +1355,9 @@ module.exports = {
 
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
   deletexamgrade: (req, res) => {
     console.log(req)
@@ -1216,7 +1365,8 @@ module.exports = {
     const id = req.body.id;
     let sqlQuery = `delete from grade where gradecode = '${id}'`;
 
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       console.log(result)
       if (error) {
         // logger.info(
@@ -1241,11 +1391,19 @@ module.exports = {
         // logger.info(`${req.method} ${req.originalUrl}, delete Class  by id`);
         //return table data
         let sqlQuery = `SELECT DISTINCT(grade.gradetitle), exampercent,classworkpercent,gradeid,gradecode,createdby,otherscorepercent from grade group by gradetitle order by gradeid desc`;
+        try {
         pool.query(sqlQuery, (error, result) => {
           res.status(200).json({ success: 1, data: result });
         });
       }
+      catch (error) {
+      }
+      }
+      
     });
+  }
+  catch (error) {
+  }
   },
   deleteGroup: (req, res) => {
     console.log(req)
@@ -1253,7 +1411,8 @@ module.exports = {
     const id = req.body.id;
     let sqlQuery = `delete from examgroup where id = '${id}'`;
 
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       console.log(result)
       if (error) {
         // logger.info(
@@ -1278,16 +1437,27 @@ module.exports = {
         // logger.info(`${req.method} ${req.originalUrl}, delete Class  by id`);
         //return table data
         let sqlQuery = `SELECT * from examgroup`;
+        try {
         pool.query(sqlQuery, (error, result) => {
           res.status(200).json({ success: 1, data: result });
         });
       }
+      catch (error) {
+      }
+      }
+    
+    
     });
+  }
+  catch (error) {
+  }
+    
   },
   getgradegroup: (req, res) => {
     let sqlQuery = `SELECT DISTINCT(grade.gradetitle), exampercent,classworkpercent,gradeid,createdby,gradecode,otherscorepercent from grade group by gradetitle order by gradeid desc`;
 
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       console.log(error);
 
       if (error) {
@@ -1305,11 +1475,15 @@ module.exports = {
 
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
   searchcustom: (req, res) => {
     let data = req.body;
     let sqlQuery = `select * from examresultcode where session = '${data.session}' and examgroup = '${data.examgroup}' `;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       console.log(error);
 
       if (error) {
@@ -1329,13 +1503,17 @@ module.exports = {
 
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
 
   singlereport: (req, res) => {
     let data = req.body;
     let sqlQuery = `select * from examresult where session = '${data.session}' and examgroup = '${data.examgroup}' and student_id = '${data.stdid}'  `;
 
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       console.log(result);
 
       if (error) {
@@ -1364,6 +1542,9 @@ module.exports = {
 
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
 
   genrateclassreport: async (req, res) => {
@@ -1374,7 +1555,8 @@ module.exports = {
         ? `select student_id, firstName,lastName,otherName  from student where class = '${data.clazz}' and section = '${data.section}'  `
         : `select student_id, firstName,lastName,otherName  from student where class = '${data.clazz}'  `;
 
-    pool.query(sqlQuery, async (error, result) => {
+    try {
+        pool.query(sqlQuery, async (error, result) => {
       console.log(sqlQuery);
 
       if (error) {
@@ -1413,7 +1595,8 @@ module.exports = {
           let value = retrieved;
           //get all student of the class using unique classcode
           let sqlQuery = `select distinct(student_id),overallscore as totalscore,examclasscode  from examresult where examclasscode = ${data.classcode}`;
-          pool.query(sqlQuery, async (error, result) => {
+          try {
+        pool.query(sqlQuery, async (error, result) => {
             console.log(error);
 
             if (error) {
@@ -1456,8 +1639,16 @@ module.exports = {
 
           console.log("done retrieval");
         }
+        catch (error) {
+        }
+        }
+        
       }
     });
+  }
+  catch (error) {
+  }
+    
   },
   getClassreport: async (req, res) => {
     let data = req.body;
@@ -1466,7 +1657,8 @@ module.exports = {
         ? `select student_id, firstName,lastName,otherName  from student where class = '${data.clazz}' and section = '${data.section}'  `
         : `select student_id, firstName,lastName,otherName  from student where class = '${data.clazz}'  `;
 
-    pool.query(sqlQuery, async (error, result) => {
+    try {
+        pool.query(sqlQuery, async (error, result) => {
       console.log(sqlQuery);
 
       if (error) {
@@ -1511,7 +1703,8 @@ module.exports = {
       }
 
       // let sqlQuery = `select * from examresult where session = '${data.session}' and examgroup = '${data.examgroup}' and student_id = '${data.stdid}'  `;
-      // pool.query(sqlQuery, async (error, result) => {
+      // try {
+       // pool.query(sqlQuery, async (error, result) => {
       //   console.log(error);
 
       //   if (error) {
@@ -1536,11 +1729,15 @@ module.exports = {
       //   res.status(200).json({ success: 1, data: result });
       // });
     });
+  }
+  catch (error) {
+  }
   },
   updateexamcartegory: (req, res) => {
     let data = req.body;
     let sqlQuery = `update examgroup set grouptitle ='${data.title}' where id = '${data.id}' `;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       console.log(error);
 
       if (error) {
@@ -1558,7 +1755,8 @@ module.exports = {
         `${req.method} ${req.originalUrl},'success', update exam cartegory successful`
       );
       let sqlQuery = `select * from examgroup`;
-      pool.query(sqlQuery, (error, result) => {
+      try {
+        pool.query(sqlQuery, (error, result) => {
         console.log(error);
         // logger.info(
         //   `${req.method} ${req.originalUrl},'success', fetch all Class`
@@ -1566,12 +1764,20 @@ module.exports = {
 
         res.status(200).json({ success: 1, data: result });
       });
+    }
+    catch (error) {
+    }
     });
+  }
+  catch (error) {
+  }
+    
   },
   setremark: (req, res) => {
     let data = req.body;
     let sqlQuery = `update examresult set teacherreamark ='${data.remark}' where session = '${data.session}' and examgroup = '${data.examgroup}' and student_id = '${data.id}' `;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       console.log(error);
 
       if (error) {
@@ -1591,11 +1797,15 @@ module.exports = {
 
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
 
   getdetailgradegroup: (req, res) => {
     let sqlQuery = `select * from grade`;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       console.log(error);
 
       if (error) {
@@ -1615,11 +1825,15 @@ module.exports = {
 
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
 
   getAllSection: (req, res) => {
     let sqlQuery = `select * from section where isActive = 'true'`;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       console.log(error);
 
       if (error) {
@@ -1639,12 +1853,16 @@ module.exports = {
 
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
   getsectionByClassId: (req, res) => {
     let id = req.body.classId;
 
     let sqlQuery = `select * from section where classId = '${id}'`;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       console.log(error);
 
       if (error) {
@@ -1664,10 +1882,14 @@ module.exports = {
       console.log(result);
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
   getAllSectiongroup: (req, res) => {
     let sqlQuery = `select * from sectiongroup where isActive = 'true'`;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       console.log(error);
 
       if (error) {
@@ -1687,10 +1909,14 @@ module.exports = {
 
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
   getAllClassWithSection: (req, res) => {
     let sqlQuery = `select class.classId, class.title ,section.sectionName from class inner join section on class.classId = section.classId  order by class.title asc`;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all Class with section`
@@ -1707,6 +1933,9 @@ module.exports = {
 
       res.status(200).json({ success: 1, data: result });
     });
+  }
+  catch (error) {
+  }
   },
 
   updateClass: (req, res) => {
@@ -1715,7 +1944,8 @@ module.exports = {
     console.log(data);
     let sqlQuery = `update class set title ='${data.title}',instructor='${data.instructor}',updatedBy='${data.updatedBy}',updatedAt='${date}' where classId = ${data.classId}`;
 
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update Class data`
@@ -1737,11 +1967,20 @@ module.exports = {
         // logger.info(`${req.method} ${req.originalUrl}, delete Class  by id`);
         //return table data
         let sqlQuery = `SELECT * from class where isActive='true' order by class.title`;
+        try {
         pool.query(sqlQuery, (error, result) => {
           res.status(200).json({ success: 1, data: result });
         });
       }
+      catch (error) {
+      }
+      }
+      
     });
+  }
+  catch (error) {
+  }
+    
   },
 
   updateSection: (req, res) => {
@@ -1750,7 +1989,8 @@ module.exports = {
     console.log(data);
     let sqlQuery = `update sectiongroup set sectionName ='${data.sectionName}' where id = ${data.id}`;
 
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update section data`
@@ -1776,11 +2016,15 @@ module.exports = {
           .json({ success: 1, data: "update section data success" });
       }
     });
+  }
+  catch (error) {
+  }
   },
   updateClassStatus: (req, res) => {
     let sqlQuery = `update class set isActive ='false'`;
 
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, update Class data`
@@ -1806,6 +2050,9 @@ module.exports = {
           .json({ success: 1, error: "update class data success" });
       }
     });
+  }
+  catch (error) {
+  }
   },
 
   deleteAllClass: (req, res) => {
@@ -1813,7 +2060,8 @@ module.exports = {
     // let sqlQuery = `delete from Class where userId = ${id.Class_id}`;
     let sqlQuery = `delete from class`;
 
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete Class by id`
@@ -1840,12 +2088,16 @@ module.exports = {
         });
       }
     });
+  }
+  catch (error) {
+  }
   },
   deleteSingleClass: (req, res) => {
     const id = req.params.classId;
     let sqlQuery = `delete from class where classId = '${id}'`;
 
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete Class by id`
@@ -1868,18 +2120,29 @@ module.exports = {
         // logger.info(`${req.method} ${req.originalUrl}, delete Class  by id`);
         //return table data
         let sqlQuery = `SELECT * from class where isActive='true' order by class.title`;
+        try {
         pool.query(sqlQuery, (error, result) => {
           res.status(200).json({ success: 1, data: result });
         });
       }
+      catch (error) {
+      }
+      }
+      
+      
     });
+  }
+  catch (error) {
+  }
+    
   },
 
   deletesinglegroup: (req, res) => {
     const id = req.params.id;
     let sqlQuery = `delete from sectiongroup where id = '${id}'`;
 
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete Class by id`
@@ -1902,16 +2165,26 @@ module.exports = {
         // logger.info(`${req.method} ${req.originalUrl}, delete Class  by id`);
         //return table data
         let sqlQuery = `select * from sectiongroup `;
+        try {
         pool.query(sqlQuery, (error, result) => {
           res.status(200).json({ success: 1, data: result });
         });
       }
+      catch (error) {
+      }
+      }
+      
     });
+  }
+  catch (error) {
+  }
+    
   },
 
   truncateTable: (req, res) => {
     let sqlQuery = `truncate table class`;
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       if (error) {
         // logger.info(
         //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, delete all records`
@@ -1928,6 +2201,9 @@ module.exports = {
         });
       }
     });
+  }
+  catch (error) {
+  }
   },
 
   deleteSectionbyClass: (req, res) => {
@@ -1935,7 +2211,8 @@ module.exports = {
     console.log(id);
     let sqlQuery = `delete from section where classId = '${id.class}' and sectionName = '${id.section}'`;
 
-    pool.query(sqlQuery, (error, result) => {
+    try {
+        pool.query(sqlQuery, (error, result) => {
       console.log(result.affectedRows);
       if (error) {
         // logger.info(
@@ -1965,5 +2242,8 @@ module.exports = {
         });
       }
     });
+  }
+  catch (error) {
+  }
   },
 };
