@@ -19,12 +19,14 @@ catch (error) {
 }
 
 function getsectionByName(email, callBack) {
+  console.log(email)
   try {
         pool.query(
-    `select * from section where sectionName = ? `,
+    `select * from sectiongroup where sectionName = ? `,
     [email],
     (error, results, fields) => {
       if (error) {
+        console.log(error)
         callBack(error);
       }
       return callBack(null, results[0]);
@@ -194,8 +196,12 @@ module.exports = {
       else {
         const data = req.body;
 
-        let sqlQuery = `insert into sectiongroup (sectionName,createdAt,createdBy,isActive) values
-           ('${data.sectionName}','${date}','${data.createdBy}','true')`;
+        const currentYear = new Date().getFullYear();
+
+       const sectionId = Math.floor(Math.random() * 9000 + 1000 + currentYear);
+ 
+        let sqlQuery = `insert into sectiongroup (id,sectionName,createdAt,createdBy,isActive) values
+           ('${sectionId}','${data.sectionName}','${date}','${data.createdBy}','true')`;
         try {
         pool.query(sqlQuery, (error, result) => {
           if (error) {

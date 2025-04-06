@@ -20,7 +20,10 @@ const {
   getgraduated,
   delgraduated,
   graduatesingledel,
-  getstudentcustom, updatefeecart, getCart, createstudentCartegory, deleteSingleStudentCart
+  getstudentcustom, updatefeecart, getCart, createstudentCartegory, deleteSingleStudentCart,
+  getdeletedstudent,
+  delalldeletedstudent,
+  deldeletedstudent
 } = require("./student.controller");
 
 
@@ -47,7 +50,13 @@ router.post("/delStudentCart", deleteSingleStudentCart);
 router.post("/createstudentcart", createstudentCartegory);
 router.get("/getcart", getCart);
 router.get("/graduated", getgraduated);
+router.get("/deletedstudent", getdeletedstudent);
+
+
 router.delete("/delgraduated", delgraduated);
+router.post("/deldeletedstudent", deldeletedstudent);
+router.delete("/delalldeletedstudent", delalldeletedstudent);
+
 
 
 router.post("/updatestudentcart", updatefeecart);

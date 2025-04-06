@@ -24,7 +24,25 @@ var transporter = nodemailer.createTransport({
     rejectUnauthorized: false,
   },
 });
+async function registerlogin(result) {
+  console.log('register called')
 
+  ////////log the login 
+  let datetime = new Date()
+  let datetime1 = datetime.toString().slice(0, 25);
+  let sqlQuery2 = `INSERT INTO loginlog (userid, firstName, lastName, role, date) VALUES ( '${result[0].userId}', '${result[0].sFirstName}', '${result[0].sLastName}', '${result[0].definedRole}', '${datetime1}')`;
+  try {
+    pool.query(sqlQuery2, (error, result) => {
+      //   resolve(result)
+
+    });
+  } catch (error) {
+  }
+
+  ////////log the login 
+
+
+}
 function getUserByEmail(email, callBack) {
 
   try {
@@ -492,22 +510,22 @@ module.exports = {
                     return res.status(500).json({ success: 0, Message: error });
                   }
                   if (result.affectedRows == 1) {
-                    try {
-                      pool.query(sqlQueryAccount, (error, result) => {
-                        if (error) {
-                          console.log("student account error");
-                          console.log(error);
+                    // try {
+                    //   pool.query(sqlQueryAccount, (error, result) => {
+                    //     if (error) {
+                    //       console.log("student account error");
+                    //       console.log(error);
 
-                          return res.status(500).json({ success: 0, Message: error });
-                        }
-                        // insert into scholarshipenroll if scholarinfo has data
-                        // if (data.scholarinfo.length) {
-                        //   createScholarship(studentid, data.scholarinfo[0], data.createdBy)
-                        // }
-                      });
-                    }
-                    catch (error) {
-                    }
+                    //       return res.status(500).json({ success: 0, Message: error });
+                    //     }
+                    //     // insert into scholarshipenroll if scholarinfo has data
+                    //     // if (data.scholarinfo.length) {
+                    //     //   createScholarship(studentid, data.scholarinfo[0], data.createdBy)
+                    //     // }
+                    //   });
+                    // }
+                    // catch (error) {
+                    // }
 
                     const signedToken = jwt.sign(
                       { data: result.email },
@@ -680,8 +698,8 @@ module.exports = {
 
 
             //insert into student table
-            sqlQuery = `insert into student (userId,student_id,cartegory,firstName,lastName,otherName,class,section,religion,dateofbirth,gender,preference,accountbalance,scholarship) values
-            ('${customStudentId}','${student_id}','${data.cartegory}','${capitalizeWords(data.firstName)}','${capitalizeWords(data.lastName)}','${capitalizeWords(data.otherName)}','${data.class}','${data.section}','${capitalizeWords(data.religion)}','${data.dateofbirth}','${data.gender}','${data.preference}','${data.accountbalance}','${data.scholarship}')`;
+            sqlQuery = `insert into student (userId,student_id,cartegory,cartegoryid,firstName,lastName,otherName,class,classid,section,sectionid,religion,dateofbirth,gender,preference,accountbalance) values
+            ('${customStudentId}','${student_id}','${data.cartegory}','${data.cartegoryid}','${capitalizeWords(data.firstName)}','${capitalizeWords(data.lastName)}','${capitalizeWords(data.otherName)}','${data.class}','${data.classid}','${data.section}','${data.sectionid}','${capitalizeWords(data.religion)}','${data.dateofbirth}','${data.gender}','${data.preference}','${data.accountbalance}')`;
             let sqlQueryAccount = `insert into account (student_id,cartegory,createdat,createdby) values ('${student_id}','${data.cartegory}','${date}','${data.createdBy}')`;
 
             userCreaterStudent(
@@ -860,15 +878,23 @@ module.exports = {
         // logger.info(
         //   `${req.originalUrl},'DB error:'${err.sqlMessage}, server error`
         // );
-        console.log('kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk')
         return res.status(200).json({
           success: 0,
           message: "Database Connection Error",
           data: [],
         });
       }
+      if (results != null && results.isActive == 'False') {
+        // logger.info(
+        //   `${req.originalUrl},'DB error:'${err.sqlMessage}, server error`
+        // );
+        return res.status(200).json({
+          success: 6,
+          message: "Account Is Inactive",
+          data: [],
+        });
+      }
       else {
-        console.log('qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq')
 
         // if (results == undefined ) {
         //   // logger.info(
@@ -906,6 +932,9 @@ module.exports = {
           // );
           const jsontoken = sign({ result: results.email }, process.env.JWT_KEY);
 
+
+          //Role being student or parent isnt allowed for currrent portal
+
           if (results.role == "student") {
             let sqlQuery = `select * from student where userId ='${results.userId}'  `;
             try {
@@ -929,10 +958,15 @@ module.exports = {
                   });
                 }
 
+                // return res.status(200).json({
+                //   success: 1,
+                //   data: returnData,
+                //   token: jsontoken,
+                // });
                 return res.status(200).json({
-                  success: 1,
-                  data: returnData,
-                  token: jsontoken,
+                  success: 0,
+                  message: "Invalid Email or Password",
+                  data: [],
                 });
               });
             } catch (error) {
@@ -962,10 +996,16 @@ module.exports = {
                   });
                 }
 
+                // return res.status(200).json({
+                //   success: 1,
+                //   data: returnData,
+                //   token: jsontoken,
+                // });
+
                 return res.status(200).json({
-                  success: 1,
-                  data: returnData,
-                  token: jsontoken,
+                  success: 0,
+                  message: "Unauthorized Access TO Portal",
+                  data: [],
                 });
               });
             } catch (error) {
@@ -973,9 +1013,12 @@ module.exports = {
           }
 
           if (results.role == "staff") {
+
+
+
             let sqlQuery = `select * from staff where userId ='${results.userId}'  `;
             try {
-              pool.query(sqlQuery, (error, result) => {
+              pool.query(sqlQuery, async (error, result) => {
                 let returnData = [
                   {
                     userId: results.userId,
@@ -995,10 +1038,19 @@ module.exports = {
                   });
                 }
 
+
+                let vv = await registerlogin(result)
+
                 return res.status(200).json({
                   success: 1,
                   data: returnData,
                 });
+
+                // return res.status(200).json({
+                //   success: 0,
+                //   message: "Unauthorized Access TO Portal",
+                //   data: [],
+                // });
               });
             } catch (error) {
             }
@@ -1093,7 +1145,29 @@ module.exports = {
     } catch (error) {
     }
   },
+  loginlog: (req, res) => {
+    let sqlQuery = `select * from loginlog order by id desc`;
+    try {
+      pool.query(sqlQuery, (error, result) => {
+        if (error) {
+          // logger.info(
+          //   `${req.method} ${req.originalUrl}, 'server error', fetch all users`
+          // );
 
+          return res
+            .status(500)
+            .json({ success: 0, error: "internal server error", message: error });
+        }
+
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'success', fetch all users`
+        // );
+
+        res.status(200).json({ success: 1, data: result });
+      });
+    } catch (error) {
+    }
+  },
   getUsers: (req, res) => {
     let sqlQuery = `select * from users`;
     try {
@@ -1739,6 +1813,9 @@ module.exports = {
   deleteStaff: (req, res) => {
     const id = req.params.id;
     console.log(id);
+
+
+
     let sqlQuery = `delete from staff where userId = '${id}'`;
 
     try {

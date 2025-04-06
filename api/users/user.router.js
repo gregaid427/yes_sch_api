@@ -25,7 +25,8 @@ const {
   getuserdata,
   setSchoolLogo,
   schoolinfoupdate,
-  updatestaff
+  updatestaff,
+  loginlog
 } = require("./user.controller");
 router.post("/logoschool",  setSchoolLogo);
 
@@ -52,6 +53,7 @@ router.post("/userdata",  getuserdata);
 
 
 router.get("/userbyrole",  getUserByUserIdRole);
+router.get("/loginlog",  loginlog);
 
 
 
