@@ -2,35 +2,35 @@ const router = require("express").Router();
 const { checkToken } = require("../../auth/token_validation");
 const {genrateclassreport,creategradegroup,updategradegroup,deletexamgrade,deleteGroup,getexambycode,gradegroupbyid,updateexamcartegory,Updateexamresult,getdetailgradegroup,getexamsubject,setremark,getgradegroup,singlereport,createexamgroup,getexamgroup, getexamlist, createnewexam,searchcustom,addexamresult, getgradegroupbyName, getexamresult, getClassreport} = require("./exam.controller");
 
-router.post("/gradegroup", creategradegroup);
-router.post("/examgroup", createexamgroup);
-router.get("/examgroup", getexamgroup);
-router.get("/gradegroup", getgradegroup);
+router.post("/gradegroup",checkToken, creategradegroup);
+router.post("/examgroup",checkToken, createexamgroup);
+router.get("/examgroup",checkToken, getexamgroup);
+router.get("/gradegroup",checkToken, getgradegroup);
 
-router.post("/updategradegroup", updategradegroup);
-router.post("/deletegroup", deleteGroup);
-router.post("/deletexamgrade", deletexamgrade);
-
-
-
-router.get("/detailgradegroup", getdetailgradegroup);
-router.get("/examlist", getexamlist);
-router.post("/newexam", createnewexam);
-router.post("/searchcustom", searchcustom);
-router.post("/getexamresult", getexamresult);
-router.post("/examresult", addexamresult);
-router.post("/gradegroupbyid", gradegroupbyid);
+router.post("/updategradegroup",checkToken, updategradegroup);
+router.post("/deletegroup",checkToken, deleteGroup);
+router.post("/deletexamgrade",checkToken, deletexamgrade);
 
 
-router.post("/singlegrade", getgradegroupbyName);
-router.post("/examsubject", getexamsubject);
-router.post("/singlereport", singlereport);
-router.post("/getClassreport", getClassreport);
-router.post("/setremark", setremark);
-router.post("/generatexlassreport", genrateclassreport);
-router.post("/exambycode", getexambycode);
-router.post("/Updateexamresult", Updateexamresult);
-router.post("/updateexamcartegory", updateexamcartegory);
+
+router.get("/detailgradegroup",checkToken, getdetailgradegroup);
+router.get("/examlist",checkToken, getexamlist);
+router.post("/newexam",checkToken, createnewexam);
+router.post("/searchcustom",checkToken, searchcustom);
+router.post("/getexamresult",checkToken, getexamresult);
+router.post("/examresult",checkToken, addexamresult);
+router.post("/gradegroupbyid",checkToken, gradegroupbyid);
+
+
+router.post("/singlegrade",checkToken, getgradegroupbyName);
+router.post("/examsubject",checkToken, getexamsubject);
+router.post("/singlereport",checkToken, singlereport);
+router.post("/getClassreport",checkToken, getClassreport);
+router.post("/setremark",checkToken, setremark);
+router.post("/generatexlassreport",checkToken, genrateclassreport);
+router.post("/exambycode",checkToken, getexambycode);
+router.post("/Updateexamresult",checkToken, Updateexamresult);
+router.post("/updateexamcartegory",checkToken, updateexamcartegory);
 
 
 

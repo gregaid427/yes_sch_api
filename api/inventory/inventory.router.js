@@ -22,26 +22,26 @@ const {
 
 
 
-router.get("/",  getAllInventory);
-router.get("/cart",  getCart);
-router.post("/cart",  createInventoryCartegory);
-router.post("/addstock",  addstockInventory);
-router.get("/getstock",  getstockInventory);
+router.get("/", checkToken, getAllInventory);
+router.get("/cart",checkToken,  getCart);
+router.post("/cart", checkToken, createInventoryCartegory);
+router.post("/addstock", checkToken, addstockInventory);
+router.get("/getstock", checkToken, getstockInventory);
 
 
-router.post("/editcartegory",  updateInventorycartegory);
-router.post("/",  createInventory);
+router.post("/editcartegory", checkToken, updateInventorycartegory);
+router.post("/", checkToken, createInventory);
 
 
-router.delete("/truncate",  truncateTable);
+router.delete("/truncate",checkToken,  truncateTable);
 
-router.get("/:Inventory_id",  getInventoryById);
-router.patch("/item",  updateInventory);
+router.get("/:Inventory_id",checkToken,  getInventoryById);
+router.patch("/item", checkToken, updateInventory);
 // router.patch("/status/:Inventory_id",  updateInventorystatus);
-router.delete("/cartegory/:id",  deleteSingleCartstock);
+router.delete("/cartegory/:id",checkToken,  deleteSingleCartstock);
 
-router.delete("/:id",  deleteSingleInventory);
-router.post("/stock/delete",  deleteSingleInventorystock);
+router.delete("/:id",checkToken,  deleteSingleInventory);
+router.post("/stock/delete",checkToken,  deleteSingleInventorystock);
 
 
 module.exports = router;

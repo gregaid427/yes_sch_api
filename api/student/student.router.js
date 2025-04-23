@@ -23,49 +23,58 @@ const {
   getstudentcustom, updatefeecart, getCart, createstudentCartegory, deleteSingleStudentCart,
   getdeletedstudent,
   delalldeletedstudent,
-  deldeletedstudent
+  deldeletedstudent,
+  getstudentbyClass2,
+  getstudentbyClassCustom3,
+  movestudent
 } = require("./student.controller");
 
 
-router.get("/", getstudent);
-router.post("/custom1", getstudentbyClassCustom);
-router.post("/custom", getstudentbyClass);
+router.get("/",checkToken, getstudent);
+router.post("/custom1",checkToken, getstudentbyClassCustom);
+router.post("/custom3",checkToken, getstudentbyClassCustom3);
 
-router.post("/custom1account", getstudentbyClassCustomBal);
-router.post("/customaccount", getstudentbyClassbal);
-router.post("/studentcustom", getstudentcustom);
-router.post("/custom1promote", getstudentbyClassCustomPromote);
-router.post("/customPromote", getstudentbyClassPromote);
-router.get("/single/:student_id", getstudentbiodata);
-router.post("/delete", deleteStudentsingle);
-router.post("/waiting", setstudentwaiting);
-router.post("/allpromote", allpromote);
-router.post("/selectedpromote", selectedpromote);
-router.post("/studentlogo", setStudentLogo);
-router.post("/bulkAdmission", bulkAdmission);
-router.post("/graduatesingledel", graduatesingledel);
+router.post("/custom",checkToken, getstudentbyClass);
+router.post("/custom2",checkToken, getstudentbyClass2);
 
 
-router.post("/delStudentCart", deleteSingleStudentCart);
-router.post("/createstudentcart", createstudentCartegory);
-router.get("/getcart", getCart);
-router.get("/graduated", getgraduated);
-router.get("/deletedstudent", getdeletedstudent);
+router.post("/custom1account",checkToken, getstudentbyClassCustomBal);
+router.post("/customaccount",checkToken, getstudentbyClassbal);
+router.post("/studentcustom",checkToken, getstudentcustom);
+router.post("/movestudent",checkToken, movestudent);
+
+router.post("/custom1promote",checkToken, getstudentbyClassCustomPromote);
+router.post("/customPromote",checkToken, getstudentbyClassPromote);
+router.get("/single/:student_id",checkToken, getstudentbiodata);
+router.post("/delete",checkToken, deleteStudentsingle);
+router.post("/waiting",checkToken, setstudentwaiting);
+router.post("/allpromote",checkToken, allpromote);
+router.post("/selectedpromote",checkToken, selectedpromote);
+router.post("/studentlogo",checkToken, setStudentLogo);
+router.post("/bulkAdmission",checkToken, bulkAdmission);
+router.post("/graduatesingledel",checkToken, graduatesingledel);
 
 
-router.delete("/delgraduated", delgraduated);
-router.post("/deldeletedstudent", deldeletedstudent);
-router.delete("/delalldeletedstudent", delalldeletedstudent);
+router.post("/delStudentCart",checkToken, deleteSingleStudentCart);
+router.post("/createstudentcart",checkToken, createstudentCartegory);
+router.get("/getcart",checkToken, getCart);
+router.get("/graduated",checkToken, getgraduated);
+router.get("/deletedstudent",checkToken, getdeletedstudent);
+
+
+router.delete("/delgraduated",checkToken, delgraduated);
+router.post("/deldeletedstudent",checkToken, deldeletedstudent);
+router.delete("/delalldeletedstudent",checkToken, delalldeletedstudent);
 
 
 
-router.post("/updatestudentcart", updatefeecart);
+router.post("/updatestudentcart",checkToken, updatefeecart);
 
 
 
-router.patch("/", updatestudent);
+router.patch("/",checkToken, updatestudent);
 
-router.delete("/truncate", truncateTable);
+router.delete("/truncate",checkToken, truncateTable);
 
 
 module.exports = router;

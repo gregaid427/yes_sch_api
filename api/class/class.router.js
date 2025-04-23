@@ -24,28 +24,28 @@ const {
 
 
 
-router.post("/",  createClass);
-router.post("/getclasswithsection",  getAllClassWithSection);
-router.get("/all/",  getAllClass);
-router.post("/allclassexam/",  allclassexam);
-router.get("/allno/",  getAllClassNo);
+router.post("/",checkToken,  createClass);
+router.post("/getclasswithsection",checkToken,  getAllClassWithSection);
+router.get("/all/",checkToken,  getAllClass);
+router.post("/allclassexam/",checkToken,  allclassexam);
+router.get("/allno/",checkToken,  getAllClassNo);
 
 
-router.get("/section",  getAllSection);
-router.get("/groupsection",  getAllSectiongroup);
+router.get("/section",checkToken,  getAllSection);
+router.get("/groupsection", checkToken, getAllSectiongroup);
 
-router.post("/single",  getClassByClassId);
-router.post("/sectionclass",  getsectionByClassId);
+router.post("/single",checkToken,  getClassByClassId);
+router.post("/sectionclass",checkToken,  getsectionByClassId);
 
-router.post("/section",  createClassSection);
-router.patch("/",  updateClass);
-router.patch("/section",  updateSection);
-router.patch("/status/:ClassId",  updateClassStatus);
-router.delete("/",  deleteAllClass);
-router.delete("/single/:classId",  deleteSingleClass);
-router.post("/single/sectiondelete",  deleteSectionbyClass);
-router.delete("/truncate",  truncateTable);
-router.delete("/sectiongroup/:id",  deletesinglegroup);
+router.post("/section", checkToken, createClassSection);
+router.patch("/", checkToken, updateClass);
+router.patch("/section", checkToken, updateSection);
+router.patch("/status/:ClassId", checkToken,  updateClassStatus);
+router.delete("/",checkToken,  deleteAllClass);
+router.delete("/single/:classId", checkToken, deleteSingleClass);
+router.post("/single/sectiondelete", checkToken,  deleteSectionbyClass);
+router.delete("/truncate", checkToken, truncateTable);
+router.delete("/sectiongroup/:id", checkToken, deletesinglegroup);
 
 
 

@@ -11,11 +11,11 @@ const {
 } = require("./subject.controller");
 
 
-router.post("/",  createsubject);
-router.get("/", getAllSubject );
-router.get("/Subject_id",  getsubjectById );
-router.patch("/",  updateSubject);
-router.delete("/:subjectId",  deleteSingleSubject);
-router.delete("/",  deleteAllSubject);
+router.post("/", checkToken, createsubject);
+router.get("/",checkToken,checkToken, getAllSubject );
+router.get("/Subject_id",checkToken,  getsubjectById );
+router.patch("/",checkToken,  updateSubject);
+router.delete("/:subjectId",checkToken,  deleteSingleSubject);
+router.delete("/",checkToken,  deleteAllSubject);
 
 module.exports = router;

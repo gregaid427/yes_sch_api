@@ -326,6 +326,94 @@ module.exports = {
     catch (error) {
     }
   },
+  movestudent: (req, res) => {
+    let data = req.body;
+
+
+
+
+
+    if (data.clazz == 'GRADUATED') {
+      console.log('Graduated not null')
+
+
+      //  let sqlQuery = `INSERT INTO graduatedstudent (userId, student_id, firstName, lastName, otherName, class, cartegory, previousclass, section, religion, gender, dateofbirth, accountbalance, status, isActive, filename, imagelink, feepayable, scholarship, arrears, preference, feegeneratedate, feegenerateforsession, feegeneratecode, deposit, amountpaid) SELECT userId, student_id, firstName, lastName, otherName, class, cartegory, previousclass, section, religion, gender, dateofbirth, accountbalance, status, isActive, filename, imagelink, feepayable, scholarship, arrears, preference, feegeneratedate, feegenerateforsession, feegeneratecode, deposit, amountpaid from student where student.class = '${data.prevclass}'`;
+      let sqlQuery = `INSERT INTO graduatedstudent (userId, student_id, firstName, lastName, otherName, class, cartegory, previousclass, section, religion, gender, dateofbirth, accountbalance, status, isActive, filename, imagelink, feepayable, scholarship, arrears, preference, feegeneratedate, feegenerateforsession, feegeneratecode, deposit, amountpaid) SELECT userId, student_id, firstName, lastName, otherName, class, cartegory, previousclass, section, religion, gender, dateofbirth, accountbalance, status, isActive, filename, imagelink, feepayable, scholarship, arrears, preference, feegeneratedate, feegenerateforsession, feegeneratecode, deposit, amountpaid from student where student.student_id = '${data.id}'`;
+
+      //  function getquery(val,val2){
+      //   if(val == 'GRADUATED' && val2 == [])  return sqlQuery
+      //   if(val == 'GRADUATED' && val2 != [])  return sqlQuery2
+
+      //  }
+      try {
+        pool.query(sqlQuery, (error, result) => {
+          console.log('query run')
+          if (error) {
+            console.log(error);
+            // logger.info(
+            //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch user by id`
+            // );
+            return res
+              .status(500)
+              .json({ success: 0, error: "internal server error", message: error });
+          } else {
+            let sqlQuery = `delete from student  where student.student_id = '${data.id}'`
+            try {
+              pool.query(sqlQuery, (error, result) => {
+                if (error) {
+                  console.log(error);
+                  // logger.info(
+                  //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch user by id`
+                  // );
+                  return res
+                    .status(500)
+                    .json({ success: 0, error: "internal server error", message: error });
+                }
+
+
+                // logger.info(`${req.method} ${req.originalUrl}, fetch user by id`);
+              });
+            }
+            catch (error) {
+            }
+
+          }
+
+        })
+      }
+      catch (error) {
+      }
+      // return res
+      //   .status(200)
+      //   .json({ success: 1, message: 'Moved to Graduated' });
+      return res
+        .status(200)
+        .json({ success: 1, message: 'Moved to Graduated' });
+    }
+    else {
+      let sqlQuery = `update student set class='${data.clazz}',previousclass ='${data.prevclass}' , classid='${data.clazzid}',section='${data.section}' where student_id='${data.id}'`;
+      try {
+        pool.query(sqlQuery, (error, result) => {
+          if (error) {
+            // logger.info(
+            //   `${req.method} ${req.originalUrl},'DB error:'${error.sqlMessage}, fetch user by id`
+            // );
+            return res
+              .status(500)
+              .json({ success: 0, error: "internal server error", message: error });
+          }
+
+          if (result.affectedRows > 0) {
+            res.status(200).json({ success: 1, data: result });
+            console.log("student Moved Successfully");
+          }
+          // logger.info(`${req.method} ${req.originalUrl}, fetch user by id`);
+        });
+      }
+      catch (error) {
+      }
+    }
+  },
   allpromote: async (req, res) => {
     console.log('all promote')
 
@@ -441,6 +529,7 @@ module.exports = {
     console.log(data)
 
     let myArray = req.body.value;
+    //if graduated multiple students
     if (data.nextclass == 'GRADUATED' && myArray.length == 0) {
       console.log('Graduated null')
 
@@ -498,6 +587,7 @@ module.exports = {
 
 
     }
+    //if graduated 
     if (data.nextclass == 'GRADUATED' && myArray.length != 0) {
       console.log('Graduated not null')
 
@@ -560,7 +650,7 @@ module.exports = {
     if (data.type == 'All') {
       console.log("Promote All");
 
-      let sqlQuery = `update student set status = 'current' ,class='${data.nextclass}',classid='${data.nextclassid}' where classid ='${data.prevclassid}'`;
+      let sqlQuery = `update student set status = 'current', previousclass ='${data.prevclass}' ,class='${data.nextclass}',classid='${data.nextclassid}' where classid ='${data.prevclassid}' or class ='${data.prevclass}'`;
       try {
         pool.query(sqlQuery, (error, result) => {
           if (error) {
@@ -590,7 +680,7 @@ module.exports = {
 
       console.log("Promote Selected");
 
-      let sqlQuery = `update student set status = 'current' ,class='${data.nextclass}',classid='${data.nextclassid}' where classid ='${data.prevclassid}'`;
+      let sqlQuery = `update student set status = 'current' , previousclass ='${data.prevclass}' ,class='${data.nextclass}',classid='${data.nextclassid}' where classid ='${data.prevclassid}'`;
       try {
         pool.query(sqlQuery, async (error, result) => {
           if (error) {
@@ -744,6 +834,60 @@ module.exports = {
     const clazz = req.body.class;
     console.log(clazz);
     let sqlQuery = `select * from student where class = '${clazz}' and isActive='true' and status='current'`;
+    try {
+      pool.query(sqlQuery, (error, result) => {
+        if (error) {
+          // logger.info(
+          //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all student by class`
+          // );
+
+          return res
+            .status(500)
+            .json({ success: 0, error: "internal server error", message: error });
+        }
+
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'success', fetch all student by class`
+        // );
+
+        res.status(200).json({ success: 1, data: result });
+      });
+    }
+    catch (error) {
+    }
+  },
+  getstudentbyClass2: (req, res) => {
+    const clazz = req.body.class;
+    console.log(clazz);
+    let sqlQuery = `select * from student where class = '${clazz}' `;
+    try {
+      pool.query(sqlQuery, (error, result) => {
+        if (error) {
+          // logger.info(
+          //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all student by class`
+          // );
+
+          return res
+            .status(500)
+            .json({ success: 0, error: "internal server error", message: error });
+        }
+
+        // logger.info(
+        //   `${req.method} ${req.originalUrl},'success', fetch all student by class`
+        // );
+
+        res.status(200).json({ success: 1, data: result });
+      });
+    }
+    catch (error) {
+    }
+  },
+  getstudentbyClassCustom3: (req, res) => {
+    const clazz = req.body.class;
+
+    const section = req.body.section;
+
+    let sqlQuery = `select * from student where class = '${clazz}' and section = '${section}'`;
     try {
       pool.query(sqlQuery, (error, result) => {
         if (error) {
@@ -1367,7 +1511,7 @@ module.exports = {
             .status(500)
             .json({ success: 0, error: "internal server error", message: error });
         }
-  
+
         if (result.affectedRows != 1) {
           // logger.info(
           //   `${req.method} ${req.originalUrl}, delete user by user id: no user record found`
@@ -1377,10 +1521,10 @@ module.exports = {
             error: "delete user by id: no user record found",
           });
         }
-  
+
         // logger.info(`${req.method} ${req.originalUrl}, delete user pin by id`);
-  
-  
+
+
         let sqlQuery = `select * from deletedstudent`;
         try {
           pool.query(sqlQuery, (error, result) => {
@@ -1393,7 +1537,7 @@ module.exports = {
         }
         catch (error) {
         }
-  
+
       })
     }
     catch (error) {
@@ -1443,7 +1587,7 @@ module.exports = {
     catch (error) {
     }
   },
-  
+
   getdeletedstudent: (req, res) => {
     let sqlQuery = `select * from deletedstudent`;
     try {

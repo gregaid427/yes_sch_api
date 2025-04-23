@@ -11,14 +11,14 @@ const {
 
 } = require("./attendance.controller");
 
-router.post("/sessionrecords",  sessionrecords); 
-router.post("/createattendance",  createattendance);
-router.post("/getdetail",  getdetail);
-router.post("/gettodayrecord",  gettodayrecord);
-router.post("/daterecords", getdaterecords );
-router.post("/updatestatus",  UpdateStatus);
-router.delete("/single/:id",  deleteSinglesession);
+router.post("/sessionrecords", checkToken, sessionrecords); 
+router.post("/createattendance",checkToken,  createattendance);
+router.post("/getdetail", checkToken, getdetail);
+router.post("/gettodayrecord",checkToken,  gettodayrecord);
+router.post("/daterecords",checkToken, getdaterecords );
+router.post("/updatestatus", checkToken, UpdateStatus);
+router.delete("/single/:id",checkToken,  deleteSinglesession);
 
-router.delete("/",  deleteAllAttendance);
+router.delete("/",checkToken,  deleteAllAttendance);
 
 module.exports = router;

@@ -29,6 +29,9 @@ function getsectionByName(email, callBack) {
         console.log(error)
         callBack(error);
       }
+      console.log(error)
+
+      console.log(results)
       return callBack(null, results[0]);
     }
   );
@@ -696,7 +699,7 @@ module.exports = {
 
       }
 
-      if (result.affectedRows != 1) {
+      if (!result.affectedRows ) {
         // logger.info(
         //   `${req.method} ${req.originalUrl}, delete Class by  id: no Class record found`
         // );
@@ -705,7 +708,7 @@ module.exports = {
           error: "delete Class by id: no Class record found",
         });
       }
-      if (result.affectedRows == 1) {
+      if (result.affectedRows ) {
         // logger.info(`${req.method} ${req.originalUrl}, delete Class  by id`);
         //return table data
         let sqlQuery = `SELECT * from class where isActive='true' order by class.title`;
