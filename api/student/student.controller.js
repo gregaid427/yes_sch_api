@@ -43,7 +43,12 @@ async function register(mydata) {
       OTHER_NAMES: mydata.OTHER_NAMES ? mydata.OTHER_NAMES : "",
       LAST_NAME: mydata.LAST_NAME ? mydata.LAST_NAME : "",
       RELIGION: mydata.RELIGION ? mydata.RELIGION : "",
-      GENDER: mydata.GENDER ? mydata.GENDER : "",
+      GENDER: mydata.GENDER_M_F ? mydata.GENDER_M_F : "",
+      ARREARS: mydata.ARREARS ? mydata.ARREARS : 0,
+      SECTION: mydata.SECTION ? mydata.SECTION : 'NONE',
+      SECTIONID: mydata.SECTIONID ? mydata.SECTIONID : "-",
+
+
       DATE_OF_BIRTH_DDMMYYYY: mydata.DATE_OF_BIRTH_DDMMYYYY
         ? mydata.DATE_OF_BIRTH_DDMMYYYY
         : "",
@@ -53,8 +58,8 @@ async function register(mydata) {
       GUARDIAN_1_LAST_NAME: mydata.GUARDIAN_1_LAST_NAME
         ? mydata.GUARDIAN_1_LAST_NAME
         : "",
-      GUARDIAN_1_GENDER: mydata.GUARDIAN_1_GENDER
-        ? mydata.GUARDIAN_1_GENDER
+      GUARDIAN_1_GENDER: mydata.GUARDIAN_1_GENDER_M_F
+        ? mydata.GUARDIAN_1_GENDER_M_F
         : "",
       GUARDIAN_1_RELATION: mydata.GUARDIAN_1_RELATION
         ? mydata.GUARDIAN_1_RELATION
@@ -94,7 +99,7 @@ async function register(mydata) {
       STUDENT_PASSWORD: mydata.STUDENT_PASSWORD ? mydata.STUDENT_PASSWORD : "",
       EMAIL: mydata.EMAIL ? mydata.EMAIL : "",
       CLASS: mydata.CLASS ? mydata.CLASS : "",
-      SECTION: mydata.SECTION ? mydata.SECTION : "",
+      CLASSID: mydata.CLASSID ? mydata.CLASSID : "",
       GUARD1_PASSWORD: mydata.GUARD1_PASSWORD ? mydata.GUARD1_PASSWORD : "",
       GUARD2_PASSWORD: mydata.GUARD2_PASSWORD ? mydata.GUARD2_PASSWORD : "",
       GUARD1_USERNAME: mydata.GUARD1_USERNAME ? mydata.GUARD1_USERNAME : "",
@@ -153,9 +158,31 @@ async function register(mydata) {
     let student_id = result ? myresult() : "SD" + partId + "1110";
     let sdtID = student_id;
     let studUserId = createHash(6);
+    function studGender(gender) {
+      if (gender == '' || gender == undefined) return '-';
+
+      if (gender == 'M' || gender == 'm' || gender == 'Male' || gender == 'male') return 'Male';
+
+      if (gender == 'F' || gender == 'f' || gender == 'Female' || gender == 'female') return 'Female';
+
+      if (gender != 'F' || gender != 'f' || gender != 'Male' || gender != 'male' || gender != 'Female' || gender != 'female') return '-';
+
+
+
+
+    }
+    let gender = studGender(data.GENDER)
+    function checkarrears(val) {
+      console.log(typeof (val))
+      if (typeof (val) != 'number') return 0
+      if (typeof (val) == 'number') return val
+
+    }
+
+    let studarrears = checkarrears(data.ARREARS)
     //insert into student table
-    sqlQuery1 = `insert into student (userId,student_id,firstName,lastName,otherName,class,section,religion,dateofbirth,gender) values
-        ('${studUserId}','${sdtID}','${data.FIRST_NAME}','${data.LAST_NAME}','${data.OTHER_NAMES}','${data.CLASS}','${data.SECTION}','${data.RELIGION}','${data.DATE_OF_BIRTH_DDMMYYYY}','${data.GENDER}')`;
+    sqlQuery1 = `insert into student (userId,student_id,firstName,lastName,otherName,class,section,religion,dateofbirth,gender,accountbalance,sectionid,classid) values
+        ('${studUserId}','${sdtID}','${data.FIRST_NAME}','${data.LAST_NAME}','${data.OTHER_NAMES}','${data.CLASS}','${data.SECTION}','${data.RELIGION}','${data.DATE_OF_BIRTH_DDMMYYYY}','${gender}','${studarrears}','${data.SECTIONID}','${data.CLASSID}')`;
 
     try {
       pool.query(sqlQuery1, (error, result) => {
@@ -163,22 +190,22 @@ async function register(mydata) {
         // first create student into student table
 
         if (result.affectedRows == 1) {
-          let sqlQuery = `insert into account (student_id,createdat,createdby) values
-        ('${sdtID}','${date}','${data.CREATED_BY}')`;
+          //   let sqlQuery = `insert into account (student_id,createdat,createdby) values
+          // ('${sdtID}','${date}','${data.CREATED_BY}')`;
 
-          try {
-            pool.query(sqlQuery, (error, result) => {
-              if (error) {
-                console.log("student account error");
-                console.log(error);
-              }
-            });
-          }
-          catch (error) {
-          }
+          //   try {
+          //     pool.query(sqlQuery, (error, result) => {
+          //       if (error) {
+          //         console.log("student account error");
+          //         console.log(error);
+          //       }
+          //     });
+          //   }
+          //   catch (error) {
+          //   }
           // insert student into users table
-          let sqlQuery1 = `insert into users (email,createdAt,createdBy,pincode,role,password,userId) values
-              ('${data.EMAIL}','${date}','${data.CREATED_BY}',${userPin},'student','${hashedPass}', '${studUserId}')`;
+          let sqlQuery1 = `insert into users (email,createdAt,createdBy,pincode,role,password,userId,pass) values 
+              ('${data.EMAIL}','${date}','${data.CREATED_BY}',${userPin},'student','${hashedPass}', '${studUserId}', '${data.STUDENT_PASSWORD}')`;
 
           try {
             pool.query(sqlQuery1, (error, result) => {
@@ -192,9 +219,21 @@ async function register(mydata) {
               if (data.GUARDIAN_1_FIRST_NAME != "") {
                 console.log("fffffffffffffffffffffff");
                 let customguardian1Id = createHash(6);
+                function GuardGender(gender) {
+                  if (gender == '' || gender == undefined) return '-';
 
+                  if (gender == 'M' || gender == 'm' || gender == 'Male' || gender == 'male') return 'Male';
+
+                  if (gender == 'F' || gender == 'f' || gender == 'Female' || gender == 'female') return 'Female';
+
+                  if (gender != 'F' || gender != 'f' || gender != 'Male' || gender != 'male' || gender != 'Female' || gender != 'female') return '-';
+
+
+
+                }
+                let guardgender = GuardGender(data.GUARDIAN_1_GENDER)
                 slqQuery4 = `insert into guardian (userId,originalemail,gEmail,gSex,gLastName,gFirstName,gContact1,gContact2,gAddress,student_id,gRelation ) values
-  ('${customguardian1Id}','${data.GUARDIAN_1_EMAIL}','${data.GUARD1_USERNAME}','${data.GUARDIAN_1_GENDER}','${data.GUARDIAN_1_LAST_NAME}','${data.GUARDIAN_1_FIRST_NAME}','${data.GUARDIAN_1_CONTACT1}','${data.GUARDIAN_1_CONTACT2}','${data.GUARDIAN_1_ADDRESS}','${sdtID}','${data.GUARDIAN_1_RELATION}') `;
+  ('${customguardian1Id}','${data.GUARDIAN_1_EMAIL}','${data.GUARD1_USERNAME}','${guardgender}','${data.GUARDIAN_1_LAST_NAME}','${data.GUARDIAN_1_FIRST_NAME}','${data.GUARDIAN_1_CONTACT1}','${data.GUARDIAN_1_CONTACT2}','${data.GUARDIAN_1_ADDRESS}','${sdtID}','${data.GUARDIAN_1_RELATION}') `;
 
                 try {
                   pool.query(slqQuery4, (error, result) => {
@@ -203,8 +242,8 @@ async function register(mydata) {
                       return res.status(500).json({ success: 0, Message: error });
                     }
 
-                    let sqlQuery3 = `insert into users (userId,email,createdAt,createdBy,pincode,role,password ) values
-  ('${customguardian1Id}','${data.GUARD1_USERNAME}','${date}','${data.CREATED_BY}',${userPinGuard1},'parent','${hashedPassGuard1}')`;
+                    let sqlQuery3 = `insert into users (userId,email,createdAt,createdBy,pincode,role,password,pass ) values
+  ('${customguardian1Id}','${data.GUARD1_USERNAME}','${date}','${data.CREATED_BY}',${userPinGuard1},'parent','${hashedPassGuard1}','${data.GUARD1_PASSWORD}')`;
 
                     try {
                       pool.query(sqlQuery3, (error, result) => {
@@ -225,9 +264,21 @@ async function register(mydata) {
               }
               if (data.GUARDIAN_2_FIRST_NAME != "") {
                 let customguardian2Id = createHash(6);
+                function GuardGender(gender) {
+                  if (gender == '' || gender == undefined) return '-';
 
+                  if (gender == 'M' || gender == 'm' || gender == 'Male' || gender == 'male') return 'Male';
+
+                  if (gender == 'F' || gender == 'f' || gender == 'Female' || gender == 'female') return 'Female';
+
+                  if (gender != 'F' || gender != 'f' || gender != 'Male' || gender != 'male' || gender != 'Female' || gender != 'female') return '-';
+
+
+
+                }
+                let guardgender = GuardGender(data.GUARDIAN_1_GENDER)
                 slqQuery4 = `insert into guardian (userId,originalemail,gEmail,gSex,gLastName,gFirstName,gContact1,gContact2,gAddress,student_id,gRelation ) values
-  ('${customguardian2Id}','${data.GUARDIAN_2_EMAIL}','${data.GUARD2_USERNAME}','${data.GUARDIAN_2_GENDER}','${data.GUARDIAN_2_LAST_NAME}','${data.GUARDIAN_2_FIRST_NAME}','${data.GUARDIAN_2_CONTACT1}','${data.GUARDIAN_2_CONTACT2}','${data.GUARDIAN_2_ADDRESS}','${sdtID}','${data.GUARDIAN_2_RELATION}') `;
+  ('${customguardian2Id}','${data.GUARDIAN_2_EMAIL}','${data.GUARD2_USERNAME}','${guardgender}','${data.GUARDIAN_2_LAST_NAME}','${data.GUARDIAN_2_FIRST_NAME}','${data.GUARDIAN_2_CONTACT1}','${data.GUARDIAN_2_CONTACT2}','${data.GUARDIAN_2_ADDRESS}','${sdtID}','${data.GUARDIAN_2_RELATION}') `;
 
                 try {
                   pool.query(slqQuery4, (error, result) => {
@@ -236,8 +287,8 @@ async function register(mydata) {
                       return res.status(500).json({ success: 0, Message: error });
                     }
 
-                    let sqlQuery3 = `insert into users (userId,email,createdAt,createdBy,pincode,role,password ) values
-  ('${customguardian2Id}','${data.GUARD2_USERNAME}','${date}','${data.CREATED_BY}',${userPinGuard2},'parent','${hashedPassGuard2}')`;
+                    let sqlQuery3 = `insert into users (userId,email,createdAt,createdBy,pincode,role,password ,pass) values
+  ('${customguardian2Id}','${data.GUARD2_USERNAME}','${date}','${data.CREATED_BY}',${userPinGuard2},'parent','${hashedPassGuard2}','${data.GUARD2_PASSWORD}')`;
 
                     try {
                       pool.query(sqlQuery3, (error, result) => {
@@ -357,7 +408,7 @@ module.exports = {
               .status(500)
               .json({ success: 0, error: "internal server error", message: error });
           } else {
-            let sqlQuery = `delete from student  where student.student_id = '${data.id}'`
+            let sqlQuery = `update student set class='Graduated',classid='0',section='Graduated' where student.student_id = '${data.id}'`
             try {
               pool.query(sqlQuery, (error, result) => {
                 if (error) {
@@ -464,7 +515,8 @@ module.exports = {
                 .status(500)
                 .json({ success: 0, error: "internal server error", message: error });
             } else {
-              let sqlQuery = `delete from student  where student.student_id = '${element}'`
+                          let sqlQuery = `update student set class='Graduated',classid='0',section='Graduated' where student.student_id ='${element}'`
+
               try {
                 pool.query(sqlQuery, (error, result) => {
                   if (error) {
@@ -548,7 +600,7 @@ module.exports = {
               .status(500)
               .json({ success: 0, error: "internal server error", message: error });
           } else {
-            let sqlQuery = `delete from student  where class = '${data.prevclass}'`
+                          let sqlQuery = `update student set class='Graduated',classid='0',section='Graduated' where  class = '${data.prevclass}'`
             try {
               pool.query(sqlQuery, (error, result) => {
                 if (error) {
@@ -613,7 +665,8 @@ module.exports = {
                 .status(500)
                 .json({ success: 0, error: "internal server error", message: error });
             } else {
-              let sqlQuery = `delete from student  where student.student_id = '${element}'`
+                                        let sqlQuery = `update student set class='Graduated',classid='0',section='Graduated'   where student.student_id = '${element}'`
+
               try {
                 pool.query(sqlQuery, (error, result) => {
                   if (error) {
@@ -650,7 +703,7 @@ module.exports = {
     if (data.type == 'All') {
       console.log("Promote All");
 
-      let sqlQuery = `update student set status = 'current', previousclass ='${data.prevclass}' ,class='${data.nextclass}',classid='${data.nextclassid}' where classid ='${data.prevclassid}' or class ='${data.prevclass}'`;
+      let sqlQuery = `update student set status = 'current', previousclass ='${data.prevclass}' ,class='${data.nextclass}',classid='${data.nextclassid}' where class ='${data.prevclass}'`;
       try {
         pool.query(sqlQuery, (error, result) => {
           if (error) {
@@ -680,7 +733,7 @@ module.exports = {
 
       console.log("Promote Selected");
 
-      let sqlQuery = `update student set status = 'current' , previousclass ='${data.prevclass}' ,class='${data.nextclass}',classid='${data.nextclassid}' where classid ='${data.prevclassid}'`;
+      let sqlQuery = `update student set status = 'current' , previousclass ='${data.prevclass}' ,class='${data.nextclass}',classid='${data.nextclassid}' class ='${data.prevclass}'`;
       try {
         pool.query(sqlQuery, async (error, result) => {
           if (error) {
@@ -890,7 +943,10 @@ module.exports = {
     let sqlQuery = `select * from student where class = '${clazz}' and section = '${section}'`;
     try {
       pool.query(sqlQuery, (error, result) => {
+        console.log(sqlQuery)
+
         if (error) {
+          console.log(sqlQuery)
           // logger.info(
           //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all student by class`
           // );
@@ -966,7 +1022,7 @@ module.exports = {
             result.map((obj, index) => {
               obj.examScore = 0;
               obj.classWorkScore = 0;
-              obj.othersScore = 0;
+              // obj.othersScore = 0;
             });
             return result;
           }
@@ -1151,7 +1207,60 @@ module.exports = {
   //     res.status(200).json({ success: 1, data: result });
   //   });
   // },
+  globalsearch: async (req, res) => {
+    const data = req.body;
+    console.log(data);
+    let sqlQuery = `select * from student`
+    const promise1 = await new Promise((resolve, reject) => {
 
+      try {
+        pool.query(sqlQuery, (error, result) => {
+          if (error) {
+            // logger.info(
+            //   `${req.method} ${req.originalUrl} ${req.error}, 'server error', fetch single student biodata`
+            // );
+            console.log(error)
+            return res
+              .status(500)
+              .json({ success: 0, error: "internal server error", message: error });
+          }
+          resolve(result)
+          // logger.info(
+          //   `${req.method} ${req.originalUrl},'success', fetch single student biodata`
+          // );
+
+        });
+      }
+      catch (error) {
+      }
+    });
+    let allstudent = promise1;
+    let id = data.id.trim()
+    let split = id.split(' ')
+    let filtered = []
+    console.log(split)
+    for (const element of split) {
+      let all = allstudent
+      let filteredData = allstudent.filter(value => {
+        return (
+          value.student_id.toLowerCase().includes(element.toLowerCase()) ||
+          value.firstName.toLowerCase().includes(element.toLowerCase()) ||
+          value.lastName.toLowerCase().includes(element.toLowerCase()) ||
+          value.otherName
+            .toString()
+            .toLowerCase()
+            .includes(element.toLowerCase())
+        );
+      });
+      all = filteredData
+      filtered = all
+    }
+
+
+    let result1 = filtered
+    return res.status(200).json({ success: 1, data: result1 });
+
+  },
   getstudentbiodata: (req, res) => {
     const id = req.params.student_id;
     console.log(id);
@@ -1211,7 +1320,7 @@ module.exports = {
     const data = req.body;
 
     //  let link = process.env.SERVERLINK + "/uploadsstudent/" + data.filename;
-    let sqlQuery = `UPDATE student SET firstName = '${data.firstName}', lastName = '${data.lastName}', otherName = '${data.otherName}', class = '${data.classes}', section = '${data.section}', religion = '${data.religion}', gender = '${data.gender}', dateofbirth = '${data.dateofbirth}' WHERE student_id = '${data.studentId}' `;
+    let sqlQuery = `UPDATE student SET firstName = '${data.firstName}', lastName = '${data.lastName}', otherName = '${data.otherName}', class = '${data.classes}',cartegory = '${data.cartegory}', section = '${data.section}', religion = '${data.religion}', gender = '${data.gender}', dateofbirth = '${data.dateofbirth}' WHERE student_id = '${data.studentId}' `;
 
     try {
       pool.query(sqlQuery, (error, result) => {
@@ -1304,7 +1413,8 @@ module.exports = {
 
 
     let promise = promise1
-    let sqlQuery = `delete from student WHERE student_id = '${studentId}'`;
+                                            let sqlQuery = `update student set class='Deleted',classid='1',section='Deleted'   where student.student_id =  '${studentId}'`;
+
     try {
       pool.query(sqlQuery, async (error, result) => {
         if (error) {
@@ -1655,8 +1765,91 @@ module.exports = {
     catch (error) {
     }
   },
-  updatefeecart: (req, res) => {
+  updatefeecart: async (req, res) => {
     const data = req.body;
+console.log(data)
+  let sqlQuery1 = `update assignfeecartegory set scartegory ='${data.name}' where scartegory ='${data.formertitle}'`;
+    let sqlQuery2 = `update assignfeerecord set cartegory ='${data.name}' where cartegory ='${data.formertitle}'`;
+    let sqlQuery3 = `update deletedstudent set cartegory ='${data.name}' where cartegory ='${data.formertitle}'`;
+    let sqlQuery4 = `update graduatedstudent set cartegory ='${data.name}' where cartegory ='${data.formertitle}'`;
+    let sqlQuery5 = `update student set cartegory ='${data.name}' where cartegory ='${data.formertitle}'`;
+  
+  
+    const promise1 = await new Promise((resolve, reject) => {
+      try {
+        pool.query(sqlQuery1, (error, result) => {
+          if (error) {
+
+          }
+          console.log('class cleared')
+          resolve(true)
+        });
+      }
+      catch (error) {
+      }
+    });
+    let p1 = promise1
+
+    const promise2 = await new Promise((resolve, reject) => {
+      try {
+        pool.query(sqlQuery2, (error, result) => {
+          if (error) {
+
+          }
+          console.log('attendance cleared')
+          resolve(true)
+        });
+      }
+      catch (error) {
+      }
+    });
+    let p2 = promise2
+
+    const promise3 = await new Promise((resolve, reject) => {
+      try {
+        pool.query(sqlQuery3, (error, result) => {
+          if (error) {
+
+          }
+          console.log('assignfeecartegory cleared')
+          resolve(true)
+        });
+      }
+      catch (error) {
+      }
+    });
+    let p3 = promise3
+
+
+    const promise4 = await new Promise((resolve, reject) => {
+      try {
+        pool.query(sqlQuery4, (error, result) => {
+          if (error) {
+
+          }
+          console.log('assignfeerecord cleared')
+          resolve(true)
+        });
+      }
+      catch (error) {
+      }
+    });
+    let p4 = promise4
+
+    const promise5 = await new Promise((resolve, reject) => {
+      try {
+        pool.query(sqlQuery5, (error, result) => {
+          if (error) {
+
+          }
+          console.log('deketedstudent cleared')
+          resolve(true)
+        });
+      }
+      catch (error) {
+      }
+    });
+    let p5 = promise5
 
     let sqlQuery = `update studentscartegory set title ='${data.name}',description='${data.description}',CreatedBy='${data.createdby}',createdat='${date}' where id = ${data.id}`;
 

@@ -1,21 +1,32 @@
 const jwt = require("jsonwebtoken");
 module.exports = {
   checkToken: (req, res, next) => {
-    let token = req.get("Authorization");
-  
+    let myArray = req.get("Authorization");
+    console.log('token')
+    if (myArray == undefined) {
+      return res.json({
+        success: 0,
+        message: "Error : Invalid Token"
 
-    if (token) {
+      });
+    }
+    console.log(myArray)
+    let kk = myArray == 'Bearer undefined' ? 0 : myArray.split('{|-')
+    //myArray = myArray == undefined ? 0 :   kk[0]
+
+    myArray = myArray == 0 ? 0 : kk[0]
+    if (myArray) {
       // Remove Bearer from string
-      token = token.slice(7);
-      console.log(token)
+      myArray = myArray.slice(7);
+      console.log(myArray)
 
-      jwt.verify(token, process.env.JWT_KEY, (err, decoded) => {
+      jwt.verify(myArray, process.env.JWT_KEY, (err, decoded) => {
         if (err) {
           console.log("error")
           return res.json({
             success: 0,
-            message: "Invalid Token..."
-            
+            message: "Session Expired"
+
           });
         } else {
           req.decoded = decoded;
@@ -23,6 +34,7 @@ module.exports = {
           console.log("no error")
         }
       });
+
     } else {
       return res.json({
         success: 0,

@@ -8,19 +8,35 @@ const {
   updatesessionStatus,
   deleteAllsession,
   deleteSinglesession,
-  getActivesession
+  getActivesession,
+  backup,
+  getbackup,
+  getbackupfile,
+  updatebackup,
+  backupdelete
 
 } = require("./session.controller");
-router.get("/active",checkToken,  getActivesession);
+router.get("/active",  getActivesession);
+// router.post("/backupfile",  getbackupfile);
 
-router.post("/status/",checkToken,  updatesessionStatus); 
-router.post("/create",checkToken,  createsession);
-router.get("/fetch", checkToken, getAllsession);
+router.post("/backup",  backup);
+router.post("/updatebackup",  updatebackup);
 
-router.get("/:id",checkToken, getsessionById );
-router.patch("/", checkToken, updatesession);
-router.post("/single",checkToken,  deleteSinglesession);
+router.post("/backupdelete",  backupdelete);
 
-router.delete("/",checkToken,  deleteAllsession);
+router.get("/backup",  getbackup);
+router.post("/status/",  updatesessionStatus); 
+router.post("/create",  createsession);
+router.get("/fetch",  getAllsession);
+
+router.get("/:id", getsessionById );
+router.patch("/",  updatesession);
+router.post("/single",  deleteSinglesession);
+
+router.delete("/",  deleteAllsession);
+
+
+
+
 
 module.exports = router;

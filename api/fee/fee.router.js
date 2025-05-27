@@ -55,101 +55,113 @@ const {
   getstudentsessionrecord,
   clearlog,
   getclearlog,
+  reoderitems,
   sessionaccountrecords,
-  fetchaccountUpdate
+  fetchaccountUpdate,
+  reports,
+  defaultreports,
+  totalfeebyclassreport,
+  totalfeereport
 } = require("./fee.controller");
 
-router.get("/",checkToken, getAllfee);
-router.get("/cart",checkToken, getCart);
-router.post("/cart",checkToken, createfeeCartegory);
-router.post("/scholarship",checkToken, addScholarship);
-router.post("/listscholarship",checkToken, getScholarshipEnroll);
-
-router.post("/updatescholarship",checkToken, updatescholarship);
-
-router.post("/enrollscholarship",checkToken, enrollScholarship);
-router.post("/revokescholarship",checkToken, revokeScholarship);
-router.post("/sessionacctreport",checkToken, sessionacctreport);
-router.get("/fetchaccountclosure",checkToken, fetchaccountclosure);
+router.get("/", getAllfee);
+router.get("/cart", getCart);
+router.post("/cart", createfeeCartegory);
+router.post("/scholarship", addScholarship);
+router.post("/listscholarship", getScholarshipEnroll);
+router.post("/totalfeebyclassreport", totalfeebyclassreport);
+router.post("/totalfeereport", totalfeereport);
 
 
-router.post("/getstudentrecord",checkToken, getstudentrecord);
-router.post("/getstudentsessionrecord",checkToken, getstudentsessionrecord);
+router.post("/updatescholarship", updatescholarship);
+
+router.post("/enrollscholarship", enrollScholarship);
+router.post("/revokescholarship", revokeScholarship);
+router.post("/sessionacctreport", sessionacctreport);
+router.get("/fetchaccountclosure", fetchaccountclosure);
 
 
-router.get("/currentopenedaccount",checkToken, currentopenedaccount);
-router.get("/scholarship",checkToken, getScholarship);
-
-router.get("/paymentrecords",checkToken, getPaymentRecords);
-router.post("/clearlog",checkToken, clearlog);
-router.get("/clearlog",checkToken, getclearlog);
+router.post("/getstudentrecord", getstudentrecord);
+router.post("/getstudentsessionrecord", getstudentsessionrecord);
 
 
+router.get("/currentopenedaccount", currentopenedaccount);
+router.get("/scholarship", getScholarship);
 
-router.post("/reversefee",checkToken, reversefeepayment);
-
-router.post("/payfee",checkToken, payfee);
-router.post("/preferences",checkToken, preferences);
-router.post("/updatebal",checkToken, updatebalance);
-
-router.post("/assignfee",checkToken, assignfee);
-
-router.get("/getallassignlog",checkToken, getAllassignlog);
-router.get("/getAssignRecordAction",checkToken, getAssignRecordAction);
-
-router.post("/totalfee",checkToken, totalfee);
-
-router.get("/generatefeerecord",checkToken, generatefeerecord);
-router.post("/generatefeebystudent",checkToken, generatefeebystudent);
-router.post("/generatefeebyclass",checkToken, generatefeebyclass);
-router.post("/generatefee",checkToken, generatefeeallstudent);
-
-router.post("/resetallaccount",checkToken, resetallaccount);
-router.post("/resetclassaccount",checkToken, resetclassaccount);
-router.get("/getallassignedfeerecord",checkToken, getallassignedfeerecord);
-router.post("/cartitemdel",checkToken, cartitemdel);
-router.post("/paymentscholarshiprecords",checkToken, paymentWithscholarship);
+router.get("/paymentrecords", getPaymentRecords);
+router.post("/clearlog", clearlog);
+router.post("/reports", reports);
+router.post("/defaultreports", defaultreports);
 
 
-router.post("/feespaidsession",checkToken, feespaidsession);
-router.post("/closeaccount",checkToken, closeaccount);
-router.post("/sessionaccountrecords",checkToken, sessionaccountrecords);
-router.get("/fetchaccountUpdate",checkToken, fetchaccountUpdate);
+
+router.get("/clearlog", getclearlog);
 
 
-router.post("/getsinglebill",checkToken, getsinglebill);
-router.post("/getbulkbill",checkToken, getbulkbill);
+
+router.post("/reversefee", reversefeepayment);
+
+router.post("/payfee", payfee);
+router.post("/preferences", preferences);
+router.post("/updatebal", updatebalance);
+
+router.post("/assignfee", assignfee);
+
+router.get("/getallassignlog", getAllassignlog);
+router.get("/getAssignRecordAction", getAssignRecordAction);
+
+router.post("/totalfee", totalfee);
+
+router.get("/generatefeerecord", generatefeerecord);
+router.post("/generatefeebystudent", generatefeebystudent);
+router.post("/generatefeebyclass", generatefeebyclass);
+router.post("/generatefee", generatefeeallstudent);
+
+router.post("/resetallaccount", resetallaccount);
+router.post("/resetclassaccount", resetclassaccount);
+router.get("/getallassignedfeerecord", getallassignedfeerecord);
+router.post("/cartitemdel", cartitemdel);
+router.post("/paymentscholarshiprecords", paymentWithscholarship);
 
 
-router.get("/feerecordgroup",checkToken, getfeerecordgroup);
-router.get("/feerecord",checkToken, getfeerecord);
-router.post("/updatefeerecord",checkToken, updatefeerecord);
-router.post("/assigncustom",checkToken, getAssigncustom);
-router.get("/assignfeerecord",checkToken, getAssignfeerecord);
+router.post("/feespaidsession", feespaidsession);
+router.post("/reoderitems", reoderitems);
 
-router.post("/",checkToken, createfee);
-router.delete("/deleteallasigned",checkToken, deleteallasigned);
+router.post("/closeaccount", closeaccount);
+router.post("/sessionaccountrecords", sessionaccountrecords);
+router.get("/fetchaccountUpdate", fetchaccountUpdate);
 
 
-router.delete("/truncate",checkToken, truncateTable);
+router.post("/getsinglebill", getsinglebill);
+router.post("/getbulkbill", getbulkbill);
 
-router.get("/:fee_id",checkToken, getfeeById);
-router.patch("/item",checkToken, updatefee);
-router.patch("/feecart",checkToken, updatefeecart);
-router.post("/updatecartitem",checkToken, updatecartitem);
+
+router.get("/feerecordgroup", getfeerecordgroup);
+router.get("/feerecord", getfeerecord);
+router.post("/updatefeerecord", updatefeerecord);
+router.post("/assigncustom", getAssigncustom);
+router.get("/assignfeerecord", getAssignfeerecord);
+
+router.post("/", createfee);
+router.delete("/deleteallasigned", deleteallasigned);
+
+
+router.delete("/truncate", truncateTable);
+
+router.get("/:fee_id", getfeeById);
+router.patch("/item", updatefee);
+router.patch("/feecart", updatefeecart);
+router.post("/updatecartitem", updatecartitem);
 
 
 // router.patch("/status/:fee_id",  updatefeestatus);
-router.post("/cartegorydel",checkToken, deleteSingleCartfee);
-router.delete("/scholarship/:id",checkToken, deletescholarship);
+router.post("/cartegorydel", deleteSingleCartfee);
+router.delete("/scholarship/:id", deletescholarship);
 
-router.delete("/:id",checkToken, deleteSinglefee);
-router.post("/groupcartdel",checkToken, deletegroupFeeCart);
+router.delete("/:id", deleteSinglefee);
+router.post("/groupcartdel", deletegroupFeeCart);
 
 module.exports = router;
-
-
-
 
 
 

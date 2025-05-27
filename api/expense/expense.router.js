@@ -18,23 +18,23 @@ const {
 } = require("./expense.controller");
 
 
-router.get("/head",checkToken,  getallexpensehead);
-router.post("/custom", checkToken, getcustomexpense);
-router.post("/update",checkToken,  updateExpense);
+router.get("/head",  getallexpensehead);
+router.post("/custom",  getcustomexpense);
+router.post("/update",  updateExpense);
 
-router.get("/",checkToken,  getallexpense);
-router.post("/head",checkToken,  createExpenseHead);
-router.patch("/updatehead",checkToken,  updateExpenseHead);
+router.get("/",  getallexpense);
+router.post("/head",  createExpenseHead);
+router.patch("/updatehead",  updateExpenseHead);
 
-router.post("/",checkToken,  createExpense);
-router.get("/:expense_id",checkToken,  getExpenseById);
+router.post("/",  createExpense);
+router.get("/:expense_id",  getExpenseById);
 // router.post("/resetPassword",  resetPassword);
-router.patch("/status/:expense_id", checkToken, updateExpensestatus);
-router.delete("/truncate",checkToken,  truncateTable);
-router.delete("/head/:id",checkToken,  deleteSingleExpenseHead);
+router.patch("/status/:expense_id",  updateExpensestatus);
+router.delete("/truncate",  truncateTable);
+router.delete("/head/:id",  deleteSingleExpenseHead);
 router.delete("/:id", checkToken ,deleteSingleExpense);
 
-router.delete("/",checkToken,  deleteallexpense);
+router.delete("/",  deleteallexpense);
 
 
 module.exports = router;

@@ -297,10 +297,10 @@ console.log(value)
       console.log(data);
       const promise1 = await new Promise((resolve, reject) => {
         let sqlQuery = absent.includes(total)
-          ? `INSERT INTO attendance(groupecode, entityid,classid, name, datetaken, createdat, createdby,status, session,section) VALUES
-      ('${code}','${total}','${data.class}','${data.name}','${data.datetaken}','${date}','${data.createdby}','Present','${data.session}','${data.section}')`
-          : `INSERT INTO attendance(groupecode, entityid,classid, name, datetaken, createdat, createdby,status, session,section) VALUES
-      ('${code}','${total}','${data.class}','${data.name}','${data.datetaken}','${date}','${data.createdby}','Absent','${data.session}','${data.section}')`;
+          ? `INSERT INTO attendance(groupecode, entityid,classid, datetaken, createdat, createdby,status, session,section) VALUES
+      ('${code}','${total}','${data.class}','${data.datetaken}','${date}','${data.createdby}','Present','${data.session}','${data.section}')`
+          : `INSERT INTO attendance(groupecode, entityid,classid, datetaken, createdat, createdby,status, session,section) VALUES
+      ('${code}','${total}','${data.class}','${data.datetaken}','${date}','${data.createdby}','Absent','${data.session}','${data.section}')`;
 
        try {
         pool.query(sqlQuery, (error, result) => {

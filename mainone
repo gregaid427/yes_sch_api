@@ -1,0 +1,41 @@
+server{
+
+	listen 4080;
+	listen [::]:4080;
+
+
+	 location / {
+            root /var/www/html/mainone;
+            index  index.html index.htm;
+            
+            try_files $uri $uri/ /index.html;
+
+        }
+      
+}
+
+server{
+        listen 4081;
+        listen [::]:4081;
+
+        root /var/www/html/sms;
+        index index.html;
+	
+	location / {
+        root /var/www/html/sms;
+        try_files $uri $uri/ /index.html;
+    }
+}
+server{
+        listen 4082;
+        listen [::]:4081;
+
+        root /var/www/html/test;
+        index index.html;
+	
+	location / {
+        root /var/www/html/test;
+        try_files $uri $uri/ /index.html;
+    }
+}
+

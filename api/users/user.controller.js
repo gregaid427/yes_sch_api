@@ -280,7 +280,7 @@ module.exports = {
   setSchoolLogo: async (req, res) => {
     await uploadFile1(req, res);
     const data = JSON.parse(req.body.data);
-
+console.log(data)
     let link = process.env.SERVERLINK + "/" + data.filename;
     let sqlQuery = `update school set filename='${data.filename}',logolink = '${link}'
      where id = '1' `;
@@ -358,7 +358,7 @@ module.exports = {
             if (data.gfName1 != "") {
               let sqlQuery1 = `insert into users (email,createdAt,createdBy,pincode,role,password ,userId,pass) values
           ('${data.gemail1}','${date}','${data.createdBy}',${userPin1},'parent','${hashedPass1}','${customguardian1Id}','${gaurdian1Pass}')`;
-
+console.log(sqlQuery1)
               try {
                 pool.query(sqlQuery1, (error, result) => {
                   if (error) {
@@ -431,6 +431,7 @@ module.exports = {
             if (data.gfName2 != "") {
               let sqlQuery1 = `insert into users (email,createdAt,createdBy,pincode,role,password,userId,pass ) values
           ('${data.gemail2}','${date}','${data.createdBy}',${userPin1},'parent','${hashedPass2}','${customguardian2Id}','${gaurdian2Pass}')`;
+          console.log(sqlQuery1)
 
               try {
                 pool.query(sqlQuery1, (error, result) => {
@@ -502,6 +503,7 @@ module.exports = {
             if (data.firstName != "") {
               let sqlQuery1 = `insert into users (email,createdAt,createdBy,pincode,role,password,userId,pass) values
           ('${data.email}','${date}','${data.createdBy}',${userPin},'student','${hashedPass}','${customStudentId}','${studentPass}')`;
+          console.log(sqlQuery1)
 
               try {
                 pool.query(sqlQuery1, (error, result) => {
@@ -700,7 +702,7 @@ module.exports = {
             //insert into student table
             sqlQuery = `insert into student (userId,student_id,cartegory,cartegoryid,firstName,lastName,otherName,class,classid,section,sectionid,religion,dateofbirth,gender,preference,accountbalance) values
             ('${customStudentId}','${student_id}','${data.cartegory}','${data.cartegoryid}','${capitalizeWords(data.firstName)}','${capitalizeWords(data.lastName)}','${capitalizeWords(data.otherName)}','${data.class}','${data.classid}','${data.section}','${data.sectionid}','${capitalizeWords(data.religion)}','${data.dateofbirth}','${data.gender}','${data.preference}','${data.accountbalance}')`;
-            let sqlQueryAccount = `insert into account (student_id,cartegory,createdat,createdby) values ('${student_id}','${data.cartegory}','${date}','${data.createdBy}')`;
+            let sqlQueryAccount = ``;
 
             userCreaterStudent(
               sqlQuery,
@@ -1229,7 +1231,7 @@ let password = await bcrypt.hash(custompassword, saltRounds);
           // logger.info(
           //   `${req.method} ${req.originalUrl}, 'server error', fetch all users`
           // );
-
+console.log(error)
           return res
             .status(500)
             .json({ success: 0, error: "internal server error", message: error });
@@ -1356,7 +1358,7 @@ console.log(promise5)
       }
     });
     console.log(promise8)
-    let sqlQuery = `select * from guardian  where student_id = '${data.id}' `;
+    let sqlQuery = `select * from guardian  where student_id = '${data.id}' order by guardianId desc`;
     console.log(sqlQuery);
 
     try {

@@ -8,8 +8,8 @@ const {
 } = require("./setting.controller");
 
 
-router.post("/school",checkToken,  createSchoolInfo);
-router.post("/picture",checkToken,  setStudentPicture);
+router.post("/school",  createSchoolInfo);
+router.post("/picture",  setStudentPicture);
 // router.get("/",  getUsers);
 // router.post("/guardian",  createUserGuardian);
 // router.post("/staff",  createUserStaff);

@@ -29,11 +29,11 @@ module.exports = {
 
     checkSubjectExist(data, (err, results) => {
       if (results) {
-        console.log("Create new Exam  Exists For Academic Session");
+        console.log("Create new Subject  Exists");
         return res.status(200).json({
           success: 0,
           data: null,
-          message: "Exam Already Exist For Academic Session",
+          message: "Subject Name Already Exists",
         });
       } else {
         let code = hashgenerator(5);
@@ -133,9 +133,44 @@ module.exports = {
   }
   },
 
-  updateSubject: (req, res) => {
+  updateSubject: async (req, res) => {
     const data = req.body;
     console.log(data);
+
+
+        let sqlQuery2 = `update examresult set subject ='${data.subjectname}' where subject ='${data.formersubject}'`;
+    let sqlQuery3 = `update examresultcode set subject ='${data.subjectname}' where subject ='${data.formersubject}'`;
+
+ const promise1 = await new Promise((resolve, reject) => {
+      try {
+        pool.query(sqlQuery2, (error, result) => {
+          if (error) {
+
+          }
+          console.log('class cleared')
+          resolve(true)
+        });
+      }
+      catch (error) {
+      }
+    });
+    let p1 = promise1
+
+    const promise3 = await new Promise((resolve, reject) => {
+      try {
+        pool.query(sqlQuery3, (error, result) => {
+          if (error) {
+
+          }
+          console.log('attendance cleared')
+          resolve(true)
+        });
+      }
+      catch (error) {
+      }
+    });
+    let p2 = promise3
+
     let sqlQuery = `update subject set subjectname ='${data.subjectname}',createdat='${date}',createdby='${data.createdby}' , type='${data.type}' where id = ${data.id}`;
 
     try {
