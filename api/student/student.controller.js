@@ -5,6 +5,7 @@ const pool = require("../../config/database.js");
 // const logger = require("../../util/logger.js");
 const uploadFile = require("./upload.js");
 
+
 let date = new Date();
 date = date.toUTCString();
 let createHash = require("hash-generator");
@@ -353,7 +354,101 @@ module.exports = {
 
     }
   },
+  getdetails: async (req, res) => {
 
+    let data = req.body;
+    let myArray = []
+
+    function getresulttype(data) {
+      if (data.section == null) {
+        return `select student.student_id,student.firstName,student.otherName, student.lastName,student.gender,student.section, student.class,student.cartegory,student.cartegory from student where student.class = '${data.class}'`;
+      }
+      if (data.section == "All Sections") {
+        return `select student.student_id,student.firstName,student.otherName, student.lastName,student.gender,student.section, student.class, student.cartegory,student.cartegory from student where student.class = '${data.class}'`;
+      } else {
+        return `select student.student_id,student.firstName,student.otherName, student.lastName,student.gender,student.section, student.cartegory,student.cartegory from student where student.class = '${data.class}'  and student.section = '${data.section}'`;
+      }
+    }
+    const promise1 = await new Promise((resolve, reject) => {
+
+      try {
+        pool.query(getresulttype(data), async (error, resultz) => {
+          if (error) {
+            console.log(
+              `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all student by class`
+            );
+          } else {
+            resolve(resultz)
+          }
+        });
+      }
+      catch (error) {
+      }
+    });
+    let promise = promise1
+    if (promise.length == 0) { }
+    else {
+      let arr=[]
+
+      function update(result,myArray) {
+console.log(result)
+      //   let std = result[0].firstName +" "+ result[0].otherName +" "+ result[0].lastName;
+      //  let g1 = result[0].gFirstName +" "+ result[0].gLastName;
+      // let g2 = result[0].gFirstName +" "+ result[0].gLastName;
+
+      //  let g1c1 = result[0].gContact1 == undefined ? '-' : result[0].gContact1
+      //  let g1c2 = result[0].gContact2 == undefined ? '-' : result[0].gContact2
+      //    let g2c1 = result[1].gContact1 == undefined ? '-' : result[1].gContact1
+      //  let g2c2 = result[1].gContact2 == undefined ? '-' : result[1].gContact2
+      
+      result.length > 1 ? myArray.push({ StudentId: result[0].student_id, name: result[0].firstName +" "+ result[0].otherName +" "+ result[0].lastName, class: result[0].class, section: result[0].section, Guardianz: result[0].gFirstName ,Guardian: result[0].gLastName,  Contact1: result[0].gContact1, Contact2: result[0].gContact2, Guardian_2: result[1].gFirstName +" "+ result[1].gLastName, Contact_1: result[1].gContact1, Contact_2: result[1].gContact2, acct_bal: result[0].accountbalance }) : myArray.push({ StudentId: result[0].student_id, name: result[0].firstName +" "+ result[0].otherName +" "+ result[0].lastName, class: result[0].class, section: result[0].section, Guardianz: result[0].gFirstName, Guardian: result[0].gLastName , Contact1: result[0].gContact1, Contact2: result[0].gContact2, acct_bal: result[0].accountbalance })
+        return myArray
+      }
+
+      for (const val of promise) {
+        let sqlQuery = `select student.student_id,student.firstName,student.lastName,student.otherName,student.class,student.cartegory,student.section,student.amountpaid,student.accountbalance, guardian.* from student left join guardian on student.student_id = guardian.student_id  where student.student_id = '${val.student_id}'`;
+      //  console.log(sqlQuery)
+        const promise1 = await new Promise((resolve, reject) => {
+
+          try {
+
+            pool.query(sqlQuery, (error, result) => {
+              if (error) {
+                // logger.info(
+                //   `${req.method} ${req.originalUrl}, 'server error', fetch all users`
+                // );
+
+                return res
+                  .status(500)
+                  .json({ success: 0, error: "internal server error", message: error });
+              }
+              resolve(result)
+
+              // logger.info(
+              //   `${req.method} ${req.originalUrl},'success', fetch all users`
+              // );
+              //  let info = result[0]
+              //  console.log(result[0].gContact1 +""+ result[0].gContact2,)
+
+            });
+
+
+          } catch (error) {
+          }
+        });
+        
+         update(promise1,arr)
+
+     ///   console.log('myArrayyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy')
+
+       
+
+      }
+         res.status(200).json({ success: 1, data: arr });
+
+    }
+
+  },
   setstudentwaiting: (req, res) => {
     let sqlQuery = `update student set status = 'Awaiting Promotion'`;
     try {
@@ -515,7 +610,7 @@ module.exports = {
                 .status(500)
                 .json({ success: 0, error: "internal server error", message: error });
             } else {
-                          let sqlQuery = `update student set class='Graduated',classid='0',section='Graduated' where student.student_id ='${element}'`
+              let sqlQuery = `update student set class='Graduated',classid='0',section='Graduated' where student.student_id ='${element}'`
 
               try {
                 pool.query(sqlQuery, (error, result) => {
@@ -600,7 +695,7 @@ module.exports = {
               .status(500)
               .json({ success: 0, error: "internal server error", message: error });
           } else {
-                          let sqlQuery = `update student set class='Graduated',classid='0',section='Graduated' where  class = '${data.prevclass}'`
+            let sqlQuery = `update student set class='Graduated',classid='0',section='Graduated' where  class = '${data.prevclass}'`
             try {
               pool.query(sqlQuery, (error, result) => {
                 if (error) {
@@ -665,7 +760,7 @@ module.exports = {
                 .status(500)
                 .json({ success: 0, error: "internal server error", message: error });
             } else {
-                                        let sqlQuery = `update student set class='Graduated',classid='0',section='Graduated'   where student.student_id = '${element}'`
+              let sqlQuery = `update student set class='Graduated',classid='0',section='Graduated'   where student.student_id = '${element}'`
 
               try {
                 pool.query(sqlQuery, (error, result) => {
@@ -1413,7 +1508,7 @@ module.exports = {
 
 
     let promise = promise1
-                                            let sqlQuery = `update student set class='Deleted',classid='1',section='Deleted'   where student.student_id =  '${studentId}'`;
+    let sqlQuery = `update student set class='Deleted',classid='1',section='Deleted'   where student.student_id =  '${studentId}'`;
 
     try {
       pool.query(sqlQuery, async (error, result) => {
@@ -1767,14 +1862,14 @@ module.exports = {
   },
   updatefeecart: async (req, res) => {
     const data = req.body;
-console.log(data)
-  let sqlQuery1 = `update assignfeecartegory set scartegory ='${data.name}' where scartegory ='${data.formertitle}'`;
+    console.log(data)
+    let sqlQuery1 = `update assignfeecartegory set scartegory ='${data.name}' where scartegory ='${data.formertitle}'`;
     let sqlQuery2 = `update assignfeerecord set cartegory ='${data.name}' where cartegory ='${data.formertitle}'`;
     let sqlQuery3 = `update deletedstudent set cartegory ='${data.name}' where cartegory ='${data.formertitle}'`;
     let sqlQuery4 = `update graduatedstudent set cartegory ='${data.name}' where cartegory ='${data.formertitle}'`;
     let sqlQuery5 = `update student set cartegory ='${data.name}' where cartegory ='${data.formertitle}'`;
-  
-  
+
+
     const promise1 = await new Promise((resolve, reject) => {
       try {
         pool.query(sqlQuery1, (error, result) => {

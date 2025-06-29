@@ -27,6 +27,7 @@ const {
   getstudentbyClass2,
   getstudentbyClassCustom3,
   globalsearch,
+  getdetails,
   movestudent
 } = require("./student.controller");
 
@@ -63,6 +64,7 @@ router.post("/createstudentcart", createstudentCartegory);
 router.get("/getcart", getCart);
 router.get("/graduated", getgraduated);
 router.get("/deletedstudent", getdeletedstudent);
+router.post("/getdetails", getdetails);
 
 
 router.delete("/delgraduated", delgraduated);

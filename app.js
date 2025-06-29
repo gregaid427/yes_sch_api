@@ -109,6 +109,7 @@ app.listen(port, () => {
           //create backup file to be used
           const fileName = `${moment().format('MMMM_D_YYYY_HH-mm-A')}.sql`
 
+          const mydate = moment().format('MMMM_D_YYYY_HH-mm-A')
 
           const job = cron.schedule('0 0 28 * *', async () => {
 
@@ -148,7 +149,7 @@ app.listen(port, () => {
               process.env.SERVERLINK + "/" + fileName;
             if (backups == true) {
               let sqlQuery4 = `insert into backup (file,datetaken,mode,takenby,link) values
-         ('${fileName}','${date}','Manual','Auto','${link}')`;
+         ('${fileName}','${mydate}','Manual','Auto','${link}')`;
 
               try {
                 pool.query(sqlQuery4, (error, result) => {
@@ -209,7 +210,7 @@ app.listen(port, () => {
               process.env.SERVERLINK + "/" + fileName;
             if (backups == true) {
               let sqlQuery4 = `insert into backup (file,datetaken,mode,takenby,link) values
-            ('${fileName}','${date}','Auto','Auto','${link}')`;
+            ('${fileName}','${mydate}','Auto','Auto','${link}')`;
 
               try {
                 pool.query(sqlQuery4, (error, result) => {

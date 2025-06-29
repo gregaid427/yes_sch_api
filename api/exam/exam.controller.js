@@ -469,7 +469,7 @@ async function insertResult(
     let date = new Date();
     date = date.toLocaleDateString("en-CA");
     let sqlQuery = `insert into examresult (examid,examclasscode,subject,student_id,totalscore,examscore,classworkscore,grade,examremark,othersscore,session,examgroup,classize,exampercent,classworkpercent,otherpercent,rawclassscore,rawexamscore) values
-                                            ('${examid}','${classcode}','${subject}','${student_id}','${totalscore}','${examscore}','${classscore}','${grade}','${remarks}','0','${session}','${examgroup}','${size}','${exampercent}','${classworkpercent}','${otherpercent}','${rawclass}','${rawexam}')`;
+                                            ('${examid}','${classcode}','${subject}','${student_id}','${totalscore}','${Math.round(examscore)}','${Math.round(classscore)}','${grade}','${remarks}','0','${session}','${examgroup}','${size}','${exampercent}','${classworkpercent}','${otherpercent}','${rawclass}','${rawexam}')`;
     console.log(sqlQuery);
 
     try {
@@ -847,6 +847,111 @@ module.exports = {
     });
 
   },
+  updateremarksgroup: async (req, res) => {
+    let data = req.body;
+
+   
+        let sqlQuery1 = `update  examremarkgroup set text ='${data.text}' where id='${data.id}'`
+        try {
+          pool.query(sqlQuery1, (error, result) => {
+            if (error) {
+              // logger.info(
+              //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all Class`
+              // );
+              console.log("Error creating examgroup");
+
+              return res.status(500).json({
+                success: 0,
+                error: "internal server error",
+                message: error,
+              });
+            }
+            let sqlQuery = `SELECT * from examremarkgroup `;
+            try {
+              pool.query(sqlQuery, (error, resultz) => {
+                console.log(error);
+
+                if (error) {
+                  // logger.info(
+                  //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all Class`
+                  // );
+                  console.log(error);
+
+                  return res.status(500).json({
+                    success: 1,
+                    data: resultz,
+                  });
+                }
+
+                // logger.info(
+                //   `${req.method} ${req.originalUrl},'success', fetch all Class`
+                // );
+
+                res.status(200).json({ success: 1, data: resultz });
+              });
+            }
+            catch (error) {
+            }
+          });
+        }
+        catch (error) {
+        }
+      
+    
+  },
+  examremarksgroup: async (req, res) => {
+    let data = req.body;
+
+   
+        let sqlQuery1 = `insert into examremarkgroup (text,createdat,createdby) values
+          ('${data.title}','${date}','${data.createdby}')`;
+        try {
+          pool.query(sqlQuery1, (error, result) => {
+            if (error) {
+              // logger.info(
+              //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all Class`
+              // );
+              console.log("Error creating examgroup");
+
+              return res.status(500).json({
+                success: 0,
+                error: "internal server error",
+                message: error,
+              });
+            }
+            let sqlQuery = `SELECT * from examremarkgroup `;
+            try {
+              pool.query(sqlQuery, (error, resultz) => {
+                console.log(error);
+
+                if (error) {
+                  // logger.info(
+                  //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all Class`
+                  // );
+                  console.log(error);
+
+                  return res.status(500).json({
+                    success: 1,
+                    data: resultz,
+                  });
+                }
+
+                // logger.info(
+                //   `${req.method} ${req.originalUrl},'success', fetch all Class`
+                // );
+
+                res.status(200).json({ success: 1, data: resultz });
+              });
+            }
+            catch (error) {
+            }
+          });
+        }
+        catch (error) {
+        }
+      
+    
+  },
   createexamgroup: async (req, res) => {
     let data = req.body;
 
@@ -985,6 +1090,32 @@ module.exports = {
         }
 
         console.log(`${result} ${req.originalUrl},'success', fetch all Exam`);
+
+        res.status(200).json({ success: 1, data: result });
+      });
+    }
+    catch (error) {
+    }
+  },
+  getexamremarksgroup: async (req, res) => {
+    let sqlQuery = `SELECT * from examremarkgroup  `;
+
+    try {
+      pool.query(sqlQuery, (error, result) => {
+        console.log(error);
+
+        if (error) {
+          // logger.info(
+          //   `${req.method} ${req.originalUrl} ${error}, 'server error', fetch all Class`
+          // );
+          console.log(error);
+
+          return res
+            .status(500)
+            .json({ success: 0, error: "internal server error", message: error });
+        }
+
+        console.log(`${result} ${req.originalUrl},'success', fetch all Class`);
 
         res.status(200).json({ success: 1, data: result });
       });

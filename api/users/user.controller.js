@@ -873,7 +873,7 @@ let password = await bcrypt.hash(custompassword, saltRounds);
   },
 
   login: async (req, res) => {
-    const body = req.body;
+    const body = req?.body;
     getUserByEmail(body.email, async (err, results) => {
       console.log(results)
       console.log(err)

@@ -227,10 +227,10 @@ module.exports = {
       console.log('---------------------')
       let vv = await mysqldump({
         connection: {
-      host: process.env.MYSQL_HOST,
-      user: process.env.MYSQL_USER,
-      password: process.env.MYSQL_PASSWORD,
-      database: process.env.MYSQL_DATABASE,
+          host: process.env.MYSQL_HOST,
+          user: process.env.MYSQL_USER,
+          password: process.env.MYSQL_PASSWORD,
+          database: process.env.MYSQL_DATABASE,
         },
         dumpToFile: `./backup/${fileName}`,
       });
@@ -323,14 +323,14 @@ module.exports = {
       }
 
     }
-  
+
 
   },
   updatebackup: async (req, res) => {
     const data = req.body;
     console.log(data)
-   
-   
+
+
     if (data.mode == 'Manual') {
       let sqlQuery = `update school set backupmode = 'Manual',backupemail='${data.email}'`;
 
@@ -478,7 +478,7 @@ module.exports = {
             console.error('Error getting file stats:', err);
             return;
           }
-    
+
           if (stats.isFile()) {
             fs.unlink(filePath, err => {
               if (err) {
@@ -501,7 +501,7 @@ module.exports = {
 
 
 
-      });
+    });
 
 
 
@@ -521,7 +521,7 @@ module.exports = {
               .json({ success: 0, error: "internal server error", message: error });
           }
 
-       return res.status(200).json({ success: 1, data: []});
+          return res.status(200).json({ success: 1, data: [] });
 
         });
 
@@ -556,7 +556,7 @@ module.exports = {
           }
 
 
-resolve(result)
+          resolve(result)
         });
 
 
@@ -595,7 +595,7 @@ resolve(result)
   updatesession: async (req, res) => {
     const data = req.body;
 
-console.log(data)
+    console.log(data)
     let sqlQuery1 = `update accountclosure set oldsession ='${data.session}' where oldsession ='${data.prevclass}' `;
     let sqlQuery2 = `update attendance set session ='${data.session}' where session ='${data.prevclass}'`;
     let sqlQuery3 = `update examgroup set session ='${data.session}' where session ='${data.prevclass}'`;
@@ -607,7 +607,7 @@ console.log(data)
     let sqlQuery9 = `update sessionaccountrecords set session ='${data.session}' where session ='${data.prevclass}'`;
 
 
-            let sqlQuery10 = `update accountclosure set newsession ='${data.session}' where newsession ='${data.prevclass}' `;
+    let sqlQuery10 = `update accountclosure set newsession ='${data.session}' where newsession ='${data.prevclass}' `;
 
     console.log(sqlQuery1)
     const promise1 = await new Promise((resolve, reject) => {
@@ -751,7 +751,7 @@ console.log(data)
     });
     let p9 = promise9
 
-   const promise10 = await new Promise((resolve, reject) => {
+    const promise10 = await new Promise((resolve, reject) => {
       try {
         pool.query(sqlQuery10, (error, result) => {
           if (error) {
